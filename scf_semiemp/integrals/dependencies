@@ -1,0 +1,5 @@
+$(LIBRARY_PATH)(transmat.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
+$(LIBRARY_PATH)(oneint_semiemp.o):	$(INCDIR)/util.fh /home/soumen/nwchem/src/tools/install/include/tcgmsg.fh $(INCDIR)/sym.fh $(INCDIR)/stdio.fh $(INCDIR)/rtdb.fh $(INCDIR)/msgids.fh /home/soumen/nwchem/src/tools/install/include/mafdecls.fh /home/soumen/nwchem/src/tools/install/include/global.fh $(INCDIR)/geom.fh $(INCDIR)/errquit.fh /home/soumen/nwchem/src/tools/install/include/dra.fh 
+$(LIBRARY_PATH)(molpab.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
+$(LIBRARY_PATH)(cfunct.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
+$(LIBRARY_PATH)(auc.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 

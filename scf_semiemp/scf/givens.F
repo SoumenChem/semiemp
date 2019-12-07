@@ -1,0 +1,72 @@
+      SUBROUTINE GIVENS(A,VEC,W,N,NEIG,IBGIV)
+
+      INCLUDE '../include/param.cmn'
+      LOGICAL      IBGIV
+      DIMENSION    A(*), VEC(N,NEIG), W(*)
+      DIMENSION    E2(MXCI),IND(MXCI),RV1(MXCI),RV2(MXCI),RV3(MXCI)
+      DIMENSION    RV4(MXCI),RV6(MXCI)
+      DIMENSION    D(MXCI),E(MXCI)
+
+C
+C*IBM ---------
+C*IBM IF(IBGIV) THEN
+C
+C     FIRST REPACK THE MATRIX FOR THE IBM - IE COLUMNWISE
+C     RATHER THAN ROWWISE LOWER TRIANGULAR MATRICES.
+C
+C       CALL IBMSYM(A,VEC,N)
+C*IBM   DO 100 I = 1, N
+C*IBM      KK = I*(I-1)/2
+C*IBM      DO 100 J = 1, I
+C*IBM         JJ = J + KK
+C*IBM 100       VEC(I,J) = A(JJ)
+C
+C*IBM   KK = 0
+C*IBM   DO 200 J = 1, N
+C*IBM      DO 200 I = J, N
+C*IBM         KK = KK + 1
+C*IBM 200        A(KK) = VEC(I,J)
+C
+C*IBM   IOPT = 1
+C*IBM   CALL DSLEV(IOPT,A,W,VEC,N,N,AUX,2*N)
+C*IBM   RETURN
+C*IBM ENDIF
+C*IBM ---------
+      IF(N.LE.2) THEN
+         CALL HDIAG(N,N,-1,VEC,A)
+         II = 0
+         DO 10 I = 1, N
+            II = II + I
+            W(I) = A(II)
+   10    CONTINUE
+         RETURN
+
+      END IF
+      NV = (N*N+N)/2
+      ND = N
+C     WRITE(6,6)ND,N,NEIG
+      CALL TRED3(N,NV,A,D,E,E2)
+      CALL IMTQLV(N,D,E,E2,W,IND,IERR,RV1)
+      IF(IERR.NE.0) THEN
+         WRITE (6,9000)
+
+ 9000    FORMAT (/////,5X,'DIAGONALIZATION FAILED, IMTQLV CHECK MACHEP',
+     .          /////)
+
+         CALL ZEXIT(3)
+      END IF
+      CALL TINVIT(ND,N,D,E,E2,NEIG,W,IND,VEC,IERR,RV1,RV2,RV3,RV4,RV6)
+      IF(IERR.NE.0) THEN
+         WRITE (6,9010)
+
+ 9010    FORMAT (/////,5X,'DIAGONALIZATION FAILED, TOO MANY ITERATIONS',
+     .          /////)
+
+         CALL ZEXIT(3)
+      END IF
+      CALL TRBAK3(ND,N,NV,A,NEIG,VEC)
+      RETURN
+
+ 9020 FORMAT ('   EISPTR  ND :',I5,'  N:',I5,'  NEIG :',I5)
+
+      END

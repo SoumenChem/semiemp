@@ -1,0 +1,3 @@
+$(LIBRARY_PATH)(grad_semiemp.o):	$(INCDIR)/util.fh $(INCDIR)/sym.fh $(INCDIR)/stdio.fh $(INCDIR)/rtdb.fh $(INCDIR)/msgids.fh /home/soumen/nwchem/src/tools/install/include/mafdecls.fh /home/soumen/nwchem/src/tools/install/include/global.fh $(INCDIR)/geom.fh $(INCDIR)/dftps.fh $(INCDIR)/bas.fh 
+$(LIBRARY_PATH)(forces.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
+$(LIBRARY_PATH)(semiemp_gradient.o):	$(INCDIR)/util.fh $(INCDIR)/sym.fh $(INCDIR)/stdio.fh $(INCDIR)/rtdb.fh $(INCDIR)/msgids.fh /home/soumen/nwchem/src/tools/install/include/mafdecls.fh /home/soumen/nwchem/src/tools/install/include/global.fh $(INCDIR)/geom.fh $(INCDIR)/errquit.fh $(INCDIR)/dftps.fh $(INCDIR)/bas.fh 

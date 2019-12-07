@@ -1,0 +1,133 @@
+/home/soumen/nwchem/bin/LINUX64/depend.x -I../../nwdft/include -I../../ddscf -I/home/soumen/nwchem/src/tools/install/include > dependencies
+cp -p ../../property/prop.fh ../../property/atomdata.fh /home/soumen/nwchem/src/include
+touch include_stamp
+make[1]: Entering directory '/home/soumen/nwchem/src/semiemp/gradient'
+Compiling semiemp_gradient.F...
+Compiling grad_semiemp.F...
+grad_semiemp.F:508:0:
+
+                   DPHWGT = (ONE-FPHWGT)*DGGG
+ ^
+Warning: ‘dggg’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+grad_semiemp.F:432:0:
+
+             DGGG = - (ALPHA(I,1)+ALPHA(J,1))*GG*BOHRS*GGG
+ ^
+note: ‘dggg’ was declared here
+grad_semiemp.F:618:0:
+
+             DDELG =( DRAD*DWGT + DWGT*DDELG +  DDWGT*DELG)*EDEL
+ ^
+Warning: ‘ddwgt’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+grad_semiemp.F:491:0:
+
+                   DDWGT = ZERO
+ ^
+note: ‘ddwgt’ was declared here
+grad_semiemp.F:618:0:
+
+             DDELG =( DRAD*DWGT + DWGT*DDELG +  DDWGT*DELG)*EDEL
+ ^
+Warning: ‘ddelg’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+grad_semiemp.F:453:0:
+
+                DDELG = (FMBET*RR** (FMBET-ONE)-
+ ^
+note: ‘ddelg’ was declared here
+grad_semiemp.F:345:0:
+
+               BETAS = (BETA(IZ,IB1+1)+BETA(JZ,IB2+1))/ (TWO*EVOLT) +BBQ
+ ^
+Warning: ‘betas’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+grad_semiemp.F:346:0:
+
+               BETAP = (BETA(IZ,IB1+2)+BETA(JZ,IB2+2))/ (TWO*EVOLT) +BBQ
+ ^
+Warning: ‘betap’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+grad_semiemp.F:348:0:
+
+               BETAF = (BETA(IZ,IB1+4)+BETA(JZ,IB2+4))/ (TWO*EVOLT) +BBQ
+ ^
+Warning: ‘betaf’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+grad_semiemp.F:347:0:
+
+               BETAD = (BETA(IZ,IB1+3)+BETA(JZ,IB2+3))/ (TWO*EVOLT) +BBQ
+ ^
+Warning: ‘betad’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling dgeom.F...
+dgeom.F:90:0:
+
+       HP(2) = -S2T*S2P
+ ^
+Warning: ‘s2t’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+dgeom.F:90:0: Warning: ‘s2p’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+dgeom.F:85:0:
+
+       HT(2) = C2P*C2T
+ ^
+Warning: ‘c2t’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+dgeom.F:93:0:
+
+       HP(5) = -TWO*CT*C2P
+ ^
+Warning: ‘c2p’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling difovl.F...
+Compiling molpd1.F...
+Compiling cfund1.F...
+Compiling dcoulb.F...
+Compiling difpen.F...
+Compiling dspen.F...
+dspen.F:13:0:
+
+       IF (IDD1.EQ.1) THEN
+ ^
+Warning: ‘idd1’ is used uninitialized in this function [-Wuninitialized]
+Compiling forces.F...
+forces.F:397:0:
+
+       IF (IPRINT.GE.0.and.ga_nodeid().eq.0) THEN
+ ^
+Warning: ‘iprint’ is used uninitialized in this function [-Wuninitialized]
+forces.F:286:0:
+
+       DO 400 NIJ = 2, NDN
+ ^
+Warning: ‘ndn’ is used uninitialized in this function [-Wuninitialized]
+forces.F:288:0:
+
+             F(I) = ZERO
+ ^
+Warning: ‘nrr’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+forces.F:287:0:
+
+          DO 260 I = 1, NRR
+ ^
+note: ‘nrr’ was declared here
+forces.F:155:0:
+
+             XXX = XXX + XX*ST*CF
+ ^
+Warning: ‘xx’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+forces.F:121:0:
+
+                   XX = -F(JD)*DPEN(NGJ,NGK)*Z12(KA)
+ ^
+note: ‘xx’ was declared here
+forces.F:80:0:
+
+             KA = NU(K)
+ ^
+Warning: ‘ka’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling dcoul.F...
+dcoul.F:1:0:
+
+       FUNCTION DCOUL(K,L,R,LA,LB,AMU,BMU,NP1,NP2,NEXTA,NEXTB,FACT,ISPP)
+ ^
+Warning: ‘__result_dcoul’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+make[1]: Leaving directory '/home/soumen/nwchem/src/semiemp/gradient'
+make[1]: Entering directory '/home/soumen/nwchem/src/semiemp/gradient'
+Got lock on /home/soumen/nwchem/lib/LINUX64/libsemiemp.lock
+ar rU /home/soumen/nwchem/lib/LINUX64/libsemiemp.a semiemp_gradient.o grad_semiemp.o dgeom.o difovl.o molpd1.o cfund1.o dcoulb.o difpen.o dspen.o forces.o dcoul.o
+echo /home/soumen/nwchem/lib/LINUX64/libsemiemp.a
+/home/soumen/nwchem/lib/LINUX64/libsemiemp.a
+make[1]: Leaving directory '/home/soumen/nwchem/src/semiemp/gradient'

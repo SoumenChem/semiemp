@@ -1,0 +1,705 @@
+/home/ghosh048/nwchem/bin/LINUX64/depend.x -I../../nwdft/include -I../../ddscf -I/home/ghosh048/nwchem/src/tools/install/include > dependencies
+Making include_stamp in input
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+/home/ghosh048/nwchem/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/ghosh048/nwchem/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/ghosh048/nwchem/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+Making include_stamp in integrals
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+/home/ghosh048/nwchem/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/ghosh048/nwchem/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/ghosh048/nwchem/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+Making include_stamp in parameter
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+/home/ghosh048/nwchem/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/ghosh048/nwchem/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/ghosh048/nwchem/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+Making include_stamp in property
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+/home/ghosh048/nwchem/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/ghosh048/nwchem/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/ghosh048/nwchem/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+Making include_stamp in scf
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+/home/ghosh048/nwchem/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/ghosh048/nwchem/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/ghosh048/nwchem/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+cp -p ../../property/prop.fh ../../property/atomdata.fh /home/ghosh048/nwchem/src/include
+touch include_stamp
+Making all in input
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+Compiling semiemp_input.F...
+Compiling semiemp_init.F...
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+Got lock on /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.lock
+ar rU /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a semiemp_input.o semiemp_init.o
+echo /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+/home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/input'
+Making all in integrals
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+Compiling auc.F...
+Compiling cfunct.F...
+Compiling corone.F...
+corone.F:166:0:
+
+             ATOMKX = ATOMK
+ 
+Warning: ‘MEM[(c_char * {ref-all})&atomk]’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling molpab.F...
+Compiling oneint_semiemp.F...
+oneint_semiemp.F:390:0:
+
+              RR = R/BOHRS
+ 
+Warning: ‘bohrs’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+oneint_semiemp.F:300:0:
+
+             GO TO (100,80,90,70), MM
+ 
+Warning: ‘mm’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+oneint_semiemp.F:31:0:
+
+       integer MLP1,MM
+ 
+note: ‘mm’ was declared here
+oneint_semiemp.F:309:0:
+
+    80       EPI = ONE
+ 
+Warning: ‘epi’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+oneint_semiemp.F:305:0:
+
+             EDEL = -ONE
+ 
+Warning: ‘edel’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling ovlap.F...
+Compiling penet.F...
+Compiling twoint_semiemp.F...
+twoint_semiemp.F:91:27:
+
+               GAMMA(MN) =  F0GAM(N,L,R,PO)
+                           1
+Warning: Type mismatch in argument ‘po’ at (1); passed REAL(4) to REAL(8) [-Wargument-mismatch]
+Compiling uforma.F...
+uforma.F:109:0:
+
+       FA(IJ)=(E(6)*D(6)+E(7)*D(7))*TF*FACTOR +FA(IJ)
+ 
+Warning: ‘tf’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uforma.F:116:0:
+
+       FA(IJ)=(E(4)*D(4)+E(5)*D(5))*TD*FACTOR +FA(IJ)
+ 
+Warning: ‘td’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling uform.F...
+uform.F:773:22:
+
+             ZZZ = SPEN(RR,GAMA,GAMB,Z,GAMMA,KA,XX,II,JJ,NW,ISW1,ISPEC,KL
+                      1
+Warning: Type mismatch in argument ‘nw’ at (1); passed INTEGER(8) to REAL(8) [-Wargument-mismatch]
+uform.F:867:15:
+
+         POTI = SPEN(RR,GAMA,GAMB,Z,GAMMA,KA,XX,II,JJ,NW,ISW1,ISPEC,KL)
+               1
+Warning: Type mismatch in argument ‘nw’ at (1); passed INTEGER(8) to REAL(8) [-Wargument-mismatch]
+uform.F:896:24:
+
+      X    *Z12(KB)+ SPEN(RR,GAMA,GAMB,Z,GAMMA,KA,XX,II,JJ,NW,ISW1,ISPEC)
+                        1
+Warning: Type mismatch in argument ‘nw’ at (1); passed INTEGER(8) to REAL(8) [-Wargument-mismatch]
+uform.F:895:21:
+
+           SUMFIX=SPEN(RR,GAMA,GAMB,Z,GAMMA,KA,XX,II,JJ,NW,ISW1,ISPEC,KL)
+                     1
+Warning: Type mismatch in argument ‘nw’ at (1); passed INTEGER(8) to REAL(8) [-Wargument-mismatch]
+uform.F:904:16:
+
+           POTJ =SPEN(RR,GAMA,GAMB,Z,GAMMA,KA,XX,II,JJ,NW,ISW1,ISPEC,KL)
+                1
+Warning: Type mismatch in argument ‘nw’ at (1); passed INTEGER(8) to REAL(8) [-Wargument-mismatch]
+uform.F:1244:0:
+
+             spen = ONE/sqrt(ayw**2 + r**2)
+ 
+Warning: ‘ayw’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1244:0: Warning: ‘r’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:630:0:
+
+          IF (IPRINT.GT.0) WRITE (6,9000) I, H(IS), H(IP), H(ID)
+ 
+Warning: ‘iprint’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1246:0:
+
+             spen = ONE/(ayw + r)
+ 
+Warning: ‘ayw’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1157:0:
+
+       double precision W,S,ayw,rr,r,GAMA,GAMB,z,XX,ONE
+ 
+note: ‘ayw’ was declared here
+uform.F:1246:0:
+
+             spen = ONE/(ayw + r)
+ 
+Warning: ‘r’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1157:0:
+
+       double precision W,S,ayw,rr,r,GAMA,GAMB,z,XX,ONE
+ 
+note: ‘r’ was declared here
+uform.F:726:0:
+
+             IF (IDD1.EQ.1) THEN
+ 
+Warning: ‘idd1’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:764:0:
+
+                      XX = XX + PEN*CMU*DMU
+ 
+Warning: ‘pen’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:868:0:
+
+         XXX = BETB(KAN(NU(I)),LQNO(I)+1)/ EVOLT
+ 
+Warning: ‘evolt’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1246:0:
+
+             spen = ONE/(ayw + r)
+ 
+Warning: ‘ayw’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1157:0:
+
+       double precision W,S,ayw,rr,r,GAMA,GAMB,z,XX,ONE
+ 
+note: ‘ayw’ was declared here
+uform.F:1246:0:
+
+             spen = ONE/(ayw + r)
+ 
+Warning: ‘r’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1157:0:
+
+       double precision W,S,ayw,rr,r,GAMA,GAMB,z,XX,ONE
+ 
+note: ‘r’ was declared here
+uform.F:1246:0:
+
+             spen = ONE/(ayw + r)
+ 
+Warning: ‘ayw’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1157:0:
+
+       double precision W,S,ayw,rr,r,GAMA,GAMB,z,XX,ONE
+ 
+note: ‘ayw’ was declared here
+uform.F:1246:0:
+
+             spen = ONE/(ayw + r)
+ 
+Warning: ‘r’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:1157:0:
+
+       double precision W,S,ayw,rr,r,GAMA,GAMB,z,XX,ONE
+ 
+note: ‘r’ was declared here
+uform.F:897:0:
+
+      X    *Z12(KA)
+ 
+Warning: ‘xx’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+uform.F:90:0:
+
+          KA = KAN(I)
+ 
+Warning: ‘ka’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling transmat.F...
+Compiling nucrep.F...
+nucrep.F:11:0:
+
+       REP = ZERO
+ 
+Warning: ‘zero’ is used uninitialized in this function [-Wuninitialized]
+nucrep.F:46:0:
+
+        IF (IQMMM.EQ.IZERO.AND.IPRINT.NE.-2) WRITE (6,9010) REP
+ 
+Warning: ‘iqmmm’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+nucrep.F:46:0: Warning: ‘izero’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+nucrep.F:46:0: Warning: ‘iprint’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling core_valence_charge.F...
+core_valence_charge.F:126:0:
+
+         IF(NTYP(I).EQ.0) NTYP(I) = NTYPE
+ 
+Warning: ‘ntype’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+Got lock on /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.lock
+ar rU /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a auc.o cfunct.o corone.o molpab.o oneint_semiemp.o ovlap.o penet.o twoint_semiemp.o uforma.o uform.o transmat.o nucrep.o core_valence_charge.o
+echo /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+/home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/integrals'
+Making all in parameter
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+Compiling expjam.F...
+Compiling coul.F...
+coul.F:863:0:
+
+         F=1.0D0/((WOK+WOL)/54.42D0-0.05285D0*(AMU+BMU))
+ 
+Warning: ‘wol’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+coul.F:863:0: Warning: ‘wok’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling coulb.F...
+coulb.F:95:0:
+
+      .       CB**3/12.0D0)*EXP(-CB-CB))
+ 
+Warning: ‘d’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling beta.F...
+Compiling param.F...
+param.F:490:0:
+
+       IF(ISW3.EQ.0) THEN
+ 
+Warning: ‘isw3’ is used uninitialized in this function [-Wuninitialized]
+param.F:490:0:
+
+       IF(ISW3.EQ.0) THEN
+ 
+note: ‘isw3’ was declared here
+param.F:1847:0:
+
+       FUNCTION POIJ (L,D,FG)
+ 
+Warning: ‘__result_poij’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+param.F:1901:0:
+
+   20  IF(F1.GE.F2) THEN
+ 
+Warning: ‘f2’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+param.F:1901:0: Warning: ‘f1’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling exhuck.F...
+exhuck.F:57:0:
+
+       IF (ISW3.EQ.0) THEN
+ 
+Warning: ‘isw3’ is used uninitialized in this function [-Wuninitialized]
+exhuck.F:57:0:
+
+       IF (ISW3.EQ.0) THEN
+ 
+note: ‘isw3’ was declared here
+exhuck.F:133:0:
+
+             WCOR(I) = HTEMP
+ 
+Warning: ‘htemp’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+exhuck.F:133:0:
+
+             WCOR(I) = HTEMP
+ 
+note: ‘htemp’ was declared here
+exhuck.F:228:0:
+
+             H(IJ) = X*H(IJ)
+ 
+Warning: ‘x’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+exhuck.F:212:0:
+
+                CALL HAM1(KA,KL,MA,ML,X,HSP,HSD,HSF,ISW1)
+ 
+note: ‘x’ was declared here
+Compiling fetch.F...
+Compiling fahuck.F...
+Compiling improv.F...
+Compiling gform.F...
+Compiling gforma.F...
+Compiling gformb.F...
+Compiling gformc.F...
+Compiling gformd.F...
+Compiling gforme.F...
+Compiling gformam.F...
+gformam.F:237:15:
+
+       PARAMETER  EVOLT    = 2.72113961D1
+               1
+Warning: Legacy Extension: PARAMETER without '()' at (1)
+Compiling paramc.F...
+Compiling atom_data.F...
+atom_data.F:49:16:
+
+       DATA AOS/' S      ',' P(X)   ',' P(Y)   ',' P(Z)   ',' D(Z2)  ',
+                1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:49:27:
+
+       DATA AOS/' S      ',' P(X)   ',' P(Y)   ',' P(Z)   ',' D(Z2)  ',
+                           1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:49:38:
+
+       DATA AOS/' S      ',' P(X)   ',' P(Y)   ',' P(Z)   ',' D(Z2)  ',
+                                      1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:49:49:
+
+       DATA AOS/' S      ',' P(X)   ',' P(Y)   ',' P(Z)   ',' D(Z2)  ',
+                                                 1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:49:60:
+
+       DATA AOS/' S      ',' P(X)   ',' P(Y)   ',' P(Z)   ',' D(Z2)  ',
+                                                            1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:50:16:
+
+      1         'D(X2-Y2)',' D(XY)  ',' D(XZ)  ',' D(YZ)  ',' F(Z3)  ',
+                1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:50:27:
+
+      1         'D(X2-Y2)',' D(XY)  ',' D(XZ)  ',' D(YZ)  ',' F(Z3)  ',
+                           1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:50:38:
+
+      1         'D(X2-Y2)',' D(XY)  ',' D(XZ)  ',' D(YZ)  ',' F(Z3)  ',
+                                      1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:50:49:
+
+      1         'D(X2-Y2)',' D(XY)  ',' D(XZ)  ',' D(YZ)  ',' F(Z3)  ',
+                                                 1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:50:60:
+
+      1         'D(X2-Y2)',' D(XY)  ',' D(XZ)  ',' D(YZ)  ',' F(Z3)  ',
+                                                            1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:51:16:
+
+      2         ' F(XZ2) ',' F(YZ2) ','Z(X2-Y2)',' F(XYZ) ',' X3-3XY2',
+                1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:51:27:
+
+      2         ' F(XZ2) ',' F(YZ2) ','Z(X2-Y2)',' F(XYZ) ',' X3-3XY2',
+                           1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:51:38:
+
+      2         ' F(XZ2) ',' F(YZ2) ','Z(X2-Y2)',' F(XYZ) ',' X3-3XY2',
+                                      1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:51:49:
+
+      2         ' F(XZ2) ',' F(YZ2) ','Z(X2-Y2)',' F(XYZ) ',' X3-3XY2',
+                                                 1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:51:60:
+
+      2         ' F(XZ2) ',' F(YZ2) ','Z(X2-Y2)',' F(XYZ) ',' X3-3XY2',
+                                                            1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+atom_data.F:52:16:
+
+      3         ' 3YX2-Y3'/
+                1
+Warning: Initialization string at (1) was truncated to fit the variable (1/8)
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+Got lock on /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.lock
+ar rU /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a expjam.o coul.o coulb.o beta.o param.o exhuck.o fetch.o fahuck.o improv.o gform.o gforma.o gformb.o gformc.o gformd.o gforme.o gformam.o paramc.o atom_data.o improv.o
+echo /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+/home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/parameter'
+Making all in property
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+Compiling dipole.F...
+dipole.F:178:0:
+
+       NPROP=IO_MOMENTS
+ 
+Warning: ‘io_moments’ is used uninitialized in this function [-Wuninitialized]
+dipole.F:178:0:
+
+       NPROP=IO_MOMENTS
+ 
+note: ‘io_moments’ was declared here
+dipole.F:486:0:
+
+                   DDX = DDX + DX*ABC
+ 
+Warning: ‘dx’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+dipole.F:486:0:
+
+                   DDX = DDX + DX*ABC
+ 
+note: ‘dx’ was declared here
+dipole.F:487:0:
+
+                   DDY = DDY + DY*ABC
+ 
+Warning: ‘dy’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+dipole.F:487:0:
+
+                   DDY = DDY + DY*ABC
+ 
+note: ‘dy’ was declared here
+dipole.F:488:0:
+
+                   DDZ = DDZ + DZ*ABC
+ 
+Warning: ‘dz’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+dipole.F:488:0:
+
+                   DDZ = DDZ + DZ*ABC
+ 
+note: ‘dz’ was declared here
+Compiling grndip.F...
+grndip.F:65:0:
+
+       NPROP = IO_MOMENTS
+ 
+Warning: ‘io_moments’ is used uninitialized in this function [-Wuninitialized]
+Compiling purvis.F...
+purvis.F:519:0:
+
+       IF (IPRINT.GE.0.AND.ga_nodeid().eq.0) THEN
+ 
+Warning: ‘iprint’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling bondor.F...
+bondor.F:58:0:
+
+       IF (ISWANN .EQ. IZERO) THEN
+ 
+Warning: ‘izero’ is used uninitialized in this function [-Wuninitialized]
+bondor.F:58:0:
+
+       IF (ISWANN .EQ. IZERO) THEN
+ 
+note: ‘izero’ was declared here
+Compiling semiemp_mo_print.F...
+semiemp_mo_print.F:104:0:
+
+                if (abs(dbl_mb(k_vecs+j)).ge.cur_thresh) then
+ 
+Warning: ‘thresh’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+semiemp_mo_print.F:21:0:
+
+       double precision thresh   ! [input] Print coeffs with absval >= thresh
+ 
+note: ‘thresh’ was declared here
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+Got lock on /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.lock
+ar rU /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a dipole.o grndip.o purvis.o bondor.o semiemp_mo_print.o
+echo /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+/home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/property'
+Making all in scf
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+Compiling assign.F...
+assign.F:316:0:
+
+                  IF (ISW1.EQ.0) GO TO 300
+ 
+Warning: ‘isw1’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+assign.F:316:0:
+
+                  IF (ISW1.EQ.0) GO TO 300
+ 
+note: ‘isw1’ was declared here
+assign.F:450:0:
+
+       IF ((ISW3.EQ.0 .OR. IXS.EQ.1).and.ga_nodeid().eq.0) THEN
+ 
+Warning: ‘ixs’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+assign.F:450:0:
+
+       IF ((ISW3.EQ.0 .OR. IXS.EQ.1).and.ga_nodeid().eq.0) THEN
+ 
+note: ‘ixs’ was declared here
+Compiling densit.F...
+Compiling diagr.F...
+Compiling diagu.F...
+diagu.F:80:0:
+
+       IPUN1 = IPUN + 1
+ 
+Warning: ‘ipun’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+Compiling fillf.F...
+Compiling fillfu.F...
+fillfu.F:258:0:
+
+       IF(ISW1.EQ.8) THEN
+ 
+Warning: ‘isw1’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+fillfu.F:258:0:
+
+       IF(ISW1.EQ.8) THEN
+ 
+note: ‘isw1’ was declared here
+Compiling fock.F...
+Compiling rear.F...
+Compiling scfchk.F...
+scfchk.F:315:0:
+
+          IF (ISW3.EQ.0 .AND. IPRINT.GE.0) THEN
+ 
+Warning: ‘iprint’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+scfchk.F:315:0:
+
+          IF (ISW3.EQ.0 .AND. IPRINT.GE.0) THEN
+ 
+note: ‘iprint’ was declared here
+scfchk.F:266:0:
+
+             XBACK1(I,IOP) = 0.0D0
+ 
+Warning: ‘k’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+scfchk.F:100:0:
+
+          K = NU(I)
+ 
+note: ‘k’ was declared here
+Compiling scfit.F...
+scfit.F:81:22:
+
+       NEWROT_CALLED = .FALSE.
+                      1
+Warning: Extension: Conversion from LOGICAL(8) to INTEGER(8) at (1)
+scfit.F:262:0:
+
+       IF (IQMMM .EQ. IZERO.AND.IPRINT.NE.-2 .and.ga_nodeid().eq.0)
+ 
+Warning: ‘iqmmm’ is used uninitialized in this function [-Wuninitialized]
+scfit.F:262:0:
+
+       IF (IQMMM .EQ. IZERO.AND.IPRINT.NE.-2 .and.ga_nodeid().eq.0)
+ 
+note: ‘iqmmm’ was declared here
+scfit.F:262:0:
+
+       IF (IQMMM .EQ. IZERO.AND.IPRINT.NE.-2 .and.ga_nodeid().eq.0)
+ 
+Warning: ‘iprint’ is used uninitialized in this function [-Wuninitialized]
+scfit.F:262:0:
+
+       IF (IQMMM .EQ. IZERO.AND.IPRINT.NE.-2 .and.ga_nodeid().eq.0)
+ 
+note: ‘iprint’ was declared here
+Compiling scons.F...
+scons.F:104:0:
+
+       IF (IQMMM .EQ. IZERO.AND.ga_nodeid().eq.0) THEN
+ 
+Warning: ‘iqmmm’ is used uninitialized in this function [-Wuninitialized]
+scons.F:104:0:
+
+       IF (IQMMM .EQ. IZERO.AND.ga_nodeid().eq.0) THEN
+ 
+note: ‘iqmmm’ was declared here
+Compiling semiemp_energy.F...
+semiemp_energy.F:1067:4:
+
+semiemp_energy.F:1043:72:
+
+         GO TO 20
+                                                                        2
+semiemp_energy.F:1067:4:
+
+   20   CONTINUE
+    1
+Warning: Legacy Extension: Label at (1) is not in the same block as the GOTO statement at (2)
+semiemp_energy.F:278:0:
+
+       if (.not. geom_cart_get2(geom, nat, Byte_MB(itags),
+ 
+Warning: ‘itags’ is used uninitialized in this function [-Wuninitialized]
+semiemp_energy.F:85:0:
+
+       integer ltags, itags
+ 
+note: ‘itags’ was declared here
+semiemp_energy.F:984:0:
+
+       total_wall = total_wall + util_wallsec()
+ 
+Warning: ‘total_wall’ is used uninitialized in this function [-Wuninitialized]
+semiemp_energy.F:38:0:
+
+       double precision total_wall, total_cpu
+ 
+note: ‘total_wall’ was declared here
+semiemp_energy.F:985:0:
+
+       total_cpu  = total_cpu  + util_cpusec()
+ 
+Warning: ‘total_cpu’ is used uninitialized in this function [-Wuninitialized]
+semiemp_energy.F:38:0:
+
+       double precision total_wall, total_cpu
+ 
+note: ‘total_cpu’ was declared here
+Compiling semiemp.F...
+Compiling sing.F...
+sing.F:134:0:
+
+        IF(IDD2.EQ.1) THEN
+ 
+Warning: ‘idd2’ is used uninitialized in this function [-Wuninitialized]
+sing.F:134:0:
+
+        IF(IDD2.EQ.1) THEN
+ 
+note: ‘idd2’ was declared here
+Compiling symorth.F...
+Compiling trnmat.F...
+trnmat.F:72:72:
+
+          CALL HDIAG(N,N,-1,VEC,A,QQ,NIN)
+                                                                        1
+Warning: Missing actual argument for argument ‘iq’ at (1)
+trnmat.F:793:0:
+
+             RV1(I-1) = U
+ 
+Warning: ‘u’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+trnmat.F:793:0:
+
+             RV1(I-1) = U
+ 
+Warning: ‘u’ may be used uninitialized in this function [-Wmaybe-uninitialized]
+trnmat.F:646:0:
+
+       DOUBLE PRECISION U, V, UK, XU, X0, X1, EPS2, EPS3, EPS4, NORM
+ 
+note: ‘u’ was declared here
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+make[2]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+Got lock on /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.lock
+ar rU /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a assign.o densit.o diagr.o diagu.o fillf.o fillfu.o fock.o rear.o scfchk.o scfit.o scons.o semiemp_energy.o semiemp.o sing.o symorth.o trnmat.o
+echo /home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+/home/ghosh048/nwchem/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp/scf'
+make[1]: Entering directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp'
+make[1]: Leaving directory '/home/ghosh048/nwchem/src/semiemp/scf_semiemp'

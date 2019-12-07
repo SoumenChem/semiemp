@@ -1,0 +1,106 @@
+Making include_stamp in input
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+/home/soumen/nwchem-master/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/soumen/nwchem-master/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/soumen/nwchem-master/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+Making include_stamp in propagator
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+/home/soumen/nwchem-master/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/soumen/nwchem-master/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/soumen/nwchem-master/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+Making include_stamp in properties
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+/home/soumen/nwchem-master/bin/LINUX64/depend.x -I../../../nwdft/include -I../../../ddscf -I/home/soumen/nwchem-master/src/tools/install/include > dependencies
+cp -p ../../../property/prop.fh ../../../property/atomdata.fh /home/soumen/nwchem-master/src/include
+touch include_stamp
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+cp -p ../../property/prop.fh ../../property/atomdata.fh /home/soumen/nwchem-master/src/include
+touch include_stamp
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp'
+Compiling eh_state.F...
+Compiling ga_extra.F...
+Compiling ga_fillf.F...
+Compiling rt_semiemp.F...
+Compiling rt_semiemp_restart.F...
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp'
+Making all in input
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+make[2]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+Compiling rt_semiemp_cs_init.F...
+Compiling rt_semiemp_input_excite.F...
+rt_semiemp_input_excite.F:223:55:
+
+       call rt_semiemp_excite_rtdb_put (rtdb, nexcites, excite)
+                                                       1
+Warning: Type mismatch in argument ‘excite’ at (1); passed TYPE(rt_excite_t) to TYPE(rt_excite_t)
+Compiling rt_semiemp_input.F...
+Compiling rt_semiemp_input_field.F...
+rt_semiemp_input_field.F:188:53:
+
+             call rt_semiemp_field_rtdb_get (rtdb, i, prev_field)
+                                                     1
+Warning: Type mismatch in argument ‘field’ at (1); passed TYPE(rt_field_t) to TYPE(rt_field_t)
+rt_semiemp_input_field.F:353:53:
+
+       call rt_semiemp_field_rtdb_put (rtdb, nfields, this_field)
+                                                     1
+Warning: Type mismatch in argument ‘field’ at (1); passed TYPE(rt_field_t) to TYPE(rt_field_t)
+Compiling rt_semiemp_input_print.F...
+Compiling rt_semiemp_input_put_defaults.F...
+Compiling rt_semiemp_os_init.F...
+Compiling task_rt_semiemp.F...
+make[2]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+make[2]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+Got lock on /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.lock
+ar rU /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a rt_semiemp_cs_init.o rt_semiemp_input_excite.o rt_semiemp_input.o rt_semiemp_input_field.o rt_semiemp_input_print.o rt_semiemp_input_put_defaults.o rt_semiemp_os_init.o task_rt_semiemp.o
+ar: creating /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+echo /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+/home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/input'
+Making all in propagator
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+make[2]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+Compiling prop_chebyshev.F...
+Compiling prop_os_superoperator.F...
+Compiling prop_semiemp_euler.F...
+Compiling prop_superoperator.F...
+Compiling rt_semiemp_cs_cheb.F...
+Compiling rt_semiemp_cs_prop.F...
+Compiling rt_semiemp_os_cheb.F...
+Compiling rt_semiemp_os_prop.F...
+Compiling semiemp_cs_fock_build.F...
+Compiling semiemp_os_fock_build.F...
+make[2]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+make[2]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+Got lock on /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.lock
+ar rU /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a prop_chebyshev.o prop_os_superoperator.o prop_semiemp_euler.o prop_superoperator.o rt_semiemp_cs_cheb.o rt_semiemp_cs_prop.o rt_semiemp_os_cheb.o rt_semiemp_os_prop.o semiemp_cs_fock_build.o semiemp_os_fock_build.o
+echo /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+/home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/propagator'
+Making all in properties
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+make[2]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+Compiling rt_semiemp_avgs2.F...
+Compiling rt_semiemp_charge.F...
+Compiling rt_semiemp_dipole.F...
+Compiling rt_semiemp_moocc.F...
+Compiling rt_semiemp_mullpop.F...
+Compiling rt_semiemp_output.F...
+make[2]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+make[2]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+Got lock on /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.lock
+ar rU /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a rt_semiemp_avgs2.o rt_semiemp_charge.o rt_semiemp_dipole.o rt_semiemp_moocc.o rt_semiemp_mullpop.o rt_semiemp_output.o
+echo /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+/home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+make[2]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp/properties'
+make[1]: Entering directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp'
+Got lock on /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.lock
+ar rU /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a eh_state.o ga_extra.o ga_fillf.o rt_semiemp.o rt_semiemp_restart.o
+echo /home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+/home/soumen/nwchem-master/lib/LINUX64/libsemiemp.a
+make[1]: Leaving directory '/home/soumen/nwchem-master/src/semiemp/rt_semiemp'
