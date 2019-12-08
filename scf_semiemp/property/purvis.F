@@ -265,7 +265,7 @@ C 260 CONTINUE
 c     IBGIV = .TRUE.
       call diag_para(Dbl_MB(iH),LC*(LC+1)/2,LC,Dbl_MB(iBB),
      1 dbl_mb(iCEIG))
-      if (ga_nodeid().eq.0) write(6,*)"here 1"
+c     if (ga_nodeid().eq.0) write(6,*)"here 1"
 c     CALL GIVENS(H,BB,CEIG,LC,LC,IBGIV,QQ,NIN)
 C     SYMORB WOULD NEED NUC, NWC, NFIRST AND OTHERS
 
@@ -374,7 +374,7 @@ C     independent from each other. Must check this later.
 C     THE EXPONENTS ARE NOW BEING FILLED IN. ALPC(I)
 C
 C     EXCEPT WHERE NOTED THESE ARE SLATER EXPONENTS.
-      write(6,*)"i am in defcor"
+c     write(6,*)"i am in defcor"
       LC = 0
 C
       DO 1100 I = 1, NA
