@@ -740,16 +740,13 @@ c        write(6,*)"NIN",INT_MB(iNIN+I)
      2   Int_MB(ipqn),Int_MB(iban),int_mb(ilqm),INT_MB(infirst),ISW1,
      3   INT_MB(intype),byte_mb(iaso),byte_mb(iatom),int_mb(iatnum))
 
-       write(6,*)"i am here"
        if (.not.rtdb_put(rtdb,'semiemp:aso',mt_byte,nbf*8,
      1  byte_mb(iaso)))
      1  call errquit('semiemp: failed to write ASO',0, RTDB_ERR)
 
-       write(6,*)"i am here 0"
        if (.not.rtdb_put(rtdb,'semiemp:atom',mt_byte,nbf*8,
      1  byte_mb(iatom)))
      1  call errquit('semiemp: failed to write ATOM',0, RTDB_ERR)
-       write(6,*)"i am here 1"
        if (.not.rtdb_put(rtdb,'semiemp:numbf',mt_int,nat,int_mb(inb)))
      1  call errquit('semiemp: failed to write numbf',0, RTDB_ERR)
 
@@ -1070,7 +1067,6 @@ C-------------------------------------------------------------------------------
      A Dbl_MB(igrad),inttyp,NDN)
  
 c      call grad_force(rtdb,nbf,geom)
-       write(6,*)"i am at the end"
 c      CALL sym_grad_symmetrize(geom,dbl_mb(iFZ))
 c      do i = 0 , nrr-1
 c       write(6,*)"FZ",Dbl_MB(idipz+i)

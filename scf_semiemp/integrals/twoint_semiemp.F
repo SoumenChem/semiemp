@@ -187,7 +187,7 @@ c     INCLUDE '../include/am1.cmn'
 C     R ENTERS IN ANGS
 C     *
 C *** INITIALIZATION.
-      write(6,*)"i am in fogam"
+c     write(6,*)"i am in fogam"
       RAU = R!/BOHRS
       R2     = RAU*RAU
       AEE    = (PO(1,NI)+PO(1,NJ))**2

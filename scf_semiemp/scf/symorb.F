@@ -74,7 +74,7 @@ C-----------------------------------------------------------------------
 C
 C
 C
-      write(6,*)"i am in symorb"
+c     write(6,*)"i am in symorb"
       IFLAG = ITSYM
       MB = NORB 
 C     WRITE(6,*) ' VECTORS IN SYMORB'

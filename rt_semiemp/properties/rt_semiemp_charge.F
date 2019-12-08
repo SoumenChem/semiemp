@@ -29,7 +29,7 @@ C#include "cdft.fh"
 
        me = ga_nodeid()
        
-        write(6,*)"i am in charge"!,(KAN(I),I=1,na)
+c       write(6,*)"i am in charge"!,(KAN(I),I=1,na)
 
       if (.not. ga_create(mt_dbl, nb, nb, "Re[Dens]", 0, 0, g_densre))
      $     call errquit ("couldnt create g_densre", 0, GA_ERR)
