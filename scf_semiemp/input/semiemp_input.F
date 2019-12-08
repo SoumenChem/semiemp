@@ -37,8 +37,8 @@ c
       logical  geom_rtdb_ncent  !for getting number of atoms
       integer nat               !number of atoms
       
-      if (ga_nodeid().eq.0)
-     &     write(luout,*) "building semiemp"
+c     if (ga_nodeid().eq.0)
+c    &     write(luout,*) "building semiemp"
 c
 c      Create geometry object and load in geometry from rtdb
 c      if (.not.geom_create(geom,'geometry'))
