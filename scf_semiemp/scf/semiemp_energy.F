@@ -152,8 +152,8 @@ c     logical  geom_cart_get2 !for getting coordinate and atomic number
 c    
        total_cpu = 0.0d0
        total_wall = 0.0d0 
-       if (ga_nodeid().eq.0) 
-     .      write(luout,*) " i am in semiemp_energy"
+c      if (ga_nodeid().eq.0) 
+c    .      write(luout,*) " i am in semiemp_energy"
 c
        semiemp_energy=.true. 
 c
