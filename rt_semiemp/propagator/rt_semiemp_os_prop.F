@@ -375,6 +375,7 @@ C      g_zdens_ao)
 
       call ga_add(z1,g_ztemp1,z1,g_ztemp2,g_zscr)
 
+c     call ga_print(g_zwa)
 
       call rt_semiemp_dipole(rtdb,g_zscr,RAD,KAN,NA,CO,NU,NW,NP,NIN,
      1 ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,Dbl_MB(idipx),Dbl_MB(idipy),
@@ -387,6 +388,7 @@ C      g_zdens_ao)
      1 GPARAMA,GPARAMB,n,g_zwa,g_zwb,dt,SUMELEL,QQ,LABI,LABJ,LABK,
      1 LABL,LL,NIN,Q,NG,GAMMA,g_zfpa,g_zfpb,g_zcheba,g_zchebb)
 
+c     call ga_print(g_zcheba)
       call ga_zero(g_ztemp1)
       call ga_zero(g_ztemp2)
       call ga_copy(g_zcheba,g_zwa)

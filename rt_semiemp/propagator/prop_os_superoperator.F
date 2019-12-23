@@ -302,8 +302,8 @@ c     write(6,*)"in superoperator_os"
       call ga_norm_infinity(g_zwb,Bnorm)
       call ga_copy(g_zwb,g_zwb_scale)
 
-      alpha_scale = Anorm*1D-3
-      beta_scale = Bnorm*1D-3
+      alpha_scale = 1.0D0
+      beta_scale = 1.0D0
 
 c     write(6,*)"Anorm,Bnorm",Anorm,Bnorm
 c     write(6,*)"alpha_scale,beta_scale", alpha_scale,beta_scale
@@ -352,7 +352,7 @@ c     call ga_print(g_zcomm)
            
       call ga_add(z1,g_zcomm,-z1,g_zfpa,g_zsupera)
 
-      call ga_scale(g_zsupera,-zi*Abeta*alpha_scale)
+      call ga_scale(g_zsupera,-zi/(Abeta*alpha_scale))
 
 c     call ga_print(g_zsupera)
       call ga_zero(g_ztemp1)
@@ -372,7 +372,7 @@ c     call ga_print(g_ztemp2)
 
 c     call ga_print(g_zcomm)
       call ga_add(z1,g_zcomm,-z1,g_zfpb,g_zsuperb)
-      call ga_scale(g_zsuperb,-zi*Bbeta*beta_scale) 
+      call ga_scale(g_zsuperb,-zi/(Bbeta*beta_scale)) 
 
 c     call ga_print(g_zsuperb)
 c     total_wall = total_wall +  util_wallsec()
