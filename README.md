@@ -12,7 +12,7 @@ To set up the code-
 
 (iv) Copy util_module_avail.F from "nwchem/src/semiemp/setup" folder to "nwchem/src/util" folder.
 
-(v) Compile nwchem.
+(v) Compile nwchem. (It might be necessary to run "make realclean" before compiling the code.
 
 
 
