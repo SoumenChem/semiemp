@@ -41,6 +41,7 @@ c#include "cdft.fh"
       double precision TEST !convergence criteria
       double precision bessfun !bessel function
       double precision total_wall, total_cpu
+      logical, external ::mat_is_same_semiemp
       LOGICAL CONVERGED,status
       DATA TEST /1.0D-10/
       CONVERGED = .FALSE.
@@ -122,7 +123,7 @@ c     end if
 
       if (IT.eq.2) GO TO 20
 
-       if ( mat_is_same (g_zcheb_n_1,g_zcheb_n,test)) then
+       if ( mat_is_same_semiemp (g_zcheb_n_1,g_zcheb_n,test)) then
         CONVERGED = .true.
        ELSE
         CONVERGED = .false.

@@ -162,6 +162,8 @@ c#include "cdft.fh"
       double precision alpha !scaling factor
       double precision bessfun !bessel function
 c     double complex zi
+      logical, external ::mat_is_same_semiemp
+
       LOGICAL CONVERGED,status
       DATA TEST /1.0D-10/
 c     DATA TEST/1.0D-23/
@@ -221,7 +223,7 @@ c      call ga_print(g_zcheb_n)
 c     call ga_print(g_zcheb)
       if (IT.eq.2) GO TO 20
 
-       if ( mat_is_same (g_zcheb_n_1,g_zcheb_n,test)) then
+       if ( mat_is_same_semiemp (g_zcheb_n_1,g_zcheb_n,test)) then
         CONVERGED = .true.
        ELSE
         CONVERGED = .false.

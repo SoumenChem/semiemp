@@ -127,8 +127,8 @@ C     == Initialization ==
       print_s2 = .false.
       
 
-c     if (me.eq.0) call util_print_centered (luout,
-c    $     "Closed shell propagation", 40, .true.)
+      if (me.eq.0) call util_print_centered (luout,
+     $     "Closed shell propagation", 40, .true.)
       
 
       

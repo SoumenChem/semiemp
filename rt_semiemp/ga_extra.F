@@ -287,4 +287,109 @@ C-------------------------------------------------------------------------------
       return
       end
 
+C====================================================================
+C
+C     Compares two matricies to see if they differ.
+C     Works for mixed real and/or complex matricies.
+C
+      logical function mat_is_same_semiemp (g_a, g_b, tol)
+      implicit none
+
+#include "global.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "errquit.fh"
+
+C     == Inputs ==
+      integer, intent(in)          :: g_a, g_b
+      double precision, intent(in) :: tol
+
+
+C     == Variables ==
+      integer dtype_a, dtype_b
+      integer n1_a, n2_a, n1_b, n2_b
+      double precision norm
+      logical same
+      integer g_tmp
+      integer me
+
+C     == Parameters ==
+      character(*), parameter      :: pname = "mat_is_same: "
+      double complex, parameter    :: zone = (1d0, 0d0)
+      double complex, parameter    :: nzone = (-1d0, 0d0)
+      
+C     == External ==
+      double precision, external :: mat_norm
+
+      me = ga_nodeid ()
+      
+C     Check GAs and get their data types
+      call ga_check_handle (g_a, "1st arg of "//pname//"not valid GA")
+      call ga_check_handle (g_b, "2nd arg of "//pname//"not valid GA")
+
+      call ga_inquire (g_a, dtype_a, n1_a, n2_a)
+      call ga_inquire (g_b, dtype_b, n1_b, n2_b)
+
+      if ((n1_a .ne. n1_b).or.(n2_a .ne. n2_b))
+     $     call errquit (pname//"mats must be same size", 0, 0)
+
+      same = .false.
+      
+      if (dtype_a .eq. dtype_b)  then !they are the same data type
+
+         if (dtype_a .eq. mt_dbl) then ! real data
+            if (.not. ga_create (mt_dbl,n1_a,n1_a, "tmp", 0, 0, g_tmp))
+     $           call errquit (pname//"cannot create g_tmp",0,0)
+
+            call ga_zero (g_tmp)
+            call ga_dadd (1d0, g_a, -1d0, g_b, g_tmp)
+            norm = mat_norm (g_tmp)
+
+            if (norm < tol) then
+               same = .true.
+            else
+               same = .false.
+               if (me.eq.0) write (luout, *)
+     $              pname//"|| A - B || = ", norm
+               call util_flush (luout)
+            endif
+
+            if (.not. ga_destroy (g_tmp))
+     $           call errquit (pname//"cannot destroy g_tmp",0,0)
+
+         elseif (dtype_a .eq. mt_dcpl) then ! complex data
+            if (.not. ga_create (mt_dcpl,n1_a,n1_a, "tmp", 0, 0, g_tmp))
+     $           call errquit (pname//"cannot create g_tmp",0,0)
+
+            call ga_zero (g_tmp)
+C            call ga_zadd (zone, g_a, nzone, g_b, g_tmp)
+            call ga_add (zone, g_a, nzone, g_b, g_tmp)
+            norm = mat_norm (g_tmp)
+
+            if (norm < tol) then
+               same = .true.
+            else
+               same = .false.
+c              if (me.eq.0) write (luout, *)
+c    $              pname//"|| A - B || = ", norm
+               call util_flush (luout)
+            endif
+
+            if (.not. ga_destroy (g_tmp))
+     $           call errquit (pname//"cannot destroy g_tmp",0,0)
+
+      else
+         call errquit (pname//"unsupported data type", 0, 0)
+      endif                     ! ends real/complex data check
+            
+      else                      ! they are different data types
+         call errquit (pname//"both must be same data type", 0, 0)
+         
+      endif                     ! ends same data check
+      
+      mat_is_same_semiemp = same
+
+      end function
+
+
 
