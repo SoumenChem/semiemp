@@ -391,5 +391,44 @@ c    $              pname//"|| A - B || = ", norm
 
       end function
 
+C====================================================================
+C
+C     Computes Gaussian function for windowing pulse.
+C
+      double precision function rt_semiemp_gaussian_window (frequency, 
+     $ center,width,tt)
+      implicit none
+
+#include "errquit.fh"
+#include "global.fh"
+#include "stdio.fh"
+#include "rt_tddft.fh"
+
+C     == Inputs ==
+
+      double precision tt, center, frequency, width, phase 
+
+C     == Parameters ==
+      character(*) ,parameter  :: pname = "rt_semiemp_gaussian_window: "
+
+C     == Variables ==
+      double precision arg, gout, val
+      phase = 0.0d0
+      rt_semiemp_gaussian_window = 0.0d0 
+      val = 1.0d0
+      gout = 0.0d0
+      arg = 0.0d0
+
+      if (frequency.ne.0d0) val =  sin(frequency*tt + phase) 
+      arg = -1d0 * (tt - center)*(tt - center) /
+     $     (2d0*width*width)
+
+c$$$  dd          c = field%max / sqrt (2d0 * dpi) / s  !normalization
+
+      gout = exp (arg)
+c     write(6,*)" val, gout =", val, gout
+      rt_semiemp_gaussian_window = gout*val
+
+      end function
 
 
