@@ -190,6 +190,10 @@ C     (Fock and dens mats in AO and MO basis)
       call ga_zero(g_scr)
       call ga_zero(g_zscr)
 
+      if (inp_compare(.false.,field_type,'gaussian'))
+     $ call errquit(pname//' gaussian pulse is not appropriate for this
+     $propagator',0,
+     $ RTDB_ERR)
 
 
        if (.not.rtdb_get(rtdb,'rt_semiemp:field_max',mt_dbl,1,fval))

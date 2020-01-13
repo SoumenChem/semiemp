@@ -34,6 +34,8 @@ c     type(rt_params_t), intent(inout) :: params  !< struct containing parameter
       type(rt_field_t) field
 C     == Parameters ==
       character(*), parameter     :: pname       = "rt_semiemp_cs_prop:"
+
+      double precision, external :: rt_semiemp_gaussian_window
       
 C     == Variables ==
       integer rtdb
@@ -43,12 +45,13 @@ C     == Variables ==
       integer g_densre_ao, g_densim_ao
       integer g_densre_mo, g_densim_mo
       integer g_zfock_mo_n12dt  !stored previous F'(t-0.5*dt) values
-      integer g_zfock_ao_init, g_ztemp,g_ztemp1, g_ztemp2
+      integer g_zfock_ao_init, g_ztemp3,g_ztemp1, g_ztemp2
       integer g_zcheb, g_scr, g_zscr, g_temp, g_zc
       integer g_dipx, g_dipy, g_dipz
       integer g_zscr_ao, g_zscr_mo, g_zscr2_mo, g_zs
       integer g_ft, g_ft_inv, g_zft, g_zw      
       double precision charge, charge_elec, charge_nuc,fval
+      double precision fgauss
 
       double precision GPARAM
       type(rt_energies_t) energies
@@ -91,6 +94,7 @@ C     (profiling)
 
 C     (estimating time remaining)
       double precision est_cputime_start, max
+      double precision frequency, width, center
       integer est_it_start
 
 C     == Variables ==
@@ -125,7 +129,10 @@ C     == Initialization ==
       print_charge = .false.
       print_convergence = .false.
       print_s2 = .false.
-      
+      frequency = 0.0d0
+      center = 0.0d0
+      width = 0.0d0
+      fval = 0.0d0 
 
       if (me.eq.0) call util_print_centered (luout,
      $     "Closed shell propagation", 40, .true.)
@@ -158,6 +165,7 @@ C     (Fock and dens mats in AO and MO basis)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex W start", 0,0, g_zw)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex temp", 0,0, g_ztemp1)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex temp", 0,0, g_ztemp2)
+c     ok=ok.and.ga_create(mt_dcpl,n,n,"complex temp", 0,0,g_ztemp3)
       ok=ok.and.ga_create(mt_dcpl,n,n,"[F0,P0]", 0,0, g_zfp)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex inv c", 0,0, g_zc)
       ok=ok.and.ga_create(mt_dcpl,n,n,"projeted MO", 0,0, g_zdens_mo)
@@ -215,9 +223,15 @@ c     call canorg_check (params, params%g_s)
      $     1, field_type)) call errquit (pname//
      $     "failed to get 'field_type' target into rtdb",0,0)
       
-      if (inp_compare(.false.,field_type,'delta')) then
+            if ( (field_type.ne."delta").and.
+     $         (field_type.ne."gaussian") )
+     $      call errquit (pname//"invalid field type: "//field_type,0,0)
 
-       if (inp_compare(.false.,polarization,'x'))  then
+
+      if (inp_compare(.false.,field_type,'delta').or.
+     $ inp_compare(.false.,field_type,'gaussian')) then
+
+      if (inp_compare(.false.,polarization,'x'))  then
 
        call ga_add(fval,g_dipx,z0,g_scr,g_scr)
 
@@ -230,6 +244,31 @@ c     call canorg_check (params, params%g_s)
        
        end if
       end if
+
+      if (inp_compare(.false.,field_type,'gaussian'))
+     $ call errquit(pname//' gaussian pulse is not appropriate for this
+     $propagator',0,
+     $ RTDB_ERR)
+      
+      if (inp_compare(.false.,field_type,'gaussian')) then
+       if (.not.rtdb_get(rtdb,'rt_semiemp:frequency',mt_dbl,1,
+     $   frequency))
+     $       call errquit(pname//'failed to read frequency rtdb',0,
+     $ RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:center',mt_dbl,1,
+     $   center))
+     $       call errquit(pname//'failed to read center rtdb',0,
+     $ RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:width',mt_dbl,1,
+     $   width))
+     $       call errquit(pname//'failed to read width rtdb',0,
+     $ RTDB_ERR)
+       
+c      write(6,*)"frequency, center, width =",frequency, center,width
+
+      end if 
 
 c     call ga_scale(g_scr,-1.0d0)
       if (.not. rtdb_get (rtdb, "rt_semiemp:got_orbspace",
@@ -262,9 +301,11 @@ C      call rt_tddft_movecs_zdens (params, 1, g_movecs_ao_gs, g_zdens_ao)
 
       t = 0.0d0
 c     dt = 0.1
-c     tmax = 0.1   
+c     tmax = 0.1  
+
       call convert_d2z (1d0, g_densre, 0d0, g_densre, g_zdens_ao)
 
+      if (inp_compare(.false.,field_type,'delta')) then
       call ga_zgemm('N','N',n,n,n,z1,g_zscr,g_zdens_ao,z0,
      1 g_ztemp1)
 
@@ -274,6 +315,7 @@ c     tmax = 0.1
       call ga_add(z1, g_ztemp1, -z1, g_ztemp2, g_zw)
 
       call ga_scale(g_zw, -zi)
+      end if 
 
       call semiemp_cs_fock_build(g_zdens_ao,SUMELEL,QQ,LABI,LABJ
      1 ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfock_ao,1,GPARAM,emin,g_c)
@@ -348,9 +390,31 @@ c     call ga_print(g_zfock_ao)
       if (lrestart) call  rt_semiemp_restart_load(it,n,t,g_zw)
    10 continue
       call ga_zero(g_ztemp1)
+      call ga_zero(g_ztemp2)
+c     call ga_zero(g_ztemp3)
 c     call ga_print(g_zw)
 c     call ga_print(g_zdens_ao)
       call ga_add(z1,g_zdens_ao,z1,g_zw,g_ztemp1)
+
+c     if (inp_compare(.false.,field_type,'gaussian')) then
+c      fgauss = 0.0d0       
+c      fgauss = rt_semiemp_gaussian_window(frequency,
+c    $ center,width,t)
+c     write(6,*)"fgauss",fgauss
+c     call ga_add(z1*fgauss,g_zscr,z0,g_zscr,g_zscr)
+
+c     call ga_zgemm('N','N',n,n,n,z1,g_zscr,g_ztemp1,z0,
+c    1 g_ztemp2)
+
+c     call ga_zgemm('N','N',n,n,n,z1,g_ztemp1,g_zscr,z0,
+c    1 g_ztemp3)
+
+c     call ga_add(z1, g_ztemp2, -z1, g_ztemp3, g_zw)
+
+c     call ga_scale(g_zw, -zi)
+        
+c      end if
+
 
       if (print_dipole) then
        if (got_orbspace) then
@@ -404,6 +468,7 @@ C     == Cleanup GAs for time-dependent quantities and params ==
       ok = ok .and. ga_destroy(g_zdens_mo)
       ok = ok .and. ga_destroy(g_zc)
       ok = ok .and. ga_destroy(g_zfp)
+c     ok = ok .and. ga_destroy(g_ztemp3)
       ok = ok .and. ga_destroy(g_ztemp2)
       ok = ok .and. ga_destroy(g_ztemp1)
       ok = ok .and. ga_destroy(g_zw)
