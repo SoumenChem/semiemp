@@ -225,8 +225,10 @@ C     (Fock and dens mats in AO and MO basis)
       call ga_scale(g_scr,-1.0d0)
 
       call convert_d2z(z1,g_scr,z0,g_scr,g_zscr)
-c     call ga_print(g_zscr)
-c      write(6,*)"t,dt",tmax,dt
+
+       frequency = 0.0d0
+       width = 0.0d0
+       center = 0.0d0
       if (inp_compare(.false.,field_type,'gaussian')) then
        if (.not.rtdb_get(rtdb,'rt_semiemp:frequency',mt_dbl,1,
      $   frequency))
@@ -416,7 +418,6 @@ c     write(6,*)"got_orbspace",got_orbspace
      $       call errquit(pname//'failed to read mult rtdb',0,RTDB_ERR)
 
 
-c     write(6,*)"HERE before cycle"
       energy = 0d0
    50 continue
 
