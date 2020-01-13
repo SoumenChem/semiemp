@@ -4,7 +4,7 @@ C
 C     Parses input deck for rt-tddft parameters.
 C     
 C
-      subroutine rt_semiemp_input (rtdb)
+      subroutine rt_semiemp_input(rtdb)
       implicit none
 
 #include "rt_tddft.fh"
@@ -37,7 +37,7 @@ C      character*20 dplot_opts
 C      integer nsnapshots
       character*20 num_str
       integer checklvl
-      double precision field_max
+      double precision field_max, center, width, frequency
       double precision ecut
       integer orbitals(2), orbspace(2)
       integer frag_charge(2)
@@ -175,12 +175,55 @@ C
             if (.not.inp_a(field_type)) then
                call errquit (pname//"failed to parse field_type",0,0)
             endif
-c       write(6,*)"field_type",field_type
+        write(6,*)"field_type",field_type
             if (.not. rtdb_cput (rtdb, "rt_semiemp:field_type",
      $           1, field_type))
      $           call errquit (pname//
      $           "failed to put 'field_type' target into rtdb",0,0)
 
+
+C
+C     center the field (only for gaussian and Hann)
+C
+         elseif (inp_compare(.false.,test,'center')) then
+            if (.not.inp_f(center)) call errquit (pname//
+     $           "center takes a float >= 0", 0, 0)
+            if (.not.rtdb_put(rtdb,'rt_semiemp:center',mt_dbl,1,
+     $    center))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+
+C
+C     width the field (only for gaussian and Hann)
+C
+         elseif (inp_compare(.false.,test,'width')) then
+            if (.not.inp_f(width)) call errquit (pname//
+     $           "width takes a float >= 0", 0, 0)
+            if (.not.rtdb_put(rtdb,'rt_semiemp:width',mt_dbl,1,
+     $    width))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+
+C
+C     frequency the field (only for gaussian and cw)
+C
+         elseif (inp_compare(.false.,test,'frequency')) then
+            if (.not.inp_f(frequency)) call errquit (pname//
+     $           "frequency takes a float >= 0", 0, 0)
+           write(6,*)"frequency",frequency
+            if (.not.rtdb_put(rtdb,'rt_semiemp:frequency',mt_dbl,1,
+     $    frequency))
+     $         call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)   
+C
+C     field max
+C
+
+       elseif (inp_compare(.false.,test,'field_max')) then
+            if (.not.inp_f(field_max)) call errquit (pname//
+     $           "field_max takes a float", 0, 0)
+            if (.not.rtdb_put(rtdb,'rt_semiemp:field_max',mt_dbl,1,
+     $    field_max))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+            got_fmax = .true.
+            
 C
 C
 C
@@ -351,17 +394,6 @@ C
             got_tmax = .true.
             
             
-C
-C     field max
-C
-
-         elseif (inp_compare(.false.,test,'field_max')) then
-            if (.not.inp_f(field_max)) call errquit (pname//
-     $           "field_max takes a float", 0, 0)
-            if (.not.rtdb_put(rtdb,'rt_semiemp:field_max',mt_dbl,1,
-     $    field_max))
-     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
-            got_fmax = .true.
 C     
 C     dt
 C     
