@@ -38,12 +38,8 @@ C     == Parameters ==
 
 
 C     == External ==
-      logical, external  :: rt_tddft_atpoint
-      logical, external  :: rt_tddft_at_snap      
-      logical, external  :: rt_tddft_cs_tdfock
-      logical, external  :: rt_tddft_checkpoint
 
-
+      double precision, external :: rt_semiemp_gaussian_window
       
 C     == Variables ==
       integer rtdb
@@ -64,6 +60,7 @@ C     == Variables ==
       integer g_zfat, g_zfbt, g_zfat_dt, g_zfbt_dt
       integer g_zpda, g_zpdb
       double precision charge, charge_elec, charge_nuc,fval
+      double precision fgauss, frequency, width, center
 
       double precision GPARAM
       type(rt_energies_t) energies
@@ -183,7 +180,8 @@ C     (Fock and dens mats in AO and MO basis)
      $     1, field_type)) call errquit (pname//
      $     "failed to get 'field_type' target into rtdb",0,0)
       
-      if (inp_compare(.false.,field_type,'delta')) then
+      if (inp_compare(.false.,field_type,'delta').or.
+     $ inp_compare(.false.,field_type,'gaussian')) then
 
        if (inp_compare(.false.,polarization,'x'))  then
 
@@ -206,6 +204,26 @@ C     (Fock and dens mats in AO and MO basis)
 c     call ga_print(g_zscr)
 c      write(6,*)"t,dt",tmax,dt
       t = 0.0d0
+
+      if (inp_compare(.false.,field_type,'gaussian')) then
+       if (.not.rtdb_get(rtdb,'rt_semiemp:frequency',mt_dbl,1,
+     $   frequency))
+     $       call errquit(pname//'failed to read frequency rtdb',0,
+     $ RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:center',mt_dbl,1,
+     $   center))
+     $       call errquit(pname//'failed to read center rtdb',0,
+     $ RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:width',mt_dbl,1,
+     $   width))
+     $       call errquit(pname//'failed to read width rtdb',0,
+     $ RTDB_ERR)
+
+c      write(6,*)"frequency, center, width =",frequency, center,width
+
+      end if
 
 
 
@@ -259,9 +277,12 @@ c     call ga_print(g_zwb)
      1 LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,1,GPARAMA,
      2 GPARAMB)
 
-      call ga_add(z1, g_zfocka, z1, g_zscr, g_zfocka)
+      if (inp_compare(.false.,field_type,'delta')) then
+      
+       call ga_add(z1, g_zfocka, z1, g_zscr, g_zfocka)
 
-      call ga_add(z1, g_zfockb, z1, g_zscr, g_zfockb)
+       call ga_add(z1, g_zfockb, z1, g_zscr, g_zfockb)
+      end if
 
 c     call convert_d2z (1d0, g_ca, 0d0, g_ca, g_zca)
 c     call convert_d2z (1d0, g_cb, 0d0, g_cb, g_zcb)
@@ -362,11 +383,18 @@ C      g_zdens_ao)
      $       call errquit(pname//'failed to read mult rtdb',0,RTDB_ERR)
 
 
-      write(6,*)"HERE"
    50 continue
 
 c     call ga_add(z1,g_zdensa,z1,g_zwa,g_ztemp1)
 c     call ga_add(z1,g_zdensb,z1,g_zwb,g_ztemp2)
+       if (inp_compare(.false.,field_type,'gaussian')) then
+       fgauss = 0.0d0
+       fgauss = rt_semiemp_gaussian_window(frequency,
+     $ center,width,t)
+c      write(6,*)"fgauss=",fgauss
+      call ga_add(z1, g_zfocka, z1*fgauss, g_zscr, g_zfocka)
+      call ga_add(z1, g_zfockb, z1*fgauss, g_zscr, g_zfockb)
+      end if
 
       call rt_semiemp_avgs2(rtdb,g_zdensa,g_zdensb,g_densa,g_densb,
      1 g_scr,g_zscr,n,nel,t)
