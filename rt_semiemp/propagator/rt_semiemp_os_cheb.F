@@ -204,7 +204,9 @@ C     (Fock and dens mats in AO and MO basis)
 c     call ga_print(g_zscr)
 c      write(6,*)"t,dt",tmax,dt
       t = 0.0d0
-
+      frequency = 0.0
+      width = 0.0
+      center = 0.0
       if (inp_compare(.false.,field_type,'gaussian')) then
        if (.not.rtdb_get(rtdb,'rt_semiemp:frequency',mt_dbl,1,
      $   frequency))
