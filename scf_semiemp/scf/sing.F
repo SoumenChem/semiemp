@@ -38,12 +38,13 @@ C
       DIMENSION    HA(*),HB(*),BH(*),F(*),NTYP(*),NU(*),NG(*)
       DIMENSION    H(*),FA(*),FZ(*),GAMMA(*),RAD(*),DIFF(10)
      . ,W(*),FOP(*),SUMELEL(*),QQ(*),LABI(*),LABJ(*),RA(*),RB(*),
-     . LABK(*),LABL(*),D12(NA), Q(*),NIN(*),PNOW(NA,33),PRA(*),PRB(*)
+     . LABK(*),LABL(*),D12(NA), Q(*),NIN(*),PNOW(*),PRA(*),PRB(*),
+     . XBACK1(*), XBACK2(*), PBACK1(*)
       INTEGER JSLIT(4)
       SAVE         ARF1, BRF1, E11
       DATA         ARF1/0.0D0/, BRF1/0.0D0/
 
-c     write(6,*)"i am in sing" ,(HA(I),I=1,nrr)
+c     write(6,*)"i am in sing"
 c     write(6,*)"HB",(HB(I),I=1,nrr)
 c     write(6,*)"JSLIT in sing",JSLIT
       IRFAC=0
@@ -427,7 +428,7 @@ c     CALL ZRREAD(ITAPE, F, 1, NRR, 'SING')
 C
 C     NOW THE NUCLEAR REPULSION. PT. CHARGE PT. CHARGE TERM IS NOT INCLU
 C     DED
- 9000 FORMAT (//' CORE REPULSION ENERGY1 =',F13.6,' au',//)
+ 9000 FORMAT (//' CORE REPULSION ENERGY =',F13.6,' au',//)
 C
 C     Here the TOTAL energy E1 is calculated. When adding new terms to
 C     it, please use new variables in ennuc.cmn. Do NOT add your energy

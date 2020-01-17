@@ -44,8 +44,8 @@ C                 62, 3, (1979) P550-554
      +   IFIVE = 5, ISIX = 6, ISEVEN = 7, IEIGHT = 8, ININE = 9
      +   ,ITEN = 10,IDD1=0)
       LOGICAL      DIIS, DIISCHK, DDFLAG, UPDATE_DIFF_ONLY
-      DIMENSION    F(*), FA(*), DIFF(50),PNOW(NA,33),PBACK1(NA,33)
-     + ,FAC(33),XBACK1(NA,33),XBACK2(NA,33),NTYP(*),NU(*),JSLIT(4)
+      DIMENSION    F(*), FA(*), DIFF(50),PNOW(NA,2),PBACK1(NA,2)
+     + ,FAC(33),XBACK1(NA,2),XBACK2(NA,2),NTYP(*),NU(*),JSLIT(4)
      + ,PRA(*),PRB(*),RA(*),RB(*)
       SAVE         DIFF
 C     DIMENSION XBACK3(MXA,8)

@@ -67,14 +67,14 @@ C     H IS EXTENDED HUCKEL STARTING MATRIX
 c            if (.not.MA_Push_Get(MT_Dbl,nrr,'Q',lQ,iQ))
 c    &   call errquit('scfit: cannot allocate RB',0,
 c    1    MA_ERR)
-             if (.not.MA_Push_Get(MT_Dbl,33*NA,'PNOW',lPNOW,iPNOW))
+             if (.not.MA_Push_Get(MT_Dbl,2*NA,'PNOW',lPNOW,iPNOW))
      &   call errquit('scfit: cannot allocate PNOW',0,
      1    MA_ERR)
-             if (.not.MA_Push_Get(MT_Dbl,33*NA,'XBACK1',lXBACK1,iXBACK1
+             if (.not.MA_Push_Get(MT_Dbl,2*NA,'XBACK1',lXBACK1,iXBACK1
      &   )) call errquit('scfit: cannot allocate XBACK1',0, MA_ERR)
-             if (.not.MA_Push_Get(MT_Dbl,33*NA,'XBACK2',lXBACK2,iXBACK2
+             if (.not.MA_Push_Get(MT_Dbl,2*NA,'XBACK2',lXBACK2,iXBACK2
      &   )) call errquit('scfit: cannot allocate XBACK2',0, MA_ERR)
-             if (.not.MA_Push_Get(MT_Dbl,33*NA,'PBACK1',lPBACK1,iPBACK1
+             if (.not.MA_Push_Get(MT_Dbl,2*NA,'PBACK1',lPBACK1,iPBACK1
      &   )) call errquit('scfit: cannot allocate PBACK1',0, MA_ERR)
 
       if (ga_nodeid().eq.0)
@@ -91,7 +91,7 @@ c   5  CONTINUE
 c     END IF
       DO 10 I=1,NA
        D13(I) = ZERO
-       DO J = 1, 33
+       DO J = 1, 2
         Dbl_MB(iPNOW+i*j-1)= ZERO
        END DO
    10 CONTINUE
