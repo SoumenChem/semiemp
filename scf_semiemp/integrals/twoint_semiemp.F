@@ -93,8 +93,9 @@ c             write(6,*)"after F0GAM",GAMMA(MN)
               GO TO 90
             ENDIF
 C
+            IF (L.EQ.47 .AND. N.EQ.47) ISPEC = 0
             IF (ISPEC.LE.0 .OR. ISPEC.EQ.2) GO TO 50
-            IF (L.EQ.47 .OR. N.EQ.47) GO TO 50
+c           IF (L.EQ.47 .OR. N.EQ.47) GO TO 50
 c           IF (JSW(1).EQ.1) GO TO 40
 c           IF (ISPEC.EQ.4) GO TO 40
 c           IF (ISPEC.EQ.3) GO TO 30
@@ -140,6 +141,7 @@ c            GAMMA(MN) = COULP(L,N,R)
 c           GO TO 90
 
    50       CONTINUE
+c           write(6,*)"for Ag"
 C
             IF (K-M) 80, 70, 60
    60       MMM = M + (K* (K-1))/2
