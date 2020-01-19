@@ -762,10 +762,10 @@ c      calculating core energy
        rep = 0.0
        status= geom_nuc_rep_energy( geom, nrep)
        if (ga_nodeid().eq.0)
-     & write(luout,*) "NUCLEAR REPULSION ENERGY", nrep
+     & write(luout,*) "NUCLEAR REPULSION ENERGY = ", nrep
        status= core_energy(nat,Dbl_MB(ival),Dbl_MB(i_xyz),REP)
        if (INTTYP.eq.0.and.ga_nodeid().eq.0)
-     & write(luout,*) "CORE REPULSION ENERGY", REP
+     & write(luout,*) "CORE REPULSION ENERGY = ", REP
 c      calculating radius matrix
        status= radmat(nat,Dbl_MB(i_xyz),Dbl_MB(irad))
 c----------------------------------------------------------------------------------------------
