@@ -1,6 +1,6 @@
       SUBROUTINE SCFCHK(F,FA,IT,ITGL,ID,UPDATE_DIFF_ONLY,DE1,NDN,NB,NA
      1 ,ISW1,ISW3,NTYP,NU,JSLIT,NRR,PNOW,ISWANN,PRA,PRB,RA,RB,XBACK1,
-     2 XBACK2,PBACK1)
+     2 XBACK2,PBACK1,slowscf)
 C
 C     F IS NOW DETERMINED FOR THE MOLECULE FROM THE ATOMIC FACTORS
 C     WEIGHTED BY THE NUMBER OF BASIS FUNCTIONS ON THE ATOM
@@ -47,6 +47,7 @@ C                 62, 3, (1979) P550-554
       DIMENSION    F(*), FA(*), DIFF(50),PNOW(NA,2),PBACK1(NA,2)
      + ,FAC(33),XBACK1(NA,2),XBACK2(NA,2),NTYP(*),NU(*),JSLIT(4)
      + ,PRA(*),PRB(*),RA(*),RB(*)
+      logical slowscf
       SAVE         DIFF
 C     DIMENSION XBACK3(MXA,8)
 C     DIMENSION    IWAIT(8)
@@ -58,6 +59,7 @@ C   THEN CONVERGENCE IS ACCELERATED.
 C
 C     CVT = 0.6D0
 C
+       DIISCHK=.false.
 C   PACK ENERGY CONVERGENCE HISTORY INTO DIFF
        IPRINT = 0
        K = 0
@@ -104,8 +106,17 @@ c     write(6,*)"PNOW",PNOW(I,JJ)
 c      write(6,*)"F(L),PNOW",F(L),PNOW(K,JJ)
          PNOW(K,JJ) = PNOW(K,JJ) + F(L)
    40 CONTINUE
-      IF (IT.GT.1) GO TO 80
+      if (.not.slowscf) GO TO 45         
+      IF (IT.GT.21) GO TO 80
+      IF (IT.GT.20) GO TO 74
+      IF (IT.GT.15) GO TO 73
+      IF (IT.GT.10) GO TO 72
+      IF (IT.GT.5) GO TO 71
       IF (IT.GT.0) GO TO 70
+
+   45 CONTINUE
+      IF (IT.GT.1) GO TO 80
+      IF (IT.GT.0) GO TO 74      
 C
 C     CYCLE ZERO
 C
@@ -136,7 +147,19 @@ C     CALL PRNT (FA,NB,NRR)
 C
 C     FIRST CYCLE
 C
-   70 FAC(JJ) = 0.40D0
+   70 FAC(JJ) = 0.98D0
+      IF (JJ.LT.NDN) GO TO 220
+      GO TO 100      
+   71 FAC(JJ) = 0.95D0
+      IF (JJ.LT.NDN) GO TO 220
+      GO TO 100      
+   72 FAC(JJ) = 0.90D0
+      IF (JJ.LT.NDN) GO TO 220
+      GO TO 100      
+   73 FAC(JJ) = 0.60D0
+      IF (JJ.LT.NDN) GO TO 220
+      GO TO 100      
+   74 FAC(JJ) = 0.40D0   
       IF (ISW1.EQ.0) FAC(JJ) = 0.50D0
       IF (JJ.LT.NDN) GO TO 220
       GO TO 100
@@ -172,11 +195,11 @@ c       write(6,*)"PNOW,PNOW,DENOM",PNOW(I,JJ),PBACK1(I,JJ),DENOM
 C
 C     STORE ATOMIC FACTOR IN XBACK1 TEMPORARLY
 C
-c        write(6,*)"SLOPE",SLOPE
+c        write(6,*)"SLOPE,N",SLOPE,N
          XBACK1(I,JJ) = SLOPE/ (SLOPE-ONE)
          SUM = SUM + N*XBACK1(I,JJ)
    90 CONTINUE
-C     IF(.NOT.DIISCHK) PRINT *,'SLOPE OUT OF RANGE',IT,SLOPE
+c     IF(.NOT.DIISCHK) PRINT *,'SLOPE OUT OF RANGE',IT,SLOPE
       FAC(JJ) = SUM/NB
 c     write(6,*)"IFL",IFL
       IF (JJ.LT.NDN) GO TO 220

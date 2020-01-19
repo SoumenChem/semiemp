@@ -41,8 +41,10 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
      . AA(*),RA(*),RB(*),Q(*)
       CHARACTER*8  BLOCK
       CHARACTER*6  ASSINP
+      CHARACTER*20 INTPOL
 C     CHARACTER*20 ONAME
       CHARACTER*80 LINE,BLANK2
+      logical slowscf
 
 C     WARNING: SC EXISTS ONLY IN ITERATIVE EXTENDED HUCKEL (ISW1=0) !
 
@@ -54,6 +56,14 @@ c     DATA         ASSINP/'ASSINP'/
        IPRINT = IZERO
 C     write(6,*)"i am in scfit"
 C
+       slowscf = .false.
+       if (.not.rtdb_cget(rtdb,'semiemp:intpol',1,intpol)) then
+       call errquit('scfit: failed to read intpol',0, RTDB_ERR)
+       endif
+       if (inp_compare(.false.,intpol,'slow'))  then
+        slowscf = .true.
+       end if
+       
 C     H IS EXTENDED HUCKEL STARTING MATRIX
              if (.not.MA_Push_Get(MT_Dbl,2*nb,'W',lW,iW))
      &   call errquit('scfit: cannot allocate W',0,
@@ -235,7 +245,7 @@ c     total_cpu  = -util_cpusec()
      .  IT,ITGL,ITMAX,ISW1,ISWANN,NDN,NB,NA,ISW3,NTYP,NU,Dbl_MB(iW),
      .  JSLIT,FOP,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,Q,
      .  REP,D12,NIN,Dbl_MB(iPNOW),RA,RB,Dbl_MB(iPRA), Dbl_MB(iPRB),
-     . Dbl_MB(iXBACK1),Dbl_MB(iXBACK2),Dbl_MB(iPBACK1))
+     . Dbl_MB(iXBACK1),Dbl_MB(iXBACK2),Dbl_MB(iPBACK1),slowscf)
 C     CALL SLITEN(0,'SING2')
 c     total_wall = total_wall +  util_wallsec()
 c     total_cpu  =  total_cpu + util_cpusec()

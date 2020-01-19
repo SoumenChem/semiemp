@@ -1,7 +1,7 @@
       SUBROUTINE SING(HA,HB,F,H,FA,FZ,SVEC,GAMMA,SC,RAD,E1,BH,
      X IT,ITGL,ITMAX,ISW1,ISWANN,NDN,NB,NA,ISW3,NTYP,NU,W,JSLIT,FOP
      X ,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,Q,REP,D12,NIN,PNOW,RA,
-     X RB,PRA,PRB,XBACK1,XBACK2,PBACK1)
+     X RB,PRA,PRB,XBACK1,XBACK2,PBACK1,slowscf)
 C
 C     ..................................................................
 C
@@ -41,6 +41,7 @@ C
      . LABK(*),LABL(*),D12(NA), Q(*),NIN(*),PNOW(*),PRA(*),PRB(*),
      . XBACK1(*), XBACK2(*), PBACK1(*)
       INTEGER JSLIT(4)
+      logical slowscf
       SAVE         ARF1, BRF1, E11
       DATA         ARF1/0.0D0/, BRF1/0.0D0/
 
@@ -108,7 +109,7 @@ c        write(6,*)"RB before SCFCHK",(RB(I),I=1,15)
 c        write(6,*)"FA before SCFCHK",(FA(I),I=1,15)
          CALL SCFCHK(RA,FA,(IT-1),ITGL,ID,.FALSE.,DE1,NDN,NB,NA,ISW1,
      1   ISW3,NTYP,NU,JSLIT,NRR,PNOW,ISWANN,PRA,PRB,RA,RB,XBACK1,XBACK2,
-     2   PBACK1)
+     2   PBACK1,slowscf)
 c        write(6,*)"RB after SCFCHK",(RB(I),I=1,15)
 c        write(6,*)"FA after SCFCHK",(FA(I),I=1,15)
           else
@@ -116,7 +117,7 @@ c        write(6,*)"RA before SCFCHK",(RA(I),I=1,21)
 c        write(6,*)"FA before SCFCHK",(RB(I),I=1,21)
          CALL SCFCHK(RB,RA,(IT-1),ITGL,ID,.FALSE.,DE1,NDN,NB,NA,ISW1,
      1   ISW3,NTYP,NU,JSLIT,NRR,PNOW,ISWANN,PRA,PRB,RA,RB,XBACK1,XBACK2,
-     2   PBACK1)
+     2   PBACK1,slowscf)
 c        write(6,*)"RA after SCFCHK",(RA(I),I=1,21)
 c        write(6,*)"FA after SCFCHK",(FA(I),I=1,21)
           ENDIF
@@ -125,7 +126,7 @@ c        write(6,*)"FA after SCFCHK",(FA(I),I=1,21)
 c        write(6,*)"F  after SCFCHK",(F(I),I=1,21)
         CALL SCFCHK(F,FA,(IT-1),ITGL,ID,.FALSE.,DE1,NDN,NB,NA,ISW1,
      1  ISW3,NTYP,NU,JSLIT,NRR,PNOW,ISWANN,PRA,PRB,RA,RB,XBACK1,XBACK2,
-     2   PBACK1)
+     2   PBACK1,slowscf)
         ENDIF
    20   CONTINUE
 C
