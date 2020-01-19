@@ -19,6 +19,7 @@ c
       character*20 test
       character*8 scftype     !type of hf calculation
       character*8 apx          !approximate hamiltonina type
+      character*20 intpol
       logical rhf,uhf
       logical cndo,indo
       integer maxiter           !maximum iteration
@@ -37,8 +38,8 @@ c
       logical  geom_rtdb_ncent  !for getting number of atoms
       integer nat               !number of atoms
       
-c     if (ga_nodeid().eq.0)
-c    &     write(luout,*) "building semiemp"
+      if (ga_nodeid().eq.0)
+     &     write(luout,*) "building semiemp"
 c
 c      Create geometry object and load in geometry from rtdb
 c      if (.not.geom_create(geom,'geometry'))
@@ -152,6 +153,13 @@ c
           if (.not.rtdb_put(rtdb,'semiemp:inttyp',mt_int,1,inttyp))
      1    call errquit('semiemp_input: failed writing to rtdb',0,
      &       RTDB_ERR)
+        else if (inp_compare(.false.,test,'intpol')) then
+        if (.not.inp_a(intpol)) then
+          intpol='fast'
+        endif
+          if (.not.rtdb_cput(rtdb,'semiemp:intpol',1,intpol))
+     1    call errquit('semiemp_input:failed to write intpol to rtdb',0,
+     &       RTDB_ERR)          
          else if (inp_compare(.false.,test,'gfac')) then
         if (.not.inp_i(gfac)) then
           write(LuOut,*) 'semiemp_input: GFAC value not found; ',

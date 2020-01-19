@@ -20,7 +20,7 @@ c
                                       
       integer rtdb
       character*20 test
-      character*20 scftype,apx
+      character*20 scftype,apx, intpol
       logical rhf,uhf
       logical cndo,indo
       integer maxiter,inttyp,gfac
@@ -100,6 +100,11 @@ c      endif
          inttyp=0
          if (.not.rtdb_put(rtdb,'semiemp:inttyp',mt_int,1,inttyp))
      1  call errquit('semiemp: failed to write inttyp',0, RTDB_ERR)
-        endif 
+        endif
+        if (.not.rtdb_cget(rtdb,'semiemp:intpol',1,intpol)) then
+         intpol='fast'
+         if (.not.rtdb_cput(rtdb,'semiemp:intpol',1,intpol))
+     1  call errquit('semiemp: failed to write intpol',0, RTDB_ERR)
+        endif        
         return
       end
