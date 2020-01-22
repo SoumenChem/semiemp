@@ -1,4 +1,4 @@
-# semiemp
+# SEMIEMP
 
 This code can be used as an interface to NWChem. It can be used to perform real-time dynamics using INDO/S Hamiltonian. For sample input see the manual. 
 
