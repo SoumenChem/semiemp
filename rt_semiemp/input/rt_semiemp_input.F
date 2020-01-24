@@ -175,7 +175,6 @@ C
             if (.not.inp_a(field_type)) then
                call errquit (pname//"failed to parse field_type",0,0)
             endif
-        write(6,*)"field_type",field_type
             if (.not. rtdb_cput (rtdb, "rt_semiemp:field_type",
      $           1, field_type))
      $           call errquit (pname//
