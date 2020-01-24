@@ -8,6 +8,8 @@ To set up the code-
 
 (ii) Copy task.F, task_input.F, task_energy, task_gradient.F files from "nwchem/src/semiemp/setup" folder to "nwchem/src/task/" folder.
 
+(iii) Copy input_parse.F file from "nwchem/src/semiemp/setup" folder to "nwchem/src/input/" folder. 
+
 (iii) Copy make_nwchem_config from "nwchem/src/semiemp/setup" folder to  "nwchem/src/config" folder.
 
 (iv) Copy util_module_avail.F from "nwchem/src/semiemp/setup" folder to "nwchem/src/util" folder.
