@@ -10,11 +10,11 @@ To set up the code-
 
 (iii) Copy input_parse.F file from "nwchem/src/semiemp/setup" folder to "nwchem/src/input/" folder. 
 
-(iii) Copy make_nwchem_config from "nwchem/src/semiemp/setup" folder to  "nwchem/src/config" folder.
+(iv) Copy make_nwchem_config from "nwchem/src/semiemp/setup" folder to  "nwchem/src/config" folder.
 
-(iv) Copy util_module_avail.F from "nwchem/src/semiemp/setup" folder to "nwchem/src/util" folder.
+(v) Copy util_module_avail.F from "nwchem/src/semiemp/setup" folder to "nwchem/src/util" folder.
 
-(v) Compile nwchem. (It might be necessary to run "make realclean" before compiling the code.
+(vi) Compile nwchem. (It might be necessary to run "make realclean" before compiling the code.
 
 
 
