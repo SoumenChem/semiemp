@@ -194,9 +194,11 @@ c#include "cdft.fh"
        integer g_zsuper !super operator
        integer g_zdens_new !P0+norm*g_zw*10^-5
        integer g_zw_scale !norm*g_zw*10^-5
-       double precision GPARAM, emin, beta, norm, scale, beta_scale
+       double precision GPARAM, emin, beta, norm, scale
+       double complex beta_scale
        integer g_zfock !new Fock matrix
        logical status
+       double complex zscale
        double precision total_wall, total_cpu
 c     total_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec()
@@ -226,11 +228,10 @@ c     write(6,*)"i am in superoperator"
       norm = 0.0d0
       call ga_norm_infinity(g_zw,norm)
       scale = 0.0d0
-c     write(6,*)"norm",norm
-c     call ga_dgop(374, norm, 1, '+')
       scale = norm*1D-5
+      zscale = dcmplx(scale,0.0d0)
       call ga_copy(g_zw,g_zw_scale)
-      call ga_scale(g_zw_scale,scale)
+      call ga_scale(g_zw_scale,zscale)
 
       call ga_add(z1,g_zdens,z1,g_zw_scale,g_zdens_new)
 c     call ga_print(g_zdens_new)
@@ -254,8 +255,8 @@ C--------------------------------------------------------------
       
       call ga_add(z1,g_zcomm,-z1,g_zfp,g_zsuper)
 
-      beta_scale = beta*scale
-      call ga_scale(g_zsuper,-zi/(beta_scale))
+      beta_scale = -zi/(beta*zscale)
+      call ga_scale(g_zsuper,beta_scale)
 
 c     total_wall = total_wall +  util_wallsec()
 c     total_cpu  =  total_cpu + util_cpusec()

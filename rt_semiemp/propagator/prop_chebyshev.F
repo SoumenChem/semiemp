@@ -17,7 +17,8 @@ c#include "cdft.fh"
 #include "rt_tddft.fh"
 
       double precision  GPARAM !(emax-emin)
-      double precision scale
+      double precision fscale
+      double complex zfscale
       double precision emin
       double precision alpha !scaling factor
       double precision dt !time step
@@ -38,7 +39,7 @@ c#include "cdft.fh"
       double precision param
 
          nrr = nbf*(nbf+1)/2
-c     if (ga_nodeid().eq.0)  write(6,*)"in prop_chebyshev"
+c     if (ga_nodeid().eq.0)  write(6,*)"in prop_chebyshev",GPARAM
 
       if (.not. ga_create(mt_dbl, nbf, nbf, "Re[Dens]", 0, 0, g_I))
      $     call errquit ("couldnt create g_I", 0, GA_ERR)
@@ -79,10 +80,13 @@ C---------------------------------------------------------------------
 
       call convert_d2z (1d0, g_I, 0d0, g_I, g_zt_n_2)
 
-      scale = 1/(1.5*GPARAM)
-  
-c     write(6,*)"scale",scale
-      call ga_scale(g_zfock,scale)
+      fscale = 0.0d0
+      alpha  = 0.0d0
+      fscale = 1/(1.5*GPARAM)
+      zfscale = dcmplx(fscale,0.0d0)  
+c     call ga_print(g_zfock)
+c     write(6,*)"fscale",fscale
+      call ga_scale(g_zfock,zfscale)
 
 c     call ga_print(g_zfock)      
 
@@ -92,7 +96,8 @@ C     Create T1
 C-------------------------------------------------------------------- 
       call ga_copy(g_zfock,g_zt_n_1)
 C-------------------------------------------------------------------
-      alpha = 1.5*GPARAM *dt      
+      alpha = 1.5*GPARAM*dt      
+c     write(6,*)"alpha",alpha
 
       call chebyshev_propagator(g_zt_n_1,g_zt_n_2,g_zt_n,g_zfock,g_zcheb
      1 ,nbf,alpha)
@@ -223,7 +228,7 @@ c      call ga_print(g_zcheb_n)
 c     call ga_print(g_zcheb)
       if (IT.eq.2) GO TO 20
 
-       if ( mat_is_same_semiemp (g_zcheb_n_1,g_zcheb_n,test)) then
+       if ( mat_is_same_semiemp(g_zcheb_n_1,g_zcheb_n,test)) then
         CONVERGED = .true.
        ELSE
         CONVERGED = .false.

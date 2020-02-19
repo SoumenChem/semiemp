@@ -47,6 +47,7 @@ c#include "cdft.fh"
 
 c     call ga_print(g_zt_n_1)
 c     call ga_print(g_zfocka)
+c     write(6,*)"i am in open-shell superoperator"
       nrr = nbf*(nbf+1)/2
       Aalpha = 1.5*GPARAMA*dt
       Abeta = 1.5*GPARAMA
@@ -94,6 +95,8 @@ C-----------------------------------------------------------
 C-------------------------------------------------------------
 C     2nd term
 C------------------------------------------------------------
+c     call ga_print(g_zwa)
+
       call superopertor_os(g_zwa,g_zwb,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL
      1 ,NIN,nbf,Q,NG,GAMMA,GPARAMA,GPARAMB,g_zta_n_1,g_ztb_n_1,g_zfpa,
      1 g_zfpb,g_zdensa,g_zdensb,Abeta,Bbeta)
@@ -257,6 +260,7 @@ c#include "cdft.fh"
        double precision alpha_scale, beta_scale
        integer g_zfocka, g_zfockb !new Fock matrix
        logical status
+       double complex scaleia, scaleib, zascale,zbscale
        double precision total_wall, total_cpu
 c     total_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec()
@@ -303,18 +307,24 @@ c     write(6,*)"in superoperator_os"
       call ga_norm_infinity(g_zwb,Bnorm)
       call ga_copy(g_zwb,g_zwb_scale)
 
-      alpha_scale = 1.0D0
-      beta_scale = 1.0D0
+      alpha_scale = Anorm*1D-5
+      beta_scale = Bnorm*1D-5
 
 c     write(6,*)"Anorm,Bnorm",Anorm,Bnorm
 c     write(6,*)"alpha_scale,beta_scale", alpha_scale,beta_scale
 
-      call ga_scale(g_zwa_scale,alpha_scale)
-      call ga_scale(g_zwb_scale,beta_scale)
+      zascale = dcmplx(alpha_scale,0d0)
+      zbscale = dcmplx(beta_scale,0d0)
+
+      call ga_scale(g_zwa_scale,zascale)
+      call ga_scale(g_zwb_scale,zbscale)
 
 c     call ga_print(g_zdensa)
+c     call ga_print(g_zdensb)
 c     call ga_print(g_zwa)
+c     call ga_print(g_zwb)
 c     call ga_print(g_zwa_scale)
+c     call ga_print(g_zwb_scale)
   
       call ga_add(z1,g_zdensa,z1,g_zwa_scale,g_zdensa_new)
       call ga_add(z1,g_zdensb,z1,g_zwb_scale,g_zdensb_new)
@@ -323,9 +333,11 @@ c     call ga_print(g_zwa)
 c----------------------------------------------------------------
 C     Build the new Fock matrix
 C----------------------------------------------------------------
+c     call ga_print(g_zdensa_new)
+c     call ga_print(g_zdensb_new)
+
       call ga_add(z1,g_zdensa_new,z1,g_zdensb_new,g_zdens)
 
-c     call ga_print(g_zdens)
       call semiemp_os_fock_build(g_zdens,g_zdensa_new,SUMELEL,QQ,
      1 LABI,LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,
      2 GPARAMA,GPARAMB)
@@ -353,7 +365,8 @@ c     call ga_print(g_zcomm)
            
       call ga_add(z1,g_zcomm,-z1,g_zfpa,g_zsupera)
 
-      call ga_scale(g_zsupera,-zi/(Abeta*alpha_scale))
+      scaleia = -zi/(zascale*ABeta)
+      call ga_scale(g_zsupera,scaleia)
 
 c     call ga_print(g_zsupera)
       call ga_zero(g_ztemp1)
@@ -373,7 +386,9 @@ c     call ga_print(g_ztemp2)
 
 c     call ga_print(g_zcomm)
       call ga_add(z1,g_zcomm,-z1,g_zfpb,g_zsuperb)
-      call ga_scale(g_zsuperb,-zi/(Bbeta*beta_scale)) 
+
+      scaleib = -zi/(zbscale*BBeta)
+      call ga_scale(g_zsuperb,scaleib) 
 
 c     call ga_print(g_zsuperb)
 c     total_wall = total_wall +  util_wallsec()
