@@ -276,9 +276,11 @@ C-------------------------------------------------------------------------------
 C
 C----------------------------------------------------------------------------------------------
       subroutine bessel_function(IT,alpha,bessfun)
-      IMPLICIT DOUBLE PRECISION (A-H,O-Z)
-      IMPLICIT INTEGER (I-N)
-      double precision FACT(35)
+      implicit none        
+      double precision FACT(35), P, SUM, TEST, PREV, TERM, bessfun,diff
+      double precision alpha
+      integer it, m
+
       data FACT/1.0,1.0,2.0,6.0,24.0,120.0,720.0,5040.0,40320.0,362880.0
      X          ,3628800.0,39916800.0,479001600.0,6227020800.0,
      X          87178291200.0,1307674368000.0,20922789888000.0,

@@ -1,6 +1,6 @@
 # SEMIEMP
 
-This code can be used as an interface to NWChem. It can be used to perform real-time dynamics using INDO/S Hamiltonian. For sample input see the manual. 
+This code can be used as an interface to NWChem. It can be used to perform real-time dynamics using INDO/S Hamiltonian. For sample input see the "test" folder. 
 
 To set up the code-
 
@@ -8,11 +8,13 @@ To set up the code-
 
 (ii) Copy task.F, task_input.F, task_energy, task_gradient.F files from "nwchem/src/semiemp/setup" folder to "nwchem/src/task/" folder.
 
-(iii) Copy make_nwchem_config from "nwchem/src/semiemp/setup" folder to  "nwchem/src/config" folder.
+(iii) Copy input_parse.F file from "nwchem/src/semiemp/setup" folder to "nwchem/src/input/" folder. 
 
-(iv) Copy util_module_avail.F from "nwchem/src/semiemp/setup" folder to "nwchem/src/util" folder.
+(iv) Copy make_nwchem_config from "nwchem/src/semiemp/setup" folder to  "nwchem/src/config" folder.
 
-(v) Compile nwchem. (It might be necessary to run "make realclean" before compiling the code.
+(v) Copy util_module_avail.F from "nwchem/src/semiemp/setup" folder to "nwchem/src/util" folder.
+
+(vi) Compile nwchem. (It might be necessary to run "make realclean" before compiling the code.
 
 
 

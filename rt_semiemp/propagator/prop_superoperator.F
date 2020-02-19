@@ -223,8 +223,9 @@ c     write(6,*)"i am in superoperator"
       call ga_zero(g_zcomm)
       call ga_zero(g_zw_scale)
 
-
+      norm = 0.0d0
       call ga_norm_infinity(g_zw,norm)
+      scale = 0.0d0
 c     write(6,*)"norm",norm
 c     call ga_dgop(374, norm, 1, '+')
       scale = norm*1D-5
