@@ -132,7 +132,7 @@ c      call ga_print(g_zta_n_1)
       call ga_zero(g_ztempb)
       call ga_zero(g_zcheba_n)
       call ga_zero(g_zchebb_n)
-c     write(6,*)"here 1"
+      write(6,*)"here 1"
   10  CONTINUE
 C-----------------------------------------------------------------
 C     Iterations
