@@ -50,7 +50,7 @@ c#include "cdft.fh"
          nrr = nbf*(nbf+1)/2
 c     total_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec()
-
+c     write(6,*)"semiemp_os_fock_build"
 
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'densre',ldensre,idensre))
      &   call errquit('semiemp_cs_fock_build: cannot allocate densre',0,
@@ -113,6 +113,8 @@ c     total_cpu  = -util_cpusec()
       call ga_zero(g_fockbre)
       call ga_zero(g_fockbim)
 
+c     call ga_print(g_zdensa)
+
       call convert_z2d (g_zdens, g_densre, g_densim)
       call convert_z2d (g_zdensa, g_densare, g_densaim) 
 c     GO TO 100
@@ -126,8 +128,16 @@ cSG   call mat_triangular(Dbl_MB(idensre),nbf)
 
 cSG   call mat_triangular(Dbl_MB(idensim),nbf)
 
+c     call ga_print(g_densre)
+c     call ga_print(g_densare)
+
       call ga_trimat(g_densre,dbl_mb(idensre),nbf)   
       call ga_trimat(g_densare,dbl_mb(ihdense),nbf) 
+
+c     do i = 0, nbf*nbf-1
+c      write(6,*)"density total",Dbl_MB(idensre+i)
+c      write(6,*)"density alpha",Dbl_MB(ihdense+i)
+c     end do
 
 
       CALL FILLFU(Dbl_MB(ifockare),Dbl_MB(ifockbre),Dbl_MB(ihdense),
@@ -138,7 +148,8 @@ cSG   call mat_triangular(Dbl_MB(idensim),nbf)
       call ga_trimat(g_densaim,dbl_mb(ihdense),nbf)
 
 c     do i = 0, nbf*nbf-1
-c      write(6,*)"fock"!,Dbl_MB(ifockre+i)
+c      write(6,*)"focka",Dbl_MB(ifockare+i)
+c      write(6,*)"fockb",Dbl_MB(ifockbre+i)
 c     end do
 
 
@@ -151,7 +162,7 @@ c     end do
 
        do i =0 , nrr-1
         Dbl_MB(ifock+i) = Dbl_MB(ifockare+i)
-c       if (ga_nodeid().eq.0) write(6,*) "fock"!,Dbl_MB(ifock+i)
+c       if (ga_nodeid().eq.0) write(6,*) "focka",Dbl_MB(ifockare+i)
        end do
 
       call diag_para(Dbl_MB(ifock),NRR,nbf,Dbl_MB(idensre),Dbl_MB(ieig))
@@ -164,7 +175,7 @@ c     GPARAMA = Dbl_MB(ieig+nbf-1)
 
        do i =0 , nrr-1
         Dbl_MB(ifock+i) = Dbl_MB(ifockbre+i)
-c       if (ga_nodeid().eq.0) write(6,*) "fock",Dbl_MB(ifock+i)
+c       if (ga_nodeid().eq.0) write(6,*) "fockb",Dbl_MB(ifockbre+i)
        end do
 
       call diag_para(Dbl_MB(ifock),NRR,nbf,Dbl_MB(idensre),Dbl_MB(ieig))
@@ -191,6 +202,7 @@ c 150 CONTINUE
       call convert_d2z (1d0, g_densre, 1d0, g_densim, g_zdens)
       call convert_d2z (1d0, g_densare, 1d0, g_densaim, g_zdensa)
 
+c     call ga_print(g_zfocka)
 
       status=.true.
       status=status.and.ga_destroy(g_densare)
