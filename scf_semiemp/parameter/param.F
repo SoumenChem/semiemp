@@ -105,7 +105,8 @@ CSG   BETA(28,1) =-2.0D0
       BETA(44,1) = -TWO
       BETA(45,1) = -TWO
       BETA(46,1) = -TWO
-      BETA(47,1) = -TWO
+CSG      BETA(47,1) = -TWO
+      BETA(47,1) = -2.5D0
       BETA(48,1) = -TWO
       BETA(44,3) = -32.0D0
 C     TIN FROM EDITH FROM NMR.  A BETTER GEOMETRY SEEMS TO BE GIVEN BY
@@ -136,7 +137,8 @@ C     THE SECOND TRANSITION SERIES
       BETA(44,3) = -26.29D0
       BETA(45,3) = -27.17D0
       BETA(46,3) = -27.59D0
-      BETA(47,3) = -27.94D0
+CSG   BETA(47,3) = -27.94D0
+      BETA(47,3) = -30.0D0
 C   Beta values for the Lanthanide compounds from Knappe Masters thesis
 C
 C   S and P values
@@ -456,6 +458,9 @@ C      ADJUSTED LIGAND PARAMETERS FOR TRANSITION METAL COMPLEXES
       BETA(7,1) = -27.6D0
       BETA(8,1) = -34.2D0
       BETA(17,1) = -18.0D0
+c     BETA(47,1) = -2.5D0
+c     BETA(47,2) = -2.5D0
+c     BETA(47,3) = -30.0D0
    50 CONTINUE
 c     write(6,*)"BETA Ag",BETA(47,1),BETA(47,2),BETA(47,3)
       LTOT=0
