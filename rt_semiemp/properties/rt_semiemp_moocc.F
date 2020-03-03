@@ -53,7 +53,7 @@ C     == Variables ==
       double precision occk     !occupation of orbital k
       integer g_veck, g_tmp, g_veckt
       integer k
-      integer norb, numorb(10)
+      integer norb, numorb(100)
       double precision dval, tt
 
       me = ga_nodeid()

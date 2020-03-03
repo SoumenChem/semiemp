@@ -41,7 +41,7 @@ C      integer nsnapshots
       double precision ecut
       integer orbitals(2), orbspace(2)
       integer frag_charge(2)
-      integer norb, numorb(10)
+      integer norb, numorb(100)
       double precision occuorb(10)
       character*255 field_type
       character*18  polarization, spin
@@ -135,7 +135,7 @@ C
      $     call errquit (pname//"numorb takes a float", 0, 0)
         end do
             write(6,*)"numorb",numorb
-           if (.not.rtdb_put(rtdb,'rt_semiemp:numorb',mt_int,10,
+           if (.not.rtdb_put(rtdb,'rt_semiemp:numorb',mt_int,100,
      $     numorb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
