@@ -61,7 +61,7 @@ C     == Variables ==
        if (.not.rtdb_get(rtdb,'rt_semiemp:norb',mt_int,1,norb))
      1 GO to 10
 
-       if (.not.rtdb_get(rtdb,'rt_semiemp:numorb',mt_int,10,numorb))
+       if (.not.rtdb_get(rtdb,'rt_semiemp:numorb',mt_int,100,numorb))
      1 call errquit('rt_semiemp_moocc: failed to get numorb',0,RTDB_ERR)
 
       
