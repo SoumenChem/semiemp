@@ -262,6 +262,10 @@ C
       call ga_zero(g_densa)
       call ga_zero(g_densb)
 
+
+      if (got_eh) eh_state_u(rtdb,RA,RB,nb)
+
+
       call ga_sqmat(g_densa,RA,nb,1)
       call ga_sqmat(g_densb,RB,nb,1)
 

@@ -42,7 +42,8 @@ C      integer nsnapshots
       integer orbitals(2), orbspace(2)
       integer frag_charge(2)
       integer norb, numorb(100)
-      double precision occuorb(10)
+      integer naorb, nborb, numorba(100), numorbb(100)
+      double precision occuorb(10), occuorba(10), occuorbb(10)
       character*255 field_type
       character*18  polarization, spin
       character*255 tag_in, method
@@ -62,7 +63,7 @@ C     == External ==
 
 
 C     (values which have no defaults and must be supplied)
-c     write(6,*)"i am in rt_semiemp_input"
+      write(6,*)"i am in rt_semiemp_input"
       got_tmin = .false.
       got_tmax = .false.
       got_dt = .false.
@@ -129,26 +130,74 @@ C
      $     norb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
+      elseif (inp_compare(.false.,test,'naorb')) then
+            if (.not.inp_i(naorb))
+     $     call errquit (pname//"naorb takes a float", 0, 0)
+           if (.not.rtdb_put(rtdb,'rt_semiemp:naorb',mt_int,1,
+     $     naorb))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+
+      elseif (inp_compare(.false.,test,'nborb')) then
+            if (.not.inp_i(nborb))
+     $     call errquit (pname//"nborb takes a float", 0, 0)
+           if (.not.rtdb_put(rtdb,'rt_semiemp:nborb',mt_int,1,
+     $     nborb))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+           
        elseif (inp_compare(.false.,test,'numorb')) then
         do i = 1, norb
             if (.not.inp_i(numorb(i)))
      $     call errquit (pname//"numorb takes a float", 0, 0)
         end do
-            write(6,*)"numorb",numorb
            if (.not.rtdb_put(rtdb,'rt_semiemp:numorb',mt_int,100,
      $     numorb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
+       elseif (inp_compare(.false.,test,'numorba')) then
+        do i = 1, naorb
+            if (.not.inp_i(numorba(i)))
+     $     call errquit (pname//"numorba takes a float", 0, 0)
+        end do
+           if (.not.rtdb_put(rtdb,'rt_semiemp:numorba',mt_int,100,
+     $     numorba))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+
+       elseif (inp_compare(.false.,test,'numorbb')) then
+        do i = 1, nborb
+            if (.not.inp_i(numorbb(i)))
+     $     call errquit (pname//"numorbb takes a float", 0, 0)
+        end do
+           if (.not.rtdb_put(rtdb,'rt_semiemp:numorbb',mt_int,100,
+     $     numorbb))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+           
        elseif (inp_compare(.false.,test,'occuorb')) then
         do i = 1, norb
             if (.not.inp_f(occuorb(i)))
      $     call errquit (pname//"occuorb takes a float", 0, 0)
         end do
-            write(6,*)"occuorb",occuorb
            if (.not.rtdb_put(rtdb,'rt_semiemp:occuorb',mt_dbl,10,
      $     occuorb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
+       elseif (inp_compare(.false.,test,'occuorba')) then
+        do i = 1, naorb
+            if (.not.inp_f(occuorba(i)))
+     $     call errquit (pname//"occuorba takes a float", 0, 0)
+        end do
+           if (.not.rtdb_put(rtdb,'rt_semiemp:occuorba',mt_dbl,10,
+     $     occuorba))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+
+       elseif (inp_compare(.false.,test,'occuorbb')) then
+        do i = 1, nborb
+            if (.not.inp_f(occuorbb(i)))
+     $     call errquit (pname//"occuorbb takes a float", 0, 0)
+        end do
+           if (.not.rtdb_put(rtdb,'rt_semiemp:occuorbb',mt_dbl,10,
+     $     occuorbb))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+           
           got_elh=.true.
          if (.not.rtdb_put(rtdb,'rt_semiemp:got_elh',mt_log,1,got_elh))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)

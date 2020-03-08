@@ -15,7 +15,7 @@
        integer rtdb, nb
        double precision FA(*)
        integer lBB, iBB, iW, lW, norb
-       integer numorb(10)
+       integer numorb(100)
        double precision occuorb(10)
        integer ehinfo(5)
        integer soccup(2), i, j, iorb
@@ -42,7 +42,7 @@ c       write(6,*)"i am at elh_state"
        if (.not.rtdb_get(rtdb,'rt_semiemp:norb',mt_int,1,norb))
      1 call errquit('eh_state: failed to get norb',0,RTDB_ERR)
 
-       if (.not.rtdb_get(rtdb,'rt_semiemp:numorb',mt_int,10,numorb))
+       if (.not.rtdb_get(rtdb,'rt_semiemp:numorb',mt_int,100,numorb))
      1 call errquit('eh_state: failed to get numorb',0,RTDB_ERR)
 
        if (.not.rtdb_get(rtdb,'rt_semiemp:occuorb',mt_dbl,10,occuorb))
@@ -85,4 +85,118 @@ c     write(6,*)"ehinfo", ehinfo
       if (.not.ma_pop_stack(lBB))
      &   call errquit('el-h_state: cannot pop stack BB',3, MA_ERR)
 
-       end 
+       end
+
+
+c---------------------------------------------------------------------------
+c   eh state for UHF
+c--------------------------------------------------------------------------  
+       Subroutine eh_state_u(rtdb,RA,RB,nb)
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "msgids.fh"
+#include "rtdb.fh"
+#include "geom.fh"
+#include "util.fh"
+#include "matutils.fh"
+#include "zora.fh"
+#include "rt_tddft.fh"
+#include "inp.fh"
+
+       integer rtdb, nb
+       double precision RA(*), RB(*)
+       integer lAA, iAA, iWA, lWA, naorb
+       integer lBB, iBB, iWB, lWB, nborb
+       integer numorba(100), numorbb(100)
+       double precision occuorba(10), occuorbb(10)
+       integer ehinfo(5)
+       integer soccup(2), i, j, iorb
+       integer ocor, uocor
+       integer numfoa, numfob
+
+        NRR= NB*(NB+1)/2
+
+          if (.not.MA_Push_Get(MT_Dbl,nb*nb,'AA',lAA,iAA))
+     &   call errquit('eh_state: cannot allocate AA',0,MA_ERR)
+
+        if (.not.MA_Push_Get(MT_Dbl,nb,'WA',lWA,iWA))
+     &   call errquit('eh_state: cannot allocate WA',0,MA_ERR)
+
+      if (.not.rtdb_get(rtdb,'semiemp:acoefficient',mt_dbl,nb*nb,
+     1 Dbl_MB(iAA)))
+     1 call errquit('eh_state: failed to write alpha coefficient',0, 
+     1 RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'semiemp:aoccupation',mt_dbl,nb,Dbl_MB(iWA)
+     1 ))
+     1 call errquit('eh_state: failed to write alpha ocuupation',0,
+     1 RTDB_ERR)
+
+      if (.not.MA_Push_Get(MT_Dbl,nb*nb,'BB',lBB,iBB))
+     &   call errquit('eh_state: cannot allocate BB',0,MA_ERR)
+
+        if (.not.MA_Push_Get(MT_Dbl,nb,'WB',lWB,iWB))
+     &   call errquit('eh_state: cannot allocate WA',0,MA_ERR)
+
+      if (.not.rtdb_get(rtdb,'semiemp:bcoefficient',mt_dbl,nb*nb,
+     1 Dbl_MB(iBB)))
+     1 call errquit('eh_state: failed to write beta coefficient',0,
+     1 RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'semiemp:boccupation',mt_dbl,nb,
+     1 Dbl_MB(iWB)))
+     1 call errquit('eh_state: failed to write beta ocuupation',0,
+     1 RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'rt_semiemp:naorb',mt_int,1,naorb))
+     1 call errquit('eh_state: failed to get naorb',0,RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:numorba',mt_int,100,numorba))
+     1 call errquit('eh_state: failed to get numorba',0,RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:occuorba',mt_dbl,10,occuorba))
+     1 call errquit('eh_state: failed to get occuorba',0,RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'rt_semiemp:nborb',mt_int,1,nborb))
+     1 call errquit('eh_state: failed to get nborb',0,RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:numorbb',mt_int,100,numorbb))
+     1 call errquit('eh_state: failed to get numorbb',0,RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:occuorbb',mt_dbl,10,occuorbb))
+     1 call errquit('eh_state: failed to get occuorba',0,RTDB_ERR)
+
+
+       numfoa =0 
+       do iorb = 1, naorb
+        I = numorba(iorb)
+        if (Dbl_MB(iwa+i-1).eq.1.0d0) numfoa = numfoa +1
+        Dbl_MB(iwa+i-1) = occuorba(iorb)
+c      write(6,*) "occupation", occuorb(iorb)
+       end do
+      CALL DENSIT(Dbl_MB(iAA),RA,Dbl_MB(iWA),NB,NB,NRR)
+
+       numfob =0
+       do iorb = 1, nborb
+        I = numorbb(iorb)
+        if (Dbl_MB(iwb+i-1).eq.1.0d0) numfob = numfoa +1
+        Dbl_MB(iwb+i-1) = occuorbb(iorb)
+c      write(6,*) "occupation", occuorb(iorb)
+       end do
+      CALL DENSIT(Dbl_MB(iBB),RA,Dbl_MB(iWB),NB,NB,NRR)
+      
+      if (.not.ma_pop_stack(lWB))
+     &   call errquit('el-h state: cannot pop stack WB',3, MA_ERR)
+
+      if (.not.ma_pop_stack(lBB))
+     &   call errquit('el-h_state: cannot pop stack BB',3, MA_ERR)
+
+      if (.not.ma_pop_stack(lWA))
+     &   call errquit('el-h state: cannot pop stack WA',3, MA_ERR)
+
+      if (.not.ma_pop_stack(lAA))
+     &   call errquit('el-h_state: cannot pop stack AA',3, MA_ERR)
+      
+      end       
