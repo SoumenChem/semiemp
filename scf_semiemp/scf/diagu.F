@@ -1,4 +1,4 @@
-      SUBROUTINE DIAGU(BB,F,H,FA,FZ,RAD,ITMAX,IT,PREVS,SCFTOL,MIM,
+      SUBROUTINE DIAGU(rtdb,BB,F,H,FA,FZ,RAD,ITMAX,IT,PREVS,SCFTOL,MIM,
      1  ISW3,NB,EIG,FOP,ISWANN,NEL,MULT,W,JSLIT,NRR,Q,NIN,NU,NTYP,NDN,RA
      2  ,RB,NCORE,NASS)
 C
@@ -34,6 +34,7 @@ C
 #include "stdio.fh"
 #include "dra.fh"
 #include "inp.fh"
+      integer rtdb
       double precision MULT,FOP(*)
       LOGICAL      IBGIV
       PARAMETER (MXB = 4000, MXA = 1200,MXF = 100, MPE = 105)
@@ -196,12 +197,24 @@ c        ELSE
 c           WRITE (6,9010) (I,EIG(I)+EIGSHF,I=1,NROOT)
 c        END IF
 c     END IF
- 
    60 CALL REAR(BB,EIG,W,NB,NROOT,IFLAG)
 c     IF (NXT.EQ.1) CALL SYMORB(BB,EIG,NU,NW,IIMO,NB,IONE,IFLAG)
 c     IAB = 1
 c     IF (IPUN.GT.8) CALL BACKUP(BB,IT,NR,IAB)
 
+        if (.not.rtdb_put(rtdb,'semiemp:eiga',mt_dbl,nb,EIG))
+     1  call errquit('diagu: failed to write eig',0,
+     1  RTDB_ERR)
+
+         if (.not.rtdb_put(rtdb,'semiemp:acoefficient',mt_dbl,nb*nb,BB))
+     1  call errquit('diagu: failed to write alpha coefficient',0,
+     1  RTDB_ERR)
+
+       if (.not.rtdb_put(rtdb,'semiemp:aoccupation',mt_dbl,nb,W))
+     1  call errquit('diagu: failed to write alpha occupation',0,
+     1  RTDB_ERR)
+
+       
    70 CONTINUE
 c ***********
 C **********
@@ -220,6 +233,7 @@ c     write(6,*)"W after densit",(W(I),I=1,nb)
       CALL DENSIT(BB,F,W,NB,NROOT1,NRR)
 c     IF (MULT.LT.3) THEN
          call ga_dgop(Msg_diagu,F,NRR,'+')
+
 c     END IF
 c     write(6,*)"BB after densit",(BB(I),I=1,nrr)
 c     write(6,*)"FA after densit",(F(I),I=1,nrr)
@@ -391,14 +405,27 @@ c           ELSE
 c              WRITE (6,9010) (I,EIG(I)+EIGSHF,I=NC+1,NC+NORBS)
 c           END IF
 c        END IF
-
+c        write(6,*)"here 3",NC
+c        write(6,*)"EIG",(EIG(I),I=1,6)
   170    CALL REAR(BB,EIG(NC+1),W(NC+1),NB,NROOT,IFLAG)
+c        write(6,*)"EIG",(EIG(I),I=1,6)
 c        IF (NXT.EQ.1) CALL SYMORB(BB,EIGA,NU,NW,IIMO,NB,ITWO,IFLAG)
 c        IAB = 2
 c        IF (IPUN.GT.8) CALL BACKUP(BB,IT,NR,IAB)
 c
 C        OPEN SHELL RHF OR ALPHA UHF DENSITY
 C
+        if (.not.rtdb_put(rtdb,'semiemp:bcoefficient',mt_dbl,nb*nb,BB))
+     1  call errquit('diagu: failed to write beta coefficient',0,
+     1  RTDB_ERR)
+
+       if (.not.rtdb_put(rtdb,'semiemp:boccupation',mt_dbl,nb,W(NC+1)))
+     1 call errquit('diagu: failed to write beta ocuupation',0,RTDB_ERR)
+
+        if (.not.rtdb_put(rtdb,'semiemp:eigb',mt_dbl,nb,EIG))
+     1  call errquit('diagu: failed to write eig',0,
+     1  RTDB_ERR)
+       
   180    CONTINUE
 C        WRITE (14) (BB(I),I=1,NR)
 c        CALL ZRWRITE (IO_VEC_DEN, BB, 1, NR, 'DIAGU')
@@ -408,6 +435,7 @@ C
          CALL DENSIT(BB,FA,W(NC+1),NB,NROOT,NRR)
          call ga_dgop(Msg_diagu,FA,NRR,'+')
 
+         
          NC = NC + MIM(JJ)
          NORBS = NB - NC
          NSTART = NC*NB + 1

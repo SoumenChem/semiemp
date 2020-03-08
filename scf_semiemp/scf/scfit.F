@@ -214,8 +214,8 @@ c      write(6,*)"FA before diagu",(FA(I),I=1,nrr)
 c      write(6,*)"H before diagu",(H(I),I=1,nrr)
       IF ((ISWANN .EQ. 1) .OR. (ISWANN .EQ. 2)) then
 C     OPEN SHELL UNRESTRICTED
-       CALL DIAGU(BB,F,H,FA,FZ,RAD,ITMAX,IT,PREVS,SCFTOL,MIM,ISW3,NB,
-     1 EIG,FOP,ISWANN,NEL,MULT,Dbl_MB(iW),JSLIT,NRR,Q,NIN,NU
+       CALL DIAGU(rtdb,BB,F,H,FA,FZ,RAD,ITMAX,IT,PREVS,SCFTOL,MIM,ISW3,
+     1 NB,EIG,FOP,ISWANN,NEL,MULT,Dbl_MB(iW),JSLIT,NRR,Q,NIN,NU
      1 ,NTYP,NDN,RA,RB,NCORE,NASS)
 c      write(6,*)"FA after diagu",(FA(I),I=1,nrr)
 c      call ga_dgop(Msg_diagu,F,NB*NB,'+')!Propagate status

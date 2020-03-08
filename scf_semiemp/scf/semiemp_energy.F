@@ -1024,12 +1024,17 @@ c       E1 = E1/100
      1  call errquit('semiemp: failed to write eig',0, RTDB_ERR)
 
 
-       if (ISWANN.eq.0) 
-     1 CALL semiemp_mo_print(rtdb,int_mb(iatnum),nbf)
+       if (ISWANN.eq.0) then
+        if (.not.rtdb_put(rtdb,'semiemp:eig',mt_dbl,nbf,Dbl_MB(ieig)))
+     1  call errquit('semiemp: failed to write eig',0, RTDB_ERR)
+       
+       CALL semiemp_mo_print(rtdb,int_mb(iatnum),nbf)
+      end if 
 c      do i = 0 , nrr-1
 c       write(6,*)"FZ",Dbl_MB(idipz+i)
 c      end do
-
+       if (ISWANN.eq.1) 
+     1 CALL semiemp_mo_uhf_print(rtdb,int_mb(iatnum),nbf)
 C-----------------------------------------------------------------------------------
 C THIS PART PERFORMS REAL TIME CALCULATION
 C----------------------------------------------------------------------------------
