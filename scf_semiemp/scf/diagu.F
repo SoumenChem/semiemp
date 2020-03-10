@@ -51,7 +51,7 @@ C
      +   IFIVE = 5, ISIX = 6, ISEVEN = 7, IEIGHT = 8, ININE = 9
      +   ,ITEN = 10)
       dimension  F(*),H(*),FA(*),RAD(*),W(*),Q(*),D(NB),E(NB),E2(NB)
-     .           ,NASS(7),MIM(31),BB(*),EIG(*),NIN(*),A(NRR),EIGA(NB),
+     .           ,NASS(7),MIM(*),BB(*),EIG(*),NIN(*),A(NRR),EIGA(NB),
      .            WA(NB),NU(*),NTYP(*),RA(*),RB(*)
       DIMENSION    IIMO(NB),JSLIT(4)
       SAVE         ISWAN1, IL, NXT

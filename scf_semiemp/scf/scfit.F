@@ -35,7 +35,7 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
      +   IFIVE = 5, ISIX = 6, ISEVEN = 7, IEIGHT = 8, ININE = 9
      +   ,ITEN = 10)
       dimension  F(*),H(*),FA(*),GAMMA(*),SH(*),RAD(*),NU(*),NG(*)
-     .    ,D13(NA),NASS(7),MIM(31),EIG(*),BB(*),FT(*),!SC(NB,33)
+     .    ,D13(NA),NASS(7),MIM(*),EIG(*),BB(*),FT(*),!SC(NB,33)
      . JSLIT(4),SUMELEL(*),QQ(*),LABI(*),LABJ(*),LABK(*),!W(2*NB)
      . LABL(*), D12(NA),FZ(*),NIN(*),!RA(NRR),RB(NRR)
      . AA(*),RA(*),RB(*),Q(*)
