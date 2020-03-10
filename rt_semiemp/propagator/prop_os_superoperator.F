@@ -326,8 +326,8 @@ c     call ga_print(g_zwb)
 c     call ga_print(g_zwa_scale)
 c     call ga_print(g_zwb_scale)
   
-      call ga_add(z1,g_zdensa,z1,g_zwa,g_zdensa_new)
-      call ga_add(z1,g_zdensb,z1,g_zwb,g_zdensb_new)
+      call ga_add(z1,g_zdensa,z1,g_zwa_scale,g_zdensa_new)
+      call ga_add(z1,g_zdensb,z1,g_zwb_scale,g_zdensb_new)
 c     call ga_print(g_zdens)
 c     call ga_print(g_zwa)
 c----------------------------------------------------------------
