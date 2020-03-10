@@ -3,7 +3,7 @@
 #
    OBJ = \
 
-   OBJ_OPTIMIZE = eh_state.o ga_extra.o ga_fillf.o rt_semiemp.o rt_semiemp_restart.o\
+   OBJ_OPTIMIZE = eh_state.o  ga_extra.o ga_fillf.o rt_semiemp.o rt_semiemp_restart.o\
 
    LIBRARY = libsemiemp.a
 
