@@ -3,7 +3,7 @@
 #
    OBJ = \
 
-   OBJ_OPTIMIZE = rt_semiemp_avgs2.o rt_semiemp_charge.o rt_semiemp_dipole.o rt_semiemp_moocc.o rt_semiemp_mullpop.o rt_semiemp_output.o\
+   OBJ_OPTIMIZE = rt_semiemp_avgs2.o rt_semiemp_charge.o rt_semiemp_dipole.o rt_semiemp_os_dipole.o rt_semiemp_moocc.o rt_semiemp_mullpop.o       rt_semiemp_output.o\
 
    LIBRARY = libsemiemp.a
 
