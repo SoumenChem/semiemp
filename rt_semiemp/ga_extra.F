@@ -145,6 +145,71 @@ C---------------------------------------------------------------------------
 C-------------------------------------------------------------------------------------
 C
 C-------------------------------------------------------------------------------------
+      Subroutine rt_activespace_os(rtdb,n)
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "msgids.fh"
+#include "rtdb.fh"
+#include "geom.fh"
+#include "util.fh"
+#include "matutils.fh"
+#include "zora.fh"
+#include "rt_tddft.fh"
+#include "inp.fh"
+
+        integer leig, ieig
+        integer iocc, iuocc, ocor
+        double precision ecut
+        integer  orbspace(2), MIM(2)
+        integer aorb(3)
+        integer i, j, n
+
+             if (.not.MA_Push_Get(MT_Dbl,n,'EIG',leig,ieig))
+     &   call errquit('semiemp_energy: cannot allocate EIG',0,
+     1    MA_ERR)
+
+
+       if (.not.rtdb_get(rtdb,'semiemp:eig',mt_dbl,n,Dbl_MB(ieig)))
+     1  call errquit('rt_activespace: failed to write eig',0, RTDB_ERR)
+
+       if (.not.rtdb_get(rtdb,'rt_semiemp:orbspace',mt_int,2,orbspace))
+     1 continue
+
+       if (.not.rtdb_get(rtdb,'semiemp:MIM',mt_int,2,MIM))
+     1 call errquit('semiemp: failed to read MIM',0, RTDB_ERR)
+
+
+       if (ga_nodeid().eq.0)
+     1 write(6,*)"orbitals",orbspace(1), orbspace(2)
+
+        aorb(1) = MIM(1) - orbspace(1)+1
+        aorb(2) = orbspace(2) - MIM(1)
+
+        if (.not.rtdb_put(rtdb,'rt_semiemp:orbspace',mt_int,2,orbspace))
+     1  call errquit('rt_activespace: failed to write orbspace',0,
+     2   RTDB_ERR)
+
+       if (.not.rtdb_put(rtdb,'rt_semiemp:betaactsize',mt_int,3,aorb))
+     1  call errquit('rt_activespace: failed to write betaactsize',0,
+     2   RTDB_ERR)
+
+        aorb(1) = MIM(2) - orbspace(1)+1
+        aorb(2) = orbspace(2) - MIM(2)
+
+        if (.not.rtdb_put(rtdb,'rt_semiemp:alphaactsize',mt_int,3,aorb))
+     1  call errquit('rt_activespace: failed to write alphaactsize',0,
+     2   RTDB_ERR)
+       
+           if (.not.ma_pop_stack(leig))
+     &  call errquit('semiemp_energy: cannot pop stack EIG',3, MA_ERR)
+      return
+      end
+
+C-------------------------------------------------------------------------------------
+C
+C-------------------------------------------------------------------------------------
       Subroutine rt_activespace(rtdb,n)
 #include "errquit.fh"
 #include "mafdecls.fh"
