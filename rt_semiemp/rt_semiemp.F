@@ -38,6 +38,7 @@ C     == Variables ==
       integer isvals, lsvals,iovl,lovl
       integer g_densa, g_densb
       integer prop_method
+      integer MIM(2)
       logical atmblk
       integer lseig,iseig,lsvecs,isvecs, inverse
       integer LABI(*), LABJ(*), LABK(*), LABL(*), LL, NIN(*), NG(*)
@@ -171,7 +172,10 @@ c     call ga_sqmat(g_core,Q,nb,1)
 c     test = ga_spd_invert(g_s)
       if (ipol.eq.0) then
 
-      ocor = nel/2
+       if (.not.rtdb_get(rtdb,'semiemp:MIM',mt_int,2,MIM))
+     1 call errquit('semiemp: failed to read MIM',0, RTDB_ERR)
+        
+      ocor = MIM(1)
       if (.not.rtdb_put(rtdb,'rtsemiemp:ocor',mt_int,1,ocor))
      1 call errquit('rtsemiemp: failed to write ocor',0, RTDB_ERR)
 
@@ -261,10 +265,14 @@ C
 
       call ga_zero(g_densa)
       call ga_zero(g_densb)
+      if (.not. rtdb_get (rtdb, "rt_semiemp:got_elh",
+     $    mt_log, 1, got_elh))
+     2 continue
 
 
-      if (got_eh) eh_state_u(rtdb,RA,RB,nb)
-
+      if (got_elh) then 
+       call  eh_state_u(rtdb,RA,RB,nb)
+      end if 
 
       call ga_sqmat(g_densa,RA,nb,1)
       call ga_sqmat(g_densb,RB,nb,1)
