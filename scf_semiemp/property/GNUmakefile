@@ -3,7 +3,7 @@
 #
    OBJ = \
 
-   OBJ_OPTIMIZE = dipole.o grndip.o purvis.o bondor.o semiemp_mo_print.o \
+   OBJ_OPTIMIZE = dipole.o grndip.o purvis.o bondor.o semiemp_mo_print.o semiemp_mo_uhf_print.o\
 
    LIBRARY = libsemiemp.a
 
