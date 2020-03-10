@@ -381,9 +381,10 @@ C      g_zdens_ao)
 
 c     call ga_print(g_zwa)
 
-      call rt_semiemp_dipole(rtdb,g_zscr,RAD,KAN,NA,CO,NU,NW,NP,NIN,
-     1 ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,Dbl_MB(idipx),Dbl_MB(idipy),
-     1 Dbl_MB(idipz),tag,t,g_s,g_ft,it,nrestarts,got_orbspace)
+      call rt_semiemp_os_dipole(rtdb,g_zscr,g_ztemp1,g_ztemp2,RAD,KAN,NA
+     1 ,CO,NU,NW,NP,NIN,ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,
+     1 Dbl_MB(idipx),Dbl_MB(idipy),Dbl_MB(idipz),tag,t,g_s,g_ft,it,
+     1 nrestarts,got_orbspace)
 
       if (mod(it,nrestarts).eq.0) 
      $ call rt_semiemp_os_restart_save(it,n,t,g_zwa,g_zwb)

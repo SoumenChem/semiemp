@@ -403,9 +403,10 @@ c      write(6,*)"fgauss=",fgauss
 
 
 
-      call rt_semiemp_dipole(rtdb,g_ztemp1,RAD,KAN,NA,CO,NU,NW,NP,NIN,
-     1 ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,Dbl_MB(idipx),Dbl_MB(idipy),
-     1 Dbl_MB(idipz),tag,t,g_s,g_ft,it,nrestarts,got_orbspace)
+      call rt_semiemp_os_dipole(rtdb,g_ztemp1,g_zdensa,g_zdensb,RAD,KAN,
+     1 NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,
+     1 Dbl_MB(idipx),Dbl_MB(idipy),Dbl_MB(idipz),tag,t,g_s,g_ft,it,
+     1 nrestarts,got_orbspace)
 
       if (mod(it,nrestarts).eq.0) 
      $ call rt_semiemp_os_restart_save(it,n,t,g_zdensa,g_zdensb)
