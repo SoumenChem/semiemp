@@ -39,7 +39,7 @@ c
       logical numerical 
       integer III,L
       integer IA
-      integer MIM(31) ! NUM. OF ORBITALS IN EACH SHELL I.
+      integer MIM(2) ! NUM. OF ORBITALS IN EACH SHELL I.
       double precision FOP(31) ! THE NUM. OF ELECTRONS IN EACH SHELL I. CLOSED
                       ! SHELL FIRST  THEN GREATEST OPENSHELL FIRST, ETC.
       character*8 atom_type
@@ -374,7 +374,12 @@ c      write(6,*)"NEL",NEL
        MIM(1) = MIM(2) - MULT + 1
        FOP(2) = REAL(MIM(2))
        FOP(1) = REAL(MIM(1))
+c      write(6,*)"MIM",MIM(1),MIM(2)
        IF(ISWANN .EQ. 0) FOP(1) = REAL(NEL)
+
+        if (.not.rtdb_put(rtdb,'semiemp:MIM',mt_int,2,MIM))
+     1  call errquit('semiemp: failed to write MIM',0, RTDB_ERR)
+
 c     ELSE
 c      CALL RHFST(MULT)
       ENDIF
