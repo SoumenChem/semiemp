@@ -22,7 +22,7 @@ C     == In/out ==
 
 
 C     == Parameters ==
-      character(*), parameter :: pname = "rt_tddft_cs_init: "
+      character(*), parameter :: pname = "rt_tddft_os_init: "
 
 
 C     == Variables ==
