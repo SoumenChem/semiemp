@@ -18,6 +18,7 @@ C#include "cdft.fh"
 #include "rt_tddft.fh"
 
       integer rtdb
+      integer iocor
       integer g_dipx, g_dipy, g_dipz, g_zdens_ao, g_temp
       integer g_densre, g_densim, g_s, g_scr, g_ft
       double precision RAD(*),Z12(*),D12(*),H(*),BB(*)
@@ -144,12 +145,13 @@ c      IORB =  aorb(1)*aorb(2) + ehinfo(1)*(aorb(1)-ehinfo(1))
 c     else
 c      IORB = aorb(1)*aorb(2)
 c     end if
+      iocor = nel/2
 
 c     write(6,*)"IORB",IORB, aorb(1), aorb(2)
 
       call DIPOLE(rtdb,RAD,KAN,NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,NB,NRR,
      1 ISW1,Z12,D12,Dbl_MB(idens),NEL,D,dipx,dipy,dipz,2,Dbl_mb(iPME),
-     1 int_mb(iocc),int_mb(iunocc),IORB)
+     1 int_mb(iocc),int_mb(iunocc),IORB,iocor)
 
 
 c     do i = 0, nrr-1
