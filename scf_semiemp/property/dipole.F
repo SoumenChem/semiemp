@@ -1,5 +1,6 @@
       SUBROUTINE DIPOLE(rtdb,RAD,KAN,NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,NB,
-     1 NRR,ISW1,Z12,D12,P,NEL,D,FX,FY,FZ,ITAG,PME,IHOMO,ILUMO,IORB)
+     1 NRR,ISW1,Z12,D12,P,NEL,D,FX,FY,FZ,ITAG,PME,IHOMO,ILUMO,IORB,
+     1 iocor)
 
 C
 C     (17-JUN-1983) /MCZ/
@@ -69,7 +70,7 @@ c     INCLUDE '../include/outcntrl.cmn'
      .             BB(3), E(3), BBB(3),NLL(16),NIN(*),NU(*),
      .             B(3),NW(*),CO(3,NA),NP(*),ALPHA(NB,6),KAN(*),DIPP(6)
      .             ,DPM(3),D12(*),Z12(*),P(*),D(3),FX(*),FY(*)
-     .             ,FZ(*), PME(3*iorb)
+     .             ,FZ(*), PME(3*iorb),IHOMO(*),ILUMO(*)
       DIMENSION    LABEL(3), MPG(3)
       PARAMETER
      + (ZERO =  0.0D0, ONE  =  1.0D0, TWO  =  2.0D0, THREE = 3.0D0,
@@ -150,10 +151,10 @@ C
 
        end if
 
-       if (got_elh) then
-        if (.not.rtdb_get(rtdb,'rtsemiemp:ehinfo',mt_int,5, ehinfo))
-     1 call errquit('eh_state: failed to get ehinfo',0,RTDB_ERR)
-       end if
+c      if (got_elh) then
+c       if (.not.rtdb_get(rtdb,'rtsemiemp:ehinfo',mt_int,5, ehinfo))
+c    1 continue
+c      end if
 
        if (got_orbspace) then
 c       write(6,*)"here"
@@ -587,7 +588,7 @@ c     case still.
 C  
       CALL GRNDIP(P,E,A,B,BBB,BB,FX,FY,FZ,RAD,ITDIP,NA,NU,NRR,ISW1,NIN,
      1 CO,Z12,KAN,NB,NW,PME,orbspace,got_orbspace,got_elh,IHOMO,ILUMO,
-     1 IORB,NEL,ehinfo)
+     1 IORB,NEL,ehinfo,iocor)
 
 c      call ga_sync()
 C

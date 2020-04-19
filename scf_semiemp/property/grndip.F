@@ -1,6 +1,6 @@
       SUBROUTINE GRNDIP(P,E,A,B,BBB,BB,FX,FY,FZ,RAD,ITDIP,NA,NU,NRR,ISW1
      .     ,NIN,CO,Z12,KAN,NB,NW,PME,orbspace,got_orbspace,got_elh,IHOMO
-     .     ,ILUMO,IORB,NEL,ehinfo)
+     .     ,ILUMO,IORB,NEL,ehinfo,iocor)
 C
 C     THIS SUBROUTINE CALC. THE DIPOLE MATRIX ELEMENTS FOR A GIVEN
 C     STATE.
@@ -200,8 +200,8 @@ c            write(6,*)"HERE,KJ",KJ,P(KJ),FZ(KJ)
              PME((L-1)*3+1) = PME((L-1)*3+1) + P(KJ)*FX(KJ)
              PME((L-1)*3+2) = PME((L-1)*3+2) + P(KJ)*FY(KJ)
              PME((L-1)*3+3) = PME((L-1)*3+3) + P(KJ)*FZ(KJ)
-            ELSE IF ((K.GE.orbspace(1).AND.K.LE.NEL/2).AND.
-     1   (J.LE.orbspace(2).AND.J.GT.NEL/2)) THEN
+            ELSE IF ((K.GE.orbspace(1).AND.K.LE.iocor).AND.
+     1   (J.LE.orbspace(2).AND.J.GT.iocor)) THEN
              L = L + 1
              IHOMO(L) = K
              ILUMO(L) = J
@@ -211,8 +211,8 @@ c            write(6,*)"HERE,KJ",KJ,P(KJ),FZ(KJ)
              PME((L-1)*3+2) = PME((L-1)*3+2) + P(KJ)*FY(KJ)
              PME((L-1)*3+3) = PME((L-1)*3+3) + P(KJ)*FZ(KJ)
               END IF
-            ELSE IF ((K.GE.orbspace(1).AND.K.LE.NEL/2).AND.
-     1   (J.LE.orbspace(2).AND.J.GT.NEL/2)) THEN
+            ELSE IF ((K.GE.orbspace(1).AND.K.LE.iocor).AND.
+     1   (J.LE.orbspace(2).AND.J.GT.iocor)) THEN
              L = L + 1
              IHOMO(L) = K
              ILUMO(L) = J
