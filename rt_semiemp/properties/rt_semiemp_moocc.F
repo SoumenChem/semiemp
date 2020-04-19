@@ -16,7 +16,8 @@ C
 C     Note, can also compute using matrix multiplications (XXX double check):
 C     n_k(t) = [C'^+ P'(t) C']_kk
 C
-      subroutine rt_semiemp_moocc(rtdb,g_densre_mo,nbf,g_movecs_gs,tt)
+      subroutine rt_semiemp_moocc(rtdb,g_densre_mo,nbf,g_movecs_gs,tt,
+     1 tag)
       implicit none
 
 #include "errquit.fh"
@@ -35,7 +36,7 @@ C     == Inputs ==
       integer rtdb
       integer g_densre_mo  !re part of density matrix in MO basis
       integer g_movecs_gs  !ground state movecs
-
+      integer tag
 
 C     == Outputs ==
       double precision moocc(10) !MO occupations
@@ -55,15 +56,43 @@ C     == Variables ==
       integer k
       integer norb, numorb(100)
       double precision dval, tt
+      character*20 scftype
+
+
 
       me = ga_nodeid()
 
-       if (.not.rtdb_get(rtdb,'rt_semiemp:norb',mt_int,1,norb))
-     1 GO to 10
+       if (.not.rtdb_cget(rtdb,'semiemp:scftype',1,scftype)) then
+      call errquit('semiemp_energy: failed to read scftype',0, RTDB_ERR)
+       endif
 
-       if (.not.rtdb_get(rtdb,'rt_semiemp:numorb',mt_int,100,numorb))
+      if (inp_compare(.false.,scftype,'rhf'))  then
+
+      if (.not.rtdb_get(rtdb,'rt_semiemp:norb',mt_int,1,norb))
+     1 call errquit('rt_semiemp_moocc: failed to get norb',0,RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'rt_semiemp:numorb',mt_int,100,numorb))
      1 call errquit('rt_semiemp_moocc: failed to get numorb',0,RTDB_ERR)
 
+       elseif (inp_compare(.false.,scftype,'uhf'))  then
+         if (tag.eq.1) then
+          if (.not.rtdb_get(rtdb,'rt_semiemp:naorb',mt_int,1,norb))
+     1 call errquit('rt_semiemp_moocc: failed to get naorb',0,RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'rt_semiemp:numorba',mt_int,100,numorb))
+     1 call errquit('rt_semiemp_moocc: failed to get numorba',0,
+     1 RTDB_ERR)
+          
+        elseif (tag.gt.1) then
+       if (.not.rtdb_get(rtdb,'rt_semiemp:nborb',mt_int,1,norb))
+     1 call errquit('rt_semiemp_moocc: failed to get nborb',0,RTDB_ERR)
+
+      if (.not.rtdb_get(rtdb,'rt_semiemp:numorbb',mt_int,100,numorb))
+     1 call errquit('rt_semiemp_moocc: failed to get numorbb',0,
+     1 RTDB_ERR)
+                   
+          end if 
+         end if 
       
       if (.not. ga_create(mt_dbl, nbf, 1,
      $     "k^th evec", 0, 0, g_veck))
