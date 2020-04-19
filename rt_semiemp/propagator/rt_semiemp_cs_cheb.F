@@ -439,7 +439,7 @@ c    1 g_scr,g_zscr,n,nel,t)
 
       if (print_moocc) then
       call convert_z2d(g_zdens_ao,g_densre,g_scr)
-      call rt_semiemp_moocc(rtdb,g_densre,n,g_cgs,t)
+      call rt_semiemp_moocc(rtdb,g_densre,n,g_cgs,t,1)
       end if
 
       if (print_dipole) then

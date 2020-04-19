@@ -9,8 +9,8 @@ C>  dynamics.
 C--------------------------------------------------------------------
       subroutine rt_semiemp_os_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ
      1,LABK,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,n,RAD,KAN,NA,CO,
-     2 NU,NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_ft_inv,g_core,
-     3 g_temp,g_densa,g_densb)
+     2 NU,NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgsa,g_cgsb,
+     3 g_core,g_temp,g_densa,g_densb)
       implicit none
 
 #include "errquit.fh"
@@ -46,14 +46,14 @@ C     == Variables ==
       integer ihomo, ilumo
       integer g_densre, g_s, g_zfpa, g_zfpb, g_core
       integer g_densa, g_densb
-      integer g_ca, g_cb
+      integer g_cgsa, g_cgsb
       integer g_zdensa, g_zdensb,  g_zfocka, g_zfockb !in AO basis
       integer g_zdens_ao, g_zfock_ao !in AO basis
       integer g_densre_ao, g_densim_ao
       integer g_densre_mo, g_densim_mo
       integer g_zfock_mo_n12dt  !stored previous F'(t-0.5*dt) values
       integer g_zfock_ao_init, g_ztemp,g_ztemp1, g_ztemp2
-      integer g_zcheba, g_zchebb, g_scr, g_zscr, g_temp, g_zca, g_zcb
+      integer g_zcheba, g_zchebb, g_scr, g_zscr, g_temp
       integer g_dipx, g_dipy, g_dipz
       integer g_zscr_ao, g_zscr_mo, g_zscr2_mo, g_zs
       integer g_ft, g_ft_inv, g_zft, g_zwa, g_zwb      
@@ -74,8 +74,8 @@ C     == Variables ==
       integer miter
       character*60 outstr
       logical lrestart
-      integer idipx, ldipx, idipy, ldipy, idipz, ldipz
-
+      integer iadipx, ladipx, iadipy, ladipy, iadipz, ladipz
+      integer ibdipx, lbdipx, ibdipy, lbdipy, ibdipz, lbdipz
       double precision emin, t, dt, tmax
       double precision GPARAMA, GPARAMB
       integer i, j
@@ -85,7 +85,8 @@ C     == Variables ==
       double precision ALPHA(*),CO(*)
       integer NU(*),NW(*),NP(*),KAN(*)      
       integer NEL,NA,ISW1,nrr
-      integer g_inv_c 
+      integer g_inv_c
+      integer g_zdensa_mo, g_zdensb_mo, g_zca, g_zcb 
 C     (time-dependent system properties)
       double precision diff1, diff2, norm1, norm2, norm3, norm4
       double precision ga_trace_diag, pstrace
@@ -108,7 +109,7 @@ C     (profiling)
 C     (estimating time remaining)
       double precision est_cputime_start, max, pptrace, avgs2
       integer est_it_start
-
+      logical print_dipole, print_moocc
 C     == Variables ==
       character*32 basename
       character*32 entry_name
@@ -118,13 +119,18 @@ C     == Variables ==
       
       me = ga_nodeid()
 
-
+      print_dipole=.false.
+      print_moocc=.false.
 C     == Initialization ==
       
       write(6,*)"i am in rt_semiemp_os_cheb"
       if (me.eq.0) call util_print_centered (luout,
      $     "Open shell propagation", 40, .true.)
       
+       got_orbspace = .false.
+       if (.not. rtdb_get (rtdb, "rt_semiemp:got_orbspace",
+     $  mt_log, 1, got_orbspace)) call errquit (pname//
+     $     "failed to get 'got_orbspace' target into rtdb",0,0)
 
       
        nrr = n*(n+1)/2
@@ -150,8 +156,12 @@ C     (Fock and dens mats in AO and MO basis)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex temp", 0,0, g_ztemp)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex temp", 0,0, g_ztemp1)
       ok=ok.and.ga_create(mt_dcpl,n,n,"complex temp", 0,0, g_ztemp2)
-      ok=ok.and.ga_create(mt_dcpl,n,n,"alpha [F0,P0]", 0,0, g_zfpa)
-      ok=ok.and.ga_create(mt_dcpl,n,n,"beta [F0,P0]", 0,0, g_zfpb)
+      if (got_orbspace) then
+      ok=ok.and.ga_create(mt_dcpl,n,n,"complex alpha Coeff", 0,0, g_zca)
+      ok=ok.and.ga_create(mt_dcpl,n,n,"complex beta Coeff", 0,0, g_zcb)
+      ok=ok.and.ga_create(mt_dcpl,n,n,"complex mo RA", 0,0, g_zdensa_mo)
+      ok=ok.and.ga_create(mt_dcpl,n,n,"complex mo RB", 0,0, g_zdensb_mo)
+      end if
       if (.not.ok) call errquit(pname//"GA allocation failed", 0,GA_ERR)
 
       call ga_zero(g_zdens_ao) 
@@ -165,7 +175,6 @@ C     (Fock and dens mats in AO and MO basis)
       call ga_zero (g_temp)
       call ga_zero (g_ztemp1)
       call ga_zero (g_ztemp2)
-      call ga_zero (g_zfpb)
 
 
        if (.not.rtdb_get(rtdb,'rt_semiemp:field_max',mt_dbl,1,fval))
@@ -308,22 +317,62 @@ c    1 g_ztemp2)
 
 c     call ga_print(g_ztemp2)
 C--------------------------------------------------------------------------
-            if (.not.MA_Push_Get(MT_Dbl,n*n,'DIPX',ldipx,idipx))
-     &   call errquit('rtsemiemp: cannot allocate svecs',0,
+      write(6,*)"here 0"
+
+      if (.not.MA_Push_Get(MT_Dbl,n*n,'ADIPX',ladipx,iadipx))
+     &   call errquit('rtsemiemp: cannot allocate adipx',0,
      1    MA_ERR)
 
-             if (.not.MA_Push_Get(MT_Dbl,n*n,'DIPY',ldipy,idipy))
-     &   call errquit('rtsemiemp: cannot allocate svecs',0,
+       if (.not.MA_Push_Get(MT_Dbl,n*n,'ADIPY',ladipy,iadipy))
+     &   call errquit('rtsemiemp: cannot allocate adipy',0,
      1    MA_ERR)
 
-             if (.not.MA_Push_Get(MT_Dbl,n*n,'DIPZ',ldipz,idipz))
-     &   call errquit('rtsemiemp: cannot allocate svecs',0,
+       if (.not.MA_Push_Get(MT_Dbl,n*n,'ADIPZ',ladipz,iadipz))
+     &   call errquit('rtsemiemp: cannot allocate adipz',0,
      1    MA_ERR)
 
-      call ga_trimat(g_dipx,Dbl_MB(idipx),n)
-      call ga_trimat(g_dipy,Dbl_MB(idipy),n)
-      call ga_trimat(g_dipz,Dbl_MB(idipz),n)
+      if (got_orbspace) then
+      call mo_proj(g_dipx,g_cgsa,n,g_scr)
+      call ga_trimat(g_scr,Dbl_MB(iadipx),n)
 
+
+      call mo_proj(g_dipy,g_cgsa,n,g_scr)
+      call ga_trimat(g_scr,Dbl_MB(iadipy),n)
+
+      call mo_proj(g_dipz,g_cgsa,n,g_scr)
+      call ga_trimat(g_scr,Dbl_MB(iadipz),n)
+      else
+
+      call ga_trimat(g_dipx,Dbl_MB(iadipx),n)
+      call ga_trimat(g_dipy,Dbl_MB(iadipy),n)
+      call ga_trimat(g_dipz,Dbl_MB(iadipz),n)
+      end if
+
+      if (got_orbspace) then
+        if (.not.MA_Push_Get(MT_Dbl,n*n,'BDIPX',lbdipx,ibdipx))
+     &   call errquit('rtsemiemp: cannot allocate adipx',0,
+     1    MA_ERR)
+
+         if (.not.MA_Push_Get(MT_Dbl,n*n,'BDIPY',lbdipy,ibdipy))
+     &   call errquit('rtsemiemp: cannot allocate adipy',0,
+     1   MA_ERR)
+
+         if (.not.MA_Push_Get(MT_Dbl,n*n,'BDIPZ',lbdipz,ibdipz))
+     &   call errquit('rtsemiemp: cannot allocate adipz',0,
+     1   MA_ERR)
+
+
+      call mo_proj(g_dipx,g_cgsb,n,g_scr)
+      call ga_trimat(g_scr,Dbl_MB(ibdipx),n)
+
+
+      call mo_proj(g_dipy,g_cgsb,n,g_scr)
+      call ga_trimat(g_scr,Dbl_MB(ibdipy),n)
+
+      call mo_proj(g_dipz,g_cgsb,n,g_scr)
+      call ga_trimat(g_scr,Dbl_MB(ibdipz),n)
+       end if
+       write(6,*)"here 3" 
 c     call ga_zgemm('N','N',n,n,n,z1,g_zfocka,g_zdensa,z0,
 c    1 g_ztemp1)
 
@@ -352,6 +401,14 @@ C
 C      call rt_tddft_movecs_zdens (params, 1, g_movecs_ao_gs,
 C      g_zdens_ao)
 
+      if (.not.rtdb_get(rtdb, "rt_semiemp:print_moocc",
+     $     mt_log, 1, print_moocc))
+     $ continue
+
+       if (.not.rtdb_get(rtdb, "rt_semiemp:print_dipole",
+     $     mt_log, 1, print_dipole)) call errquit (pname//
+     $     "failed to read print_dipole from rtdb", 0, RTDB_ERR)
+
       if (.not. rtdb_cget (rtdb, "rt_semiemp:tag",
      $     1, tag)) call errquit (pname//
      $     "failed to get 'tag' target into rtdb",0,0)
@@ -377,19 +434,23 @@ C      g_zdens_ao)
      $ g_zdensb)
       ihomo = 0
       ilumo = 0
-      got_orbspace = .false.
 
       call ga_add(z1,g_zdensa,z1,g_zdensb,g_ztemp1)
 
       if (.not.rtdb_get(rtdb,'semiemp:mult',mt_dbl,1,mult))
-     $       call errquit(pname//'failed to read mult rtdb',0,RTDB_ERR)
+     $  call errquit(pname//'failed to read mult rtdb',0,RTDB_ERR)
 
+      if (got_orbspace) call rt_activespace_os(rtdb,n)
+      if (got_orbspace) then
+       call convert_d2z (1d0, g_cgsa, 0d0, g_cgsa, g_zca)
+       call convert_d2z (1d0, g_cgsb, 0d0, g_cgsb, g_zcb)
+      end if
 
    50 continue
 
 c     call ga_add(z1,g_zdensa,z1,g_zwa,g_ztemp1)
 c     call ga_add(z1,g_zdensb,z1,g_zwb,g_ztemp2)
-       if (inp_compare(.false.,field_type,'gaussian')) then
+      if (inp_compare(.false.,field_type,'gaussian')) then
        fgauss = 0.0d0
        fgauss = rt_semiemp_gaussian_window(frequency,
      $ center,width,t)
@@ -401,13 +462,39 @@ c      write(6,*)"fgauss=",fgauss
       call rt_semiemp_avgs2(rtdb,g_zdensa,g_zdensb,g_densa,g_densb,
      1 g_scr,g_zscr,n,nel,t)
 
+      if (print_moocc) then
+      write(6,*)"||ALPHA OCCUPATIONS||"
+      call convert_z2d(g_zdensa,g_densre,g_scr)
+      call rt_semiemp_moocc(rtdb,g_densre,n,g_cgsa,t,1)
+      write(6,*)"||BETA OCCUPATIONS||"
+      call convert_z2d(g_zdensb,g_densre,g_scr)
+      call rt_semiemp_moocc(rtdb,g_densre,n,g_cgsb,t,2)
+      end if
 
-
+      if (print_dipole) then 
+      if (got_orbspace) then
+      call ga_zero(g_zdensa_mo)
+      call ga_zero(g_zdensb_mo)
+c     call ga_print(g_ztemp1)
+c     call ga_print(g_ztemp2)
+      call mo_zproj(g_zdensa,g_zca,n,g_zdensa_mo)
+      call mo_zproj(g_zdensb,g_zcb,n,g_zdensb_mo)
+c     call ga_print(g_zdensa_mo)
+c     call ga_print(g_zdensb_mo)
+      call ga_add(z1,g_zdensa_mo,z1,g_zdensb_mo,g_ztemp1)
+      call rt_semiemp_os_mo_dipole(rtdb,g_ztemp1,g_zdensa_mo,g_zdensb_mo
+     1 ,RAD,KAN,NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,
+     1 Dbl_MB(iadipx),Dbl_MB(iadipy),Dbl_MB(iadipz),Dbl_MB(ibdipx),
+     1 Dbl_MB(ibdipy),Dbl_MB(ibdipz),tag,t,g_s,g_ft,it,nrestarts,
+     1 got_orbspace)
+      else
+ 
       call rt_semiemp_os_dipole(rtdb,g_ztemp1,g_zdensa,g_zdensb,RAD,KAN,
      1 NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,n,NRR,ISW1,Z12,D12,NEL,E,
-     1 Dbl_MB(idipx),Dbl_MB(idipy),Dbl_MB(idipz),tag,t,g_s,g_ft,it,
+     1 Dbl_MB(iadipx),Dbl_MB(iadipy),Dbl_MB(iadipz),tag,t,g_s,g_ft,it,
      1 nrestarts,got_orbspace)
-
+       end if 
+       end if
       if (mod(it,nrestarts).eq.0) 
      $ call rt_semiemp_os_restart_save(it,n,t,g_zdensa,g_zdensb)
 
@@ -415,11 +502,6 @@ c      write(6,*)"fgauss=",fgauss
 c     if (it.ge.1) then
      
       miter = 0
-c     call fock_extrapolate(g_zfat_dt,g_zfat,g_zfocka)
-c     call fock_extrapolate(g_zfbt_dt,g_zfbt,g_zfockb)
-
-c     call mo_zproj(g_zfocka,g_zca,n,g_zfocka)
-c     call mo_zproj(g_zdensa,g_zca,n,g_zdensa)
 
       call prop_chebyshev(g_zdensa,g_zfocka,GPARAMA,n,emina,g_zcheba,
      1 dt)
@@ -430,27 +512,6 @@ c     call mo_zproj(g_zdensb,g_zcb,n,g_zdensb)
       call prop_chebyshev(g_zdensb,g_zfockb,GPARAMB,n,eminb,g_zcheba,
      1 dt)
 
-c     call semiemp_os_fock_build(g_ztemp1,g_zdensa,SUMELEL,QQ,LABI,
-c    1 LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,GPARAMA,
-c    2 GPARAMB,emina,eminb)
-c     call mo_zproj(g_zdensa,g_zca,n,g_zdensa)
-c     call mo_zproj(g_zdensb,g_zcb,n,g_zdensb)
-
-c 10  continue
-c     call ga_copy(g_zfocka,g_zfat_dt)
-c     call ga_copy(g_zfockb,g_zfbt_dt)
-c     miter = miter + 1
-c     write(6,*)"miter",miter
-c     call fock_intrapolate(g_zfat_dt,g_zfat,g_zfocka)
-c     call fock_intrapolate(g_zfbt_dt,g_zfbt,g_zfockb)
-
-c     call prop_chebyshev(g_zdensa,g_zfocka,GPARAMA,n,emina,g_zcheba,
-c    1 dt)
-
-
-c     call prop_chebyshev(g_zdensb,g_zfockb,GPARAMB,n,eminb,g_zcheba,
-c    1 dt)
-
 
       call ga_add(z1,g_zdensa,z1,g_zdensb,g_ztemp1)
 
@@ -458,59 +519,6 @@ c    1 dt)
      1 LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,GPARAMA,
      2 GPARAMB)
 
-c     if (miter.eq.1) then
-c      call ga_copy(g_zdensa,g_zpda)
-c      call ga_copy(g_zdensb,g_zpdb)
-c      GO TO 10
-c     end if
-c      norm1 = mat_norm(g_zdensa)
-c      norm2 = mat_norm(g_zpda)
-c      norm3 = mat_norm(g_zdensb)
-c      norm4 = mat_norm(g_zpdb)
-c      diff1 = abs(norm1-norm2)
-c      diff2 = abs(norm3-norm4)
-c     if ((diff1.le.10D-8).and.(diff2.le.10D-8)) then 
-c       Go to 20
-c       else
-c      call ga_copy(g_zdensa,g_zpda)
-c      call ga_copy(g_zdensb,g_zpdb)
-c      GO TO 10
-c      end if
-c 20  continue 
-
-c     call ga_add(z1,g_zdensa,z1,g_zdensb,g_ztemp1)
-
-c     call semiemp_os_fock_build(g_ztemp1,g_zdensa,SUMELEL,QQ,LABI,
-c    1 LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,GPARAMA,
-c    2 GPARAMB,emina,eminb)
-
-c     call ga_copy(g_zfat,g_zfat_dt)
-c     call ga_copy(g_zfocka,g_zfat)
-c     call ga_copy(g_zfbt,g_zfbt_dt)
-c     call ga_copy(g_zfockb,g_zfbt)
-c     else
-
-c     call ga_copy(g_zfocka,g_zfat_dt)
-c     call ga_copy(g_zfockb,g_zfbt_dt)
-
-c     call prop_chebyshev(g_zdensa,g_zfocka,GPARAMA,n,emina,g_zcheba,
-c    1 dt)
-
-
-c     call prop_chebyshev(g_zdensb,g_zfockb,GPARAMB,n,eminb,g_zcheba,
-c    1 dt)
-
-
-c     call ga_add(z1,g_zdensa,z1,g_zdensb,g_ztemp1)
-
-c     call semiemp_os_fock_build(g_ztemp1,g_zdensa,SUMELEL,QQ,LABI,
-c    1 LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,GPARAMA,
-c    2 GPARAMB,emina,eminb)
-
-c     call ga_copy(g_zfocka,g_zfat)
-c     call ga_copy(g_zfockb,g_zfbt)
-
-c     end if
 
 
       t = t + dt
@@ -518,28 +526,41 @@ c     end if
       if (t.le.tmax) GO TO 50
 
 
-
 C     == Cleanup GAs for time-dependent quantities and params ==
-      if (.not.ma_pop_stack(ldipz))
-     & call errquit('rt_semiemp_dipole:cannot pop stack dens',3, MA_ERR)
+      if (got_orbspace) then
+       if (.not.ma_pop_stack(lbdipz))
+     & call errquit('rt_semiemp_os_cheb:cannot pop stack bdipz',3,
+     & MA_ERR)
 
-      if (.not.ma_pop_stack(ldipy))
-     & call errquit('rt_semiemp_dipole:cannot pop stack dens',3, MA_ERR)
+      if (.not.ma_pop_stack(lbdipy))
+     & call errquit('rt_semiemp_os_cheb:cannot pop stack bdipz',3,
+     & MA_ERR)
 
-      if (.not.ma_pop_stack(ldipx))
-     & call errquit('rt_semiemp_dipole:cannot pop stack dens',3, MA_ERR)
+      if (.not.ma_pop_stack(lbdipx))
+     & call errquit('rt_semiemp_os_cheb:cannot pop stack bdipx',3,
+     & MA_ERR)
+
+       end if
+
+      if (.not.ma_pop_stack(ladipz))
+     & call errquit('rt_semiemp_os_cheb:cannot pop stack adipz',3,
+     & MA_ERR)
+
+      if (.not.ma_pop_stack(ladipy))
+     & call errquit('rt_semiemp_os_cheb:cannot pop stack adipy',3,
+     & MA_ERR)
+
+      if (.not.ma_pop_stack(ladipx))
+     & call errquit('rt_semiemp_os_cheb:cannot pop stack adipx',3,
+     & MA_ERR)
 
       ok = .true.
-c     ok = ok .and. ga_destroy(g_zpdb)
-c     ok = ok .and. ga_destroy(g_zpda)
-c     ok = ok .and. ga_destroy(g_zfbt_dt)
-c     ok = ok .and. ga_destroy(g_zfat_dt)
-c     ok = ok .and. ga_destroy(g_zfbt)
-c     ok = ok .and. ga_destroy(g_zfat)
-c     ok = ok .and. ga_destroy(g_zcb)
-c     ok = ok .and. ga_destroy(g_zca)
-      ok = ok .and. ga_destroy(g_zfpb)
-      ok = ok .and. ga_destroy(g_zfpa)
+      if (got_orbspace) then
+      ok = ok .and. ga_destroy(g_zdensb_mo)
+      ok = ok .and. ga_destroy(g_zdensa_mo)
+      ok = ok .and. ga_destroy(g_zcb)
+      ok = ok .and. ga_destroy(g_zca)
+      end if
       ok = ok .and. ga_destroy(g_ztemp2)
       ok = ok .and. ga_destroy(g_ztemp1)
       ok = ok .and. ga_destroy(g_ztemp)
@@ -557,7 +578,6 @@ c     ok = ok .and. ga_destroy(g_zchebb)
       ok = ok .and. ga_destroy(g_zfocka)
 c     ok = ok .and. ga_destroy(g_cb)
 c     ok = ok .and. ga_destroy(g_ca)
-
 
 
 
