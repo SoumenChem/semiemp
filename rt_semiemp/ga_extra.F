@@ -133,7 +133,7 @@ C---------------------------------------------------------------------------
       ok=ok.and.ga_create(mt_dbl,n,n,"complex temp", 0,0, g_temp1)
       call ga_zero(g_temp1)
       call ga_zero(g_c)
-     
+
       call ga_dgemm('T','N',n,n,n,z1,g_b,g_a,z0,g_temp1)
 
       call ga_dgemm('N','N',n,n,n,z1,g_temp1,g_b,z0,g_c)
@@ -345,7 +345,6 @@ C-------------------------------------------------------------------------------
 
        integer g_a, g_b, g_c
 
-       write(6,*)"here"
        call ga_add(0.5*z1,g_a,0.5*z1,g_b,g_c)
 
 

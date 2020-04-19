@@ -36,7 +36,7 @@ C     == Variables ==
       integer g_zX,g_zY,g_zs,g_densre,g_ft,g_temp,g_core
       integer g_dipx, g_dipy, g_dipz,g_scr,g_cgs
       integer isvals, lsvals,iovl,lovl
-      integer g_densa, g_densb
+      integer g_densa, g_densb, g_cgsa, g_cgsb
       integer prop_method
       integer MIM(2)
       logical atmblk
@@ -55,16 +55,21 @@ C     (tmp)
       external dft_lindep
       integer dft_lindep, nlindmo 
       integer test
+      logical got_orbspace
 C     integer g_scr, g_s12, g_sn12
      
 
       me = ga_nodeid ()
+      got_orbspace = .false.
       got_elh = .false.
 C
 C     Store rtdb in params struct, then determine the theory we are
 C     using.
 C
       params%rtdb = rtdb
+      if (.not. rtdb_get (rtdb, "rt_semiemp:got_orbspace",
+     $    mt_log, 1, got_orbspace)) call errquit (pname//
+     $     "failed to get 'got_orbspace' target into rtdb",0,0)
 
       if (.not. ga_create(mt_dbl, nb, nb, 'AO ovl',
      &        0, 0, g_s))
@@ -156,13 +161,9 @@ c         write(6,*)"prop_method",prop_method
      &        0, 0, g_temp))
      &        call errquit(pname//'Error creating ga',0,GA_ERR)
 
-      if (.not. ga_create(mt_dbl, nb, nb, 'ground state coefficient',
-     &        0, 0, g_cgs))
-     &        call errquit(pname//'Error creating ga',0,GA_ERR)
 
       call ga_zero(g_scr)
       call ga_zero(g_temp)
-      call ga_zero(g_cgs)
 
       call ga_sqmat(g_ft,FT,nb,1)
       call ga_sqmat(g_s,SH,nb,1)
@@ -172,6 +173,11 @@ c     call ga_sqmat(g_core,Q,nb,1)
 c     test = ga_spd_invert(g_s)
       if (ipol.eq.0) then
 
+       if (.not. ga_create(mt_dbl, nb, nb, 'ground state coefficient',
+     &        0, 0, g_cgs))
+     &        call errquit(pname//'Error creating ga',0,GA_ERR)
+
+
        if (.not.rtdb_get(rtdb,'semiemp:MIM',mt_int,2,MIM))
      1 call errquit('semiemp: failed to read MIM',0, RTDB_ERR)
         
@@ -179,6 +185,7 @@ c     test = ga_spd_invert(g_s)
       if (.not.rtdb_put(rtdb,'rtsemiemp:ocor',mt_int,1,ocor))
      1 call errquit('rtsemiemp: failed to write ocor',0, RTDB_ERR)
 
+      call ga_zero(g_cgs)
 c     write(6,*)"test",test
 c     call ga_print(g_s)
       if (.not. rtdb_get (rtdb, "rt_semiemp:got_elh",
@@ -246,6 +253,7 @@ C
      2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgs,g_core,
      3 g_temp)
 
+
        elseif (ipol.eq.0.and.prop_method.eq.2) then
       call rt_semiemp_cs_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
      1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
@@ -253,6 +261,10 @@ C
      3 g_temp)
 
 
+      if (ipol.eq.0) then
+       if (.not. ga_destroy (g_cgs))
+     $     call errquit (pname//"Failed to destroy g_cgs", 0, 0)
+      end if
 
         elseif (ipol.eq.1.and.prop_method.eq.0) then    
 
@@ -263,14 +275,36 @@ C
      &        0, 0, g_densb))
      &        call errquit(pname//'Error creating ga',0,GA_ERR)
 
+      if (.not. ga_create(mt_dbl, nb, nb, 'ground state alpha 
+     &  coefficient', 0, 0, g_cgsa))
+     &        call errquit(pname//'Error creating ga',0,GA_ERR)
+      if (.not. ga_create(mt_dbl, nb, nb, 'ground state beta 
+     &  coefficient', 0, 0, g_cgsb))
+     &        call errquit(pname//'Error creating ga',0,GA_ERR)
+
       call ga_zero(g_densa)
       call ga_zero(g_densb)
       if (.not. rtdb_get (rtdb, "rt_semiemp:got_elh",
      $    mt_log, 1, got_elh))
      2 continue
 
+      call ga_zero(g_cgsa)
+      call ga_zero(g_cgsb)
+      if (.not.rtdb_get(rtdb,'semiemp:acoefficient',mt_dbl,nb*nb,
+     1 Dbl_MB(isvecs)))
+     1 call errquit('rtsemiemp: failed to write acoefficient',0, 
+     1 RTDB_ERR)
+      call ga_put(g_cgsa,1,nb,1,nb,Dbl_MB(isvecs),nb)
+       if (.not.rtdb_get(rtdb,'semiemp:bcoefficient',mt_dbl,nb*nb,
+     1 Dbl_MB(isvecs)))
+     1 call errquit('rtsemiemp: failed to write acoefficient',0,
+     1 RTDB_ERR)
+      call ga_put(g_cgsb,1,nb,1,nb,Dbl_MB(isvecs),nb)
 
-      if (got_elh) then 
+c     end if
+
+
+       if (got_elh) then 
        call  eh_state_u(rtdb,RA,RB,nb)
       end if 
 
@@ -291,15 +325,21 @@ C
 
       call rt_semiemp_os_prop (rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
      1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
-     2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgs,g_core,
+     2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgsa,g_cgsb,g_core,
      3 g_temp,g_densa,g_densb)
 
+
+      if (.not. ga_destroy (g_cgsb))
+     $     call errquit (pname//"Failed to destroy g_cgsb", 0, 0)
+      if (.not. ga_destroy (g_cgsa))
+     $     call errquit (pname//"Failed to destroy g_cgsa", 0, 0)
+      
       if (.not. ga_destroy (g_densa))
      $     call errquit (pname//"Failed to destroy g_densa", 0, 0)
       if (.not. ga_destroy (g_densb))
      $     call errquit (pname//"Failed to destroy g_densb", 0, 0)
 
-          elseif (ipol.eq.1.and.prop_method.eq.2) then
+      elseif (ipol.eq.1.and.prop_method.eq.2) then
 
       if (.not. ga_create(mt_dbl, nb, nb, 'Beta density',
      &        0, 0, g_densa))
@@ -307,9 +347,38 @@ C
       if (.not. ga_create(mt_dbl, nb, nb, 'Alpha density',
      &        0, 0, g_densb))
      &        call errquit(pname//'Error creating ga',0,GA_ERR)
+      if (.not. ga_create(mt_dbl, nb, nb, 'ground state alpha 
+     &  coefficient', 0, 0, g_cgsa))
+     &        call errquit(pname//'Error creating ga',0,GA_ERR)
+      if (.not. ga_create(mt_dbl, nb, nb, 'ground state beta 
+     &  coefficient', 0, 0, g_cgsb))
+     &        call errquit(pname//'Error creating ga',0,GA_ERR)
 
       call ga_zero(g_densa)
       call ga_zero(g_densb)
+      if (.not. rtdb_get (rtdb, "rt_semiemp:got_elh",
+     $    mt_log, 1, got_elh))
+     2 continue
+
+      call ga_zero(g_cgsa)
+      call ga_zero(g_cgsb)
+      if (.not.rtdb_get(rtdb,'semiemp:acoefficient',mt_dbl,nb*nb,
+     1 Dbl_MB(isvecs)))
+     1 call errquit('rtsemiemp: failed to write acoefficient',0,
+     1 RTDB_ERR)
+      call ga_put(g_cgsa,1,nb,1,nb,Dbl_MB(isvecs),nb)
+       if (.not.rtdb_get(rtdb,'semiemp:bcoefficient',mt_dbl,nb*nb,
+     1 Dbl_MB(isvecs)))
+     1 call errquit('rtsemiemp: failed to write acoefficient',0,
+     1 RTDB_ERR)
+      call ga_put(g_cgsb,1,nb,1,nb,Dbl_MB(isvecs),nb)
+
+      call ga_zero(g_densa)
+      call ga_zero(g_densb)
+
+       if (got_elh) then
+       call  eh_state_u(rtdb,RA,RB,nb)
+      end if
 
       call ga_sqmat(g_densa,RA,nb,1)
       call ga_sqmat(g_densb,RB,nb,1)
@@ -330,20 +399,22 @@ C
       if (ga_nodeid().eq.0) write(6,*)"<S2>", avgs2
 
 
-      call rt_semiemp_os_cheb (rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
+       call rt_semiemp_os_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
      1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
-     2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgs,g_core,
+     2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgsa,g_cgsb,g_core,
      3 g_temp,g_densa,g_densb)
+
+      if (.not. ga_destroy (g_cgsa))
+     $     call errquit (pname//"Failed to destroy g_cgsa", 0, 0)
+      if (.not. ga_destroy (g_cgsb))
+     $     call errquit (pname//"Failed to destroy g_cgsb", 0, 0)
 
       if (.not. ga_destroy (g_densa))
      $     call errquit (pname//"Failed to destroy g_densa", 0, 0)
       if (.not. ga_destroy (g_densb))
      $     call errquit (pname//"Failed to destroy g_densb", 0, 0)
-            end if 
 
-      if (.not. ga_destroy (g_cgs))
-     $     call errquit (pname//"Failed to destroy g_temp", 0, 0)
-
+       end if 
       if (.not. ga_destroy (g_temp))
      $     call errquit (pname//"Failed to destroy g_temp", 0, 0)
 

@@ -25,6 +25,7 @@
 c       write(6,*)"i am at elh_state"
         NRR = NB*(NB+1)/2
 
+        write(6,*)"i am in eh_state"
         if (.not.MA_Push_Get(MT_Dbl,nb*nb,'BB',lBB,iBB))
      &   call errquit('eh_state: cannot allocate BB',0,MA_ERR)
 
@@ -76,7 +77,7 @@ c     write(6,*)"ehinfo", ehinfo
 
 
        if (.not.rtdb_put(rtdb,'rtsemiemp:ehinfo',mt_int,5, ehinfo))
-     1 call errquit('eh_state: failed to get ehinfo',0,RTDB_ERR)
+     1 call errquit('eh_state: failed to put ehinfo',0,RTDB_ERR)
 
 
       if (.not.ma_pop_stack(lW))
@@ -117,7 +118,7 @@ c--------------------------------------------------------------------------
        integer numfoa, numfob
 
         NRR= NB*(NB+1)/2
-
+        write(6,*)"i am in eh_state_u"
           if (.not.MA_Push_Get(MT_Dbl,nb*nb,'AA',lAA,iAA))
      &   call errquit('eh_state: cannot allocate AA',0,MA_ERR)
 
