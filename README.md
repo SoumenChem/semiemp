@@ -26,3 +26,5 @@ Soumen Ghosh, Jason C. Asher, Laura Gagliardi, Christopher J. Cramer, Niranjan G
 Soumen Ghosh, Amity Andersen, Laura Gagliardi, Christopher J. Cramer and Niranjan Govind. Modeling Optical Spectra of Large Organic Systems using Real-Time Propagation of Semiempirical Effective Hamiltonians. J. Chem. Theory Comput. 2017, 13, 4410−4420.
 
 
+
+If you have any questions or suggestions, please contact me at chemsghosh(at)gmail.com.
