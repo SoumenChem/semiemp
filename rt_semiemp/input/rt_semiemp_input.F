@@ -153,6 +153,10 @@ C
      $     numorb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
+          got_elh=.true.
+         if (.not.rtdb_put(rtdb,'rt_semiemp:got_elh',mt_log,1,got_elh))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+           
        elseif (inp_compare(.false.,test,'numorba')) then
         do i = 1, naorb
             if (.not.inp_i(numorba(i)))
