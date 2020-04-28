@@ -28,7 +28,6 @@ c#include "cdft.fh"
       integer g_zt_n !nth term in Chebyshev polynomial
       integer g_zt_n_1 !(n-1)th term in Chebyshev polynomial
       integer g_zt_n_2 !(n-2)th term in Chebyshev polynomial
-      integer limat, iimat
       integer g_I !Identity matrix
       integer g_zcheb !Total Chebyshev propagator
       integer g_zscr
@@ -62,21 +61,11 @@ c     if (ga_nodeid().eq.0)  write(6,*)"in prop_chebyshev",GPARAM
       call ga_zero(g_zscr)
       call ga_zero(g_zw)
 
-      if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'Imat',limat,iimat))
-     &   call errquit('prop_chebyshev: cannot allocate imat',0,
-     1    MA_ERR)
-
-
-
-      call get_imat(Dbl_MB(iimat),nbf)
-
-      call mat_sym(Dbl_MB(iimat),nbf,1)
-
 C---------------------------------------------------------------------
 C     Create T0
 C---------------------------------------------------------------------
 
-      call ga_put(g_I,1,nbf,1,nbf,Dbl_MB(iimat),nbf)
+      call ga_shift_diagonal(g_I,1.0d0)
 
       call convert_d2z (1d0, g_I, 0d0, g_I, g_zt_n_2)
 
@@ -119,9 +108,6 @@ c      call ga_print(g_zscr)
      1 g_zdens)
 
 c     call ga_print(g_zdens)
-      if (.not.ma_pop_stack(limat))
-     &   call errquit('prop_chebyshev: cannot pop stack fock',3,
-     1 MA_ERR)
       status = .true.
       status=status.and.ga_destroy(g_zw)
       status=status.and.ga_destroy(g_zscr) 
@@ -254,29 +240,6 @@ c     call ga_print(g_zcheb)
      1 , GA_ERR)
        return
        end
-C------------------------------------------------------------------------------------
-C
-C------------------------------------------------------------------------------------
-      subroutine get_imat(imat,n)
-
-      double precision imat(*)
-      integer n,i,j,L
-
-       do j = 1,n*n
-        imat(j) =0.0d0
-       end do
-      L = 0
-      do i = 1,n
-       do j = 1,i
-        L = L+1
-        if (i.eq.j) then
-        imat(L) = 1.0d0
-        end if
-       end do
-      end do
-
-      return
-      end subroutine
 C-----------------------------------------------------------------------------------------------
 C
 C----------------------------------------------------------------------------------------------
