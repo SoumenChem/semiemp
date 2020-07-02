@@ -153,9 +153,9 @@ C
      $     numorb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
-          got_elh=.true.
-         if (.not.rtdb_put(rtdb,'rt_semiemp:got_elh',mt_log,1,got_elh))
-     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+c         got_elh=.true.
+c        if (.not.rtdb_put(rtdb,'rt_semiemp:got_elh',mt_log,1,got_elh))
+c    $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
            
        elseif (inp_compare(.false.,test,'numorba')) then
         do i = 1, naorb
@@ -184,7 +184,11 @@ C
      $     occuorb))
      $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
 
-       elseif (inp_compare(.false.,test,'occuorba')) then
+         got_elh=.true.
+         if (.not.rtdb_put(rtdb,'rt_semiemp:got_elh',mt_log,1,got_elh))
+     $           call errquit(pname//'Write failed to rtdb',0,RTDB_ERR)
+
+      elseif (inp_compare(.false.,test,'occuorba')) then
         do i = 1, naorb
             if (.not.inp_f(occuorba(i)))
      $     call errquit (pname//"occuorba takes a float", 0, 0)
