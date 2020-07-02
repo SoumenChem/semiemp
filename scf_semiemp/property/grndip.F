@@ -195,7 +195,6 @@ c           write(6,*)"P,FX,FY,FZ",P(KJ),FX(KJ),FY(KJ),FZ(KJ)
              L = L + 1
              IHOMO(L) = K
              ILUMO(L) = J
-             write(6,*)"here for elh"
 c            write(6,*)"L,K,J",L,K,J,IHOMO(L),ILUMO(L)
 c            write(6,*)"HERE,KJ",KJ,P(KJ),FZ(KJ)
              PME((L-1)*3+1) = PME((L-1)*3+1) + P(KJ)*FX(KJ)
