@@ -95,11 +95,11 @@ c       write(6,*)"here"
 
        if (.not.rtdb_get(rtdb,'rt_semiemp:norb',mt_int,1,norb))
      1 call errquit('rt_semiemp_dipole: failed to get norb',0,RTDB_ERR)
+       
+c      write(6,*)"IORB,aorb",IORB,aorb(1),aorb(2)
 
-
-c      write(6,*)"ehinfo",ehinfo(1), aorb(2), aorb(1)
-       IORB =  (aorb(1)+ehinfo(5))*(aorb(2)-ehinfo(5)) + 
-     1 ((aorb(1)-ehinfo(3))*norb) + norb*(norb-1)/2
+c      write(6,*)"ehinfo, 1, 3",ehinfo(2), ehinfo(3),aorb(2), aorb(1)
+       IORB =  IORB+((ehinfo(4)-ehinfo(2))*(aorb(2)-ehinfo(5)))
       end if
 c      write(6,*)"IROB",IORB
         if (.not.MA_Push_Get(MT_Dbl,3*IORB,'PME',lPME,iPME))
@@ -147,7 +147,7 @@ c      IORB = aorb(1)*aorb(2)
 c     end if
       iocor = nel/2
 
-c     write(6,*)"IORB",IORB, aorb(1), aorb(2)
+      write(6,*)"IORB",IORB, aorb(1), aorb(2)
 
       call DIPOLE(rtdb,RAD,KAN,NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,NB,NRR,
      1 ISW1,Z12,D12,Dbl_MB(idens),NEL,D,dipx,dipy,dipz,2,Dbl_mb(iPME),

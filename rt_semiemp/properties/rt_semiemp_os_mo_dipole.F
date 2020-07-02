@@ -179,7 +179,7 @@ c       write(6,*)"here"
         if (.not.rtdb_get(rtdb,'rt_semiemp:orbspace',mt_int,2,orbspace))
      1  call errquit('rt_semiemp_dipole: failed to read orbspace',0,
      2   RTDB_ERR)
-        if (.not.rtdb_get(rtdb,'rt_semiemp:alphaactsize',mt_int,3,aorb))
+        if (.not.rtdb_get(rtdb,'rt_semiemp:betaactsize',mt_int,3,aorb))
      1  call errquit('rt_semiemp_dipole: failed to read alphaaorb',0,
      2   RTDB_ERR)
 
