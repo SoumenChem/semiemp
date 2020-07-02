@@ -495,4 +495,122 @@ c     write(6,*)" val, gout =", val, gout
 
       end function
 
+C------------------------------------------------------------------------------------
+C
+C------------------------------------------------------------------------------------
+      Subroutine rt_semiemp_anhi(rtdb,g_densa,g_densb,g_scr,
+     $ n,nel)
 
+      implicit none
+
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "msgids.fh"
+#include "rtdb.fh"
+#include "geom.fh"
+#include "util.fh"
+C#include "cdft.fh"
+#include "matutils.fh"
+#include "zora.fh"
+#include "rt_tddft.fh"
+
+C     == Parameters ==
+      character(*), parameter     :: pname       = "rt_semiemp_anhi:"
+      integer rtdb 
+      integer g_zdensa, g_zdensb, g_zscr
+      integer g_densa, g_densb, g_scr
+      integer g_ab, g_ba, g_anticom, g_correc
+      integer  nel,n
+      double precision tt, xterm
+      double precision unel, norma, normb
+      double precision pptrace, avgs2, mult, ga_trace_diag
+      logical ok
+      
+c     call ga_zero(g_densa)
+c     call ga_zero(g_densb)
+      call ga_zero(g_scr)
+c     write(6,*)"pptrace,avgs2",pptrace,avgs2 
+      if (.not.rtdb_get(rtdb,'semiemp:mult',mt_dbl,1,mult))
+     $       call errquit(pname//'failed to read mult rtdb',0,RTDB_ERR)
+
+c     call convert_z2d(g_zdensa,g_densa,g_scr)
+c     call convert_z2d(g_zdensb,g_densb,g_scr)
+
+      ok = .true.
+      ok=ok.and.ga_create(mt_dbl,n,n,"AB" , 0, 0, g_ab)
+      ok=ok.and.ga_create(mt_dbl,n,n,"BA" , 0, 0, g_ba)
+      ok=ok.and.ga_create(mt_dbl,n,n,"BA" , 0, 0, g_anticom)
+      ok=ok.and.ga_create(mt_dbl,n,n,"BA" , 0, 0, g_correc)
+      
+      call ga_zero(g_ab)
+      call ga_zero(g_ba)
+      call ga_zero(g_anticom)
+      call ga_zero(g_correc)
+
+      if (.not.ok) call errquit(pname//"GA allocation failed", 0,GA_ERR)
+
+      call ga_dgemm('N','N',n,n,n,1.0d0,g_densa,g_densb,0.0d0,
+     1 g_scr)
+
+      call ga_dgemm('N','N',n,n,n,1.0d0,g_densa,g_densb,0d0,
+     1 g_ab)
+
+      call ga_dgemm('N','N',n,n,n,1.0d0,g_densb,g_densa,0d0,
+     1 g_ba)
+
+       pptrace=ga_trace_diag(g_scr)
+       unel = 2*((mult-1)/2)
+       xterm = unel+2-(DBLE(nel)-unel)/2+pptrace  
+       write(6,*)"unel,pptrace,multi,xterm",unel,pptrace,mult,xterm
+
+       call ga_add(1.0d0,g_ab,1.0d0,g_ba,g_anticom)
+
+      call ga_dgemm('N','N',n,n,n,1.0d0,g_ab,g_densa,0d0,
+     1 g_correc)
+      
+      call ga_add(1.0,g_correc,-0.5,g_anticom,g_scr) 
+
+      call ga_add(1.0,g_densa,-1/xterm,g_scr,g_correc)
+
+      call ga_copy(g_correc,g_densa)
+      
+
+      call ga_zero(g_correc)
+
+      call ga_dgemm('N','N',n,n,n,1.0d0,g_ba,g_densb,0d0,
+     1 g_correc)
+
+      call ga_add(1.0,g_correc,-0.5,g_anticom,g_scr)
+
+      call ga_add(1.0,g_densb,-1/xterm,g_scr,g_correc)
+
+      call ga_copy(g_correc,g_densb)
+      
+
+c     call ga_norm_infinity(g_densa,norma)
+
+c     call ga_norm_infinity(g_densb,normb)
+
+c     call ga_scale(g_densa,1/norma)
+c     call ga_scale(g_densb,1/normb)
+
+      call ga_dgemm('N','N',n,n,n,1.0d0,g_densa,g_densb,0d0,
+     1 g_scr)
+
+       pptrace=ga_trace_diag(g_scr)
+c      write(6,*)"mult,nel,pptrace",mult,nel,pptrace
+       avgs2 = ((mult-1)/2)**2+dble(nel)/2-pptrace
+
+      if (ga_nodeid().eq.0) write(6,*) "<S2>", avgs2
+
+      
+       ok = .true.
+       ok = ok .and. ga_destroy(g_correc)
+       ok = ok .and. ga_destroy(g_anticom)       
+       ok = ok .and. ga_destroy(g_ba)
+       ok = ok .and. ga_destroy(g_ab)
+
+
+      end subroutine 

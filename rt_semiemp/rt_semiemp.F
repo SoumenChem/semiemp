@@ -321,6 +321,7 @@ c     end if
        avgs2 = ((mult-1)/2)**2+DBLE(nel)/2-pptrace
 
       if (ga_nodeid().eq.0) write(6,*)"<S2>", avgs2
+c     call rt_semiemp_anhi(rtdb,g_densa,g_densb,g_scr,nb,nel)
 
 
       call rt_semiemp_os_prop (rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
@@ -397,6 +398,7 @@ c     end if
        
 
       if (ga_nodeid().eq.0) write(6,*)"<S2>", avgs2
+c     call rt_semiemp_anhi(rtdb,g_densa,g_densb,g_scr,nb,nel)
 
 
        call rt_semiemp_os_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
