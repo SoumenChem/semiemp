@@ -190,11 +190,12 @@ c           write(6,*)"P,FX,FY,FZ",P(KJ),FX(KJ),FY(KJ),FZ(KJ)
             EZ(KA) = EZ(KA) + P(KJ)*FZ(KJ)
             IF (got_orbspace) THEN
              IF (got_elh) THEN
-              IF ((K.GE.orbspace(1).AND.K.LE.ehinfo(4)).AND.
-     1   (J.GE.ehinfo(1).AND.J.LE.orbspace(2)).AND.(K.NE.J)) THEN
+              IF ((K.GT.ehinfo(2).AND.K.LE.ehinfo(4)).AND.
+     1   (J.GT.ehinfo(4).AND.J.LE.orbspace(2)).AND.(K.NE.J)) THEN
              L = L + 1
              IHOMO(L) = K
              ILUMO(L) = J
+             write(6,*)"here for elh"
 c            write(6,*)"L,K,J",L,K,J,IHOMO(L),ILUMO(L)
 c            write(6,*)"HERE,KJ",KJ,P(KJ),FZ(KJ)
              PME((L-1)*3+1) = PME((L-1)*3+1) + P(KJ)*FX(KJ)

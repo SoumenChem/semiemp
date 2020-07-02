@@ -151,10 +151,10 @@ C
 
        end if
 
-c      if (got_elh) then
-c       if (.not.rtdb_get(rtdb,'rtsemiemp:ehinfo',mt_int,5, ehinfo))
-c    1 continue
-c      end if
+       if (got_elh) then
+        if (.not.rtdb_get(rtdb,'rtsemiemp:ehinfo',mt_int,5, ehinfo))
+     1 continue
+       end if
 
        if (got_orbspace) then
 c       write(6,*)"here"

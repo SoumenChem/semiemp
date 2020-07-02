@@ -1021,7 +1021,7 @@ c       E1 = E1/100
      1 INT_MB(iNU),INT_MB(iNW),INT_MB(ipqn),INT_MB(iNIN),Dbl_MB(iALPHA),
      2 Dbl_MB(iH),Dbl_MB(iBB),nbf,nrr,ISW1,Dbl_MB(ival),Dbl_MB(id12),
      3 Dbl_MB(irho),NEL,E,Dbl_MB(idipx),Dbl_MB(idipy),Dbl_MB(idipz),1
-     4 ,PME,IHOMO,ILUMO,IORB)
+     4 ,PME,IHOMO,ILUMO,IORB,MIM(1))
 
        if (.not.rtdb_put(rtdb,'semiemp:dipole',mt_dbl,3,E))
      1  call errquit('semiemp: failed to write dipole',0, RTDB_ERR)
