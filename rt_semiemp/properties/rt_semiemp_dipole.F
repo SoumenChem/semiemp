@@ -147,7 +147,7 @@ c      IORB = aorb(1)*aorb(2)
 c     end if
       iocor = nel/2
 
-      write(6,*)"IORB",IORB, aorb(1), aorb(2)
+c     write(6,*)"IORB",IORB, aorb(1), aorb(2)
 
       call DIPOLE(rtdb,RAD,KAN,NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,NB,NRR,
      1 ISW1,Z12,D12,Dbl_MB(idens),NEL,D,dipx,dipy,dipz,2,Dbl_mb(iPME),
