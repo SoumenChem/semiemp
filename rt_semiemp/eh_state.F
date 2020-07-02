@@ -188,6 +188,9 @@ c      write(6,*) "occupation", occuorb(iorb)
        end do
       CALL DENSIT(Dbl_MB(iBB),RA,Dbl_MB(iWB),NB,NB,NRR)
       
+       if (.not.rtdb_put(rtdb,'rtsemiemp:ehinfo',mt_int,5, ehinfo))
+     1 call errquit('eh_state_u: failed to put ehinfo',0,RTDB_ERR)
+
       if (.not.ma_pop_stack(lWB))
      &   call errquit('el-h state: cannot pop stack WB',3, MA_ERR)
 
