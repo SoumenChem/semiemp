@@ -99,7 +99,8 @@ c       write(6,*)"here"
 c      write(6,*)"IORB,aorb",IORB,aorb(1),aorb(2)
 
 c      write(6,*)"ehinfo, 1, 3",ehinfo(2), ehinfo(3),aorb(2), aorb(1)
-       IORB =  IORB+((ehinfo(4)-ehinfo(2))*(aorb(2)-ehinfo(5)))
+       IORB = (ehinfo(1)-orbspace(1))*(orbspace(2)-ehinfo(1)+1)+
+     1 (norb*(norb-1)/2)+norb*(orbspace(2)-ehinfo(4))   
       end if
 c      write(6,*)"IROB",IORB
         if (.not.MA_Push_Get(MT_Dbl,3*IORB,'PME',lPME,iPME))

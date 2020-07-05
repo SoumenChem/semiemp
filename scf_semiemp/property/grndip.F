@@ -190,8 +190,8 @@ c           write(6,*)"P,FX,FY,FZ",P(KJ),FX(KJ),FY(KJ),FZ(KJ)
             EZ(KA) = EZ(KA) + P(KJ)*FZ(KJ)
             IF (got_orbspace) THEN
              IF (got_elh) THEN
-              IF ((K.GT.ehinfo(2).AND.K.LE.ehinfo(4)).AND.
-     1   (J.GT.ehinfo(4).AND.J.LE.orbspace(2)).AND.(K.NE.J)) THEN
+              IF ((K.GE.orbspace(1).AND.K.LE.ehinfo(4)).AND.
+     1   (J.GE.ehinfo(1).AND.J.LE.orbspace(2)).AND.(J.GT.K)) THEN
              L = L + 1
              IHOMO(L) = K
              ILUMO(L) = J
@@ -200,16 +200,16 @@ c            write(6,*)"HERE,KJ",KJ,P(KJ),FZ(KJ)
              PME((L-1)*3+1) = PME((L-1)*3+1) + P(KJ)*FX(KJ)
              PME((L-1)*3+2) = PME((L-1)*3+2) + P(KJ)*FY(KJ)
              PME((L-1)*3+3) = PME((L-1)*3+3) + P(KJ)*FZ(KJ)
-            ELSE IF ((K.GE.orbspace(1).AND.K.LE.iocor).AND.
-     1   (J.LE.orbspace(2).AND.J.GT.iocor)) THEN
-             L = L + 1
-             IHOMO(L) = K
-             ILUMO(L) = J
+c           ELSE IF ((K.GE.orbspace(1).AND.K.LE.iocor).AND.
+c    1   (J.LE.orbspace(2).AND.J.GT.iocor)) THEN
+c            L = L + 1
+c            IHOMO(L) = K
+c            ILUMO(L) = J
 c            write(6,*)"L,K,J",L,K,J,IHOMO(L),ILUMO(L)
 c            write(6,*)"HERE,KJ",KJ,P(KJ),FZ(KJ)
-             PME((L-1)*3+1) = PME((L-1)*3+1) + P(KJ)*FX(KJ)
-             PME((L-1)*3+2) = PME((L-1)*3+2) + P(KJ)*FY(KJ)
-             PME((L-1)*3+3) = PME((L-1)*3+3) + P(KJ)*FZ(KJ)
+c            PME((L-1)*3+1) = PME((L-1)*3+1) + P(KJ)*FX(KJ)
+c            PME((L-1)*3+2) = PME((L-1)*3+2) + P(KJ)*FY(KJ)
+c            PME((L-1)*3+3) = PME((L-1)*3+3) + P(KJ)*FZ(KJ)
               END IF
             ELSE IF ((K.GE.orbspace(1).AND.K.LE.iocor).AND.
      1   (J.LE.orbspace(2).AND.J.GT.iocor)) THEN
