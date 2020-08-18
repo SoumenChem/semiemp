@@ -247,6 +247,12 @@ C
       IF (ISPEC.EQ.1) GO TO 30
    20 CONTINUE
 C     THESE VALUES ARE CLACK'S
+CSG INDO-X      
+      BETA(1,1) = -11.367
+      BETA(6,1) = -18.605
+      BETA(7,1) = -33.709
+      BETA(8,1) = -34.882
+CSG INDO-X
       BETA(21,3) = -15.0D0
       BETA(22,3) = -18.0D0
       BETA(23,3) = -21.0D0
@@ -351,6 +357,8 @@ C     ANDERSON IONIC VALUES FROM HEXAAQUO STUFF
 C
 C     ADJUSTMENTS  FOR SPECTRAL CALCULATION ACCORDING TO DEL BENE-JAFFE
       BETA(1,1) = -12.0D0
+CSG
+      BETA(1,1) = -9.0D0
       BETA(1,2) = -ONE
       BETA(3,1) = -ONE
       BETA(5,1) = -8.0D0
@@ -361,6 +369,13 @@ C     O ATOM IS A PROBLEM
 C     THE VALUE OF -54.0 gives better gas phase spectr, -34.0 solution
 C     spectra, is the traditional value.
       BETA(8,1) = -54.0D0
+CSG(INDO/X)
+      BETA(1,1) = -11.367
+      BETA(6,1) = -18.605
+      BETA(7,1) = -33.709
+      BETA(8,1) = -34.882
+      BETA(29,1) = -1.0D0
+      BETA(29,3) = -30.0D0 
 CJiabo
 c     CALL INDOS2(AJUNK,BETA(8,1),XJUNK)
 CLi
@@ -461,6 +476,7 @@ C      ADJUSTED LIGAND PARAMETERS FOR TRANSITION METAL COMPLEXES
 c     BETA(47,1) = -2.5D0
 c     BETA(47,2) = -2.5D0
 c     BETA(47,3) = -30.0D0
+
    50 CONTINUE
 c     write(6,*)"BETA Ag",BETA(47,1),BETA(47,2),BETA(47,3)
       LTOT=0
