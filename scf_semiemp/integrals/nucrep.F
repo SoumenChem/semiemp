@@ -100,10 +100,10 @@ c        REPGL = REPGL + Z12(I)*Z12(J)*GAMMA(NGA)
         ID = ID + I
    50  CONTINUE
        END IF
-       IF (IQMMM.EQ.IZERO.AND.IPRINT.NE.-2) WRITE (6,9010) REP
+c      IF (IQMMM.EQ.IZERO.AND.IPRINT.NE.-2) WRITE (6,9010) REP
  9000          FORMAT (' ERROR IN GEOMETRY, ATOM ',I3,' AND',I3,
      .         ' AT',F10.6,'A')
- 9010 FORMAT (//' CORE REPULSION ENERGY1 =',F14.6//)
+ 9010 FORMAT (//' CORE REPULSION ENERGY =',F14.6//)
        RETURN
        END
 C--------------------------------------------------------------------

@@ -468,8 +468,14 @@ C-------------------------------------------------------------------------------
       subroutine build_fock(F,D,E,NB)
       integer NB
       double precision F(NB,NB),D(NB),E(NB)
-c     write(6,*)"i am in build_fock"       
-      F = 0.0d0
+c     write(6,*)"i am in build_fock"    
+      F=0.0d0
+c     do i = 1, NB
+c      do j = 1, NB   
+c        F(i,j) = 0.0d0
+c       end do
+c     end do
+
       do i = 1, NB
         F(i,i) = D(i)
       end do
@@ -483,6 +489,9 @@ c-------------------------------------------------------------------------------
 c parallel diagonalization
 c------------------------------------------------------------------------------------------
       subroutine diag_para(F,NRR,NB,BB,EIG)
+
+#include "cdft.fh"
+#include "eaf.fh"
 #include "errquit.fh"
 #include "mafdecls.fh"
 #include "tcgmsg.fh"
@@ -518,29 +527,35 @@ c          write(6,*)"i am here 2"
      &   call errquit('diag_para: cannot allocate A',0,
      1    MA_ERR)
 
+
        do i = 1, NRR
 c      write(6,*)"F(I)",F(I)
           Dbl_MB(iA+I-1)= F(I)
        end do
       call tred3_sg(NB,NRR,Dbl_MB(iA),Dbl_MB(iD),Dbl_MB(iE),Dbl_MB(iE2))
        call build_fock(F,Dbl_MB(iD),Dbl_MB(iE),NB)
+c      write(6,*)"after build_fock"
+c      write(6,*)"here"
+c     call ga_dgop(Msg_buildfock,F,NB*NB,'+')!Propagate status 
 c      write(6,*)"F",(F(I),I=1,nrr)
           if (.not. ga_create(mt_dbl, nb, nb, 'F', 0, 0, g_F))
      & call errquit('Could not create g_F', 0, GA_ERR)
-         if (.not. ga_create(mt_dbl, nb, nb, 'alpha', 0, 0, g_alpha))
+c        write(6,*)"created g_F"
+         if (.not.ga_create(mt_dbl, nb, nb, 'alpha', 0, 0, g_alpha))
      & call errquit('Could not create g_alpha', 0, GA_ERR)
+c      write(6,*)"before ga_put"
        call ga_put(g_F,1,nb,1,nb,F,nb)
 
-c     total_wall = -util_wallsec()
+c     iotal_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec()
-
+c      write(6,*)"ga put done"
 C--------------------------------------------------------------------------------------
 C DIAGONALIZATION OF THE MATRIX
 C---------------------------------------------------------------------------------------
 c      call ga_print(g_F)
        call ga_diag_std(g_F,g_alpha,eig)
 C--------------------------------------------------------------------------------------
-c      write(6,*)"ga put done"
+c      write(6,*)"ga diag_std"
 c     total_wall = total_wall +  util_wallsec()
 c     total_cpu  =  total_cpu + util_cpusec()
 c     if (ga_nodeid() .eq. 0) then

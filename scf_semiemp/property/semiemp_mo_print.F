@@ -65,7 +65,7 @@ c
      &        0, 0, g_vecs))
      1 call errquit('mo_print: failed to write coefficient',0, RTDB_ERR)
 
-            write(LuOut,20)
+            if (ga_nodeid().eq.0) write(LuOut,20)
  20         format(20x,('  Final Molecular Orbital analysis '))
        
        call ga_put(g_vecs,1,nbf,1,nbf,Dbl_MB(iBB),nbf)

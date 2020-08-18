@@ -67,7 +67,7 @@ c
      &        0, 0, g_vecs))
      1 call errquit('mo_print: failed to write coefficient',0, RTDB_ERR)
 
-            write(LuOut,20)
+            if (ga_nodeid().eq.0) write(LuOut,20)
  20         format(20x,('  Final Alpha Molecular Orbital analysis '))
        
        call ga_put(g_vecs,1,nbf,1,nbf,Dbl_MB(iBB),nbf)
@@ -209,7 +209,7 @@ c    $              atnum(int_mb(k_list+k)),
      &        0, 0, g_vecs))
      1 call errquit('mo_print: failed to write coefficient',0, RTDB_ERR)
 
-            write(LuOut,40)
+            if (ga_nodeid().eq.0) write(LuOut,40)
  40         format(20x,('  Final Beta Molecular Orbital analysis '))
 
        call ga_put(g_vecs,1,nbf,1,nbf,Dbl_MB(iBB),nbf)

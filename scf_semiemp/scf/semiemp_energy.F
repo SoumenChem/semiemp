@@ -30,6 +30,7 @@ c
       integer itmax
       integer inttyp
       integer gfac
+      integer g_F
       double precision  charge
       double precision mult
       double precision scftol,E1
@@ -202,9 +203,9 @@ c      Get the atomic information from the geometry
 
 c      Initialize semiempirical parameters
        call semiemp_init(rtdb)
+
 c
-c      if (ga_nodeid().eq.0)
-c    &      write(luout,*) " after semiemp_init"
+
 C   ISW1 specifies model Hamiltonian:   (sw_hamiltonian)
 C
 C   ISW1  =   0      1       2      3      4      5      6     7
@@ -214,8 +215,6 @@ C           MNDO    AM1    PM3
        if (.not.rtdb_cget(rtdb,'semiemp:apx',1,apx)) then
        call errquit('oneint_semiemp: failed to read apx',0, RTDB_ERR)
        endif
-       if (ga_nodeid().eq.0)
-     & write(6,*) "APPROXIMATE HAMILTONIAN", "=",  apx
        if (inp_compare(.false.,apx,'EHT'))  then
         ISW1 = 0
        elseif (inp_compare(.false.,apx,'cndo/1'))  then
@@ -246,7 +245,6 @@ C           MNDO    AM1    PM3
 c     end if
          if (.not.rtdb_get(rtdb,'semiemp:inttyp',mt_int,1,inttyp))
      &  call errquit('semiemp failed read to inttyp',0,RTDB_ERR)
-      if (ga_nodeid().eq.0) write(6,*)"scftol",scftol
       if (.not.rtdb_get(rtdb,'semiemp:maxiter',mt_int,1,itmax))
      &  call errquit('scfit failed read to itmax',0,RTDB_ERR)
 c      end if
@@ -255,9 +253,9 @@ c     write(6,*)"itmax",itmax
       if (.not.rtdb_get(rtdb,'semiemp:mult',mt_dbl,1,mult))
      &  call errquit('scfit failed read to mult',0,RTDB_ERR)
 c      end if
-       if (ga_nodeid().eq.0) write(6,*)"mult",mult
        if (.not.rtdb_put(rtdb,'semiemp:natom',mt_int,1,nat))
      1  call errquit('semiemp: failed to write natom',0, RTDB_ERR)
+
 
 C   ISWANN = 0  for RHF
 C          = 1  for UHF
@@ -293,7 +291,6 @@ c    calculating number of  valence electrons
 c    make basis function array
        status= basis_function(nat,int_mb(iz),dbl_mb(ival),int_mb(inb),
      1  int_mb(inp),int_mb(intype))
-c      write(6,*)"i am back"
        nbf= 0
        cx = 0.0
        cy = 0.0
@@ -310,7 +307,7 @@ c      write(6,*)"i am back"
        do iat = 0, nat-1
          valence =valence +dbl_mb(ival+iat)
         end do
-        write(6,*)"Number of valence electrons =", valence
+c       write(6,*)"Number of valence electrons =", valence
          if (.not.MA_Push_Get(MT_int,INT(valence),'nqm',lnqm,inqm))
      &   call errquit('semiemp_energy: cannot allocate nqm',0,
      1    MA_ERR)
@@ -364,17 +361,18 @@ c         write(luout,*)
         end if
         nbf = nbf+ int_mb(inb+iat)
       enddo
-       if (ga_nodeid().eq.0)
-     & write(luout,*) "total number of basis fn", nbf
+c      if (ga_nodeid().eq.0)
+c      write(luout,*) "total number of basis fn", nbf
 c      write(6,*)"charge",charge
+
+       IF(ISWANN .NE. 3) THEN
        NEL=NEL- INT(charge)
-c      write(6,*)"NEL",NEL
-       IF(ISWANN .NE. 3 .AND. ga_nodeid().eq.0) THEN
        MIM(2) = (NEL + MULT- 1 ) / 2
        MIM(1) = MIM(2) - MULT + 1
        FOP(2) = REAL(MIM(2))
        FOP(1) = REAL(MIM(1))
 c      write(6,*)"MIM",MIM(1),MIM(2)
+c      write(6,*)"NEL=",NEL
        IF(ISWANN .EQ. 0) FOP(1) = REAL(NEL)
 
         if (.not.rtdb_put(rtdb,'semiemp:MIM',mt_int,2,MIM))
@@ -383,7 +381,14 @@ c      write(6,*)"MIM",MIM(1),MIM(2)
 c     ELSE
 c      CALL RHFST(MULT)
       ENDIF
-c     write(6,*)"MIM",MIM        
+
+      if (ga_nodeid().eq.0)  then
+       write(luout,*) "APPROXIMATE HAMILTONIAN", "=",  apx
+       write(luout,*)"SCFTOL = ",scftol
+       write(luout,*)"MULT = ",mult
+       write(luout,*) "Total Number of Basis Functions =", nbf
+      endif
+c      write(6,*)"MIM",MIM        
 c        write(6,*)"Ks"
 c        write(6,*)K0,K1,K4,K9,K16
            NGDD = K1 + 2*K4 + 3*K9 + 4*K16
@@ -704,6 +709,8 @@ c
        if (.not.rtdb_put(rtdb,'semiemp:DK',mt_dbl,nat,dbl_mb(iDK)))
      1  call errquit('semiemp: failed to write DK',0, RTDB_ERR)
 
+c      write(luout,*)"memory allocation done"
+
 c
 c
 c     Initialize exponents
@@ -728,6 +735,8 @@ C-----------------------------------------------------------------------
        Dbl_MB(igama+I) = 0.0d0
       END DO
 
+c       write(luout,*)"initialization"
+
 c
 c      Get atomic data: basis functions
        call atom_data(int_mb(iz),nat,sexpo,pexpo,dexpo,fexpo) 
@@ -736,7 +745,7 @@ c
         L=0
         do I=0,nbf*nbf-1
            INT_MB(iNIN+I)= L
-c        write(6,*)"NIN",INT_MB(iNIN+I)
+c        write(6,*)"NIN"!,INT_MB(iNIN+I)
          L=L+I+1
         end do  
 
@@ -766,11 +775,8 @@ c      calculating core energy
        nrep = 0.0
        rep = 0.0
        status= geom_nuc_rep_energy( geom, nrep)
-       if (ga_nodeid().eq.0)
-     & write(luout,*) "NUCLEAR REPULSION ENERGY = ", nrep
        status= core_energy(nat,Dbl_MB(ival),Dbl_MB(i_xyz),REP)
-       if (INTTYP.eq.0.and.ga_nodeid().eq.0)
-     & write(luout,*) "CORE REPULSION ENERGY = ", REP
+
 c      calculating radius matrix
        status= radmat(nat,Dbl_MB(i_xyz),Dbl_MB(irad))
 c----------------------------------------------------------------------------------------------
@@ -788,6 +794,11 @@ c-------------------------------------------------------------------------------
      1 CALL NUCREP(nat,Dbl_MB(irad),INT_MB(iz),Dbl_MB(ival),REP,
      1 Dbl_MB(iPO),Dbl_MB(iAALP),ISW1,INT_MB(inb),INT_MB(ing),
      1 Dbl_MB(igama),inttyp)
+       if (ga_nodeid().eq.0) then
+       write(luout,*) "NUCLEAR REPULSION ENERGY = ", nrep
+       write(luout,*) "CORE REPULSION ENERGY = ", REP
+       endif
+
 c-------------------------------------------------------------------------------------------
 c    getting beta values
 c-------------------------------------------------------------------------------------------
@@ -801,7 +812,6 @@ c this has to be filled in later
        call paramb(nat,int_mb(iz),int_mb(intype),Dbl_MB(ibeta),inttyp)
        call paramd(Dbl_MB(ibetb))
    10  Continue
-       call ga_sync()
 c----------------------------------------------------------------------------------------------
 c      calculating one electron integrals  
 c---------------------------------------------------------------------------------------------
@@ -813,6 +823,7 @@ c     constructing the one electron matrix element of the Hamiltonina
      1 Int_MB(inw),int_mb(iban),Int_MB(inu),Dbl_MB(irad),Dbl_MB(ieul),
      2 Dbl_MB(iFA),Dbl_MB(iH),Dbl_MB(iSH),INT_MB(inin),ISW1,INTTYP,
      3 Dbl_MB(iFT))
+c      write(6,*)"after oneint_semiemp"
 c     total_wall = total_wall + util_wallsec()
 c     total_cpu  = total_cpu  + util_cpusec()
 c     if (ga_nodeid() .eq. 0) then
@@ -841,11 +852,14 @@ c           Dbl_MB(ieig+I-1) = Dbl_MB(iFT+II-1)
 c        END DO
 c       GO TO 15
 c      end if
+
+c      write(6,*)"before diag_para"
        call diag_para(Dbl_MB(iFT),NRR,nbf,Dbl_MB(iBB),Dbl_MB(iEIG))
    15    CONTINUE
 C------------------------------------------------------------------------------------------  
 C GET THE FOCK TRANSFORMATION MATRIX IN TRNMAT
 C-------------------------------------------------------------------------------------------
+c      write(6,*)"before trnmat"
        call TRNMAT(Dbl_MB(iFT),Dbl_MB(ieig),nbf,NRR,Dbl_MB(iBB))
 
 c     DO  I=0,nrr-1
@@ -869,6 +883,7 @@ C-------------------------------------------------------------------------------
 C      REMOVE THE ONE CENTER KINETIC ENERGY FOR THIS IS INCLUDED
 C      THROUGH PARAMETERS FOR THE CORE INTEGRAL U
 C--------------------------------------------------------------------------------------------
+c      write(6,*)"before onekie"
        call ONEKIE(ISW1,nbf,Dbl_MB(iFA),Int_MB(inu))
 c--------------------------------------------------------------------------------------------
 C     THIS PORTION OF THE PROGRAM SETS UP THE HAMILTONIAN, H(IJ),
@@ -889,11 +904,13 @@ C
 C     HCORE - INCLUDE EFFECTIVE CORE POTENTIAL W(B)
 C
 C-----------------------------------------------------------------------
+c      write(6,*)"before exhuck"
        call exhuck(Dbl_MB(iH),Dbl_MB(iF),EIS,EIP,EID,EIF,Dbl_MB(irad),
      1 nat,Dbl_MB(iwcor),NRR,INT_MB(ilqm),nbf,INT_MB(iNIN),
      2 INT_MB(iban),INT_MB(inw),INT_MB(inu),Dbl_MB(ibeta),Dbl_MB(ibetb),
      3 ISW1,INT_MB(ipqn),Dbl_MB(ialpha),Dbl_MB(ibka),Dbl_MB(ibkb)) 
 c
+c      write(6,*)"before fetch"
        call
      1 fetch(nbf,INT_MB(inw),INT_MB(inu),INT_MB(ipqn),INT_MB(iz),
      2 Dbl_MB(ialpha),int_mb(intype),Dbl_MB(iSCG1SP),Dbl_MB(iSCF2PP),
@@ -1001,8 +1018,6 @@ c       write(6,*)"energy",E1
 c       E1 = E1/100
       total_wall = total_wall + util_wallsec()
       total_cpu  = total_cpu  + util_cpusec()
-      if (ga_nodeid() .eq. 0) then
-      end if
 
        if (.not.rtdb_put(rtdb,'semiemp:energy',mt_dbl,1,E1))
      1  call errquit('semiemp: failed to write energy',0, RTDB_ERR)
