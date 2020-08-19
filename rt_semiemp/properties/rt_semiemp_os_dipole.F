@@ -261,7 +261,7 @@ c     call rt_semiemp_mullpop(rtdb,g_scr,0)
 
       call DIPOLE(rtdb,RAD,KAN,NA,CO,NU,NW,NP,NIN,ALPHA,H,BB,NB,NRR,
      1 ISW1,Z12,D12,Dbl_MB(idens),NEL,D,dipx,dipy,dipz,2,Dbl_mb(iPME),
-     1 int_mb(iocc),int_mb(iunocc),IORB)
+     1 int_mb(iocc),int_mb(iunocc),IORB,MIM(1))
 
 
       if (me.eq.0) then
