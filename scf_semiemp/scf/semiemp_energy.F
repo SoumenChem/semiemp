@@ -150,6 +150,7 @@ c     logical  geom_cart_get2 !for getting coordinate and atomic number
        integer g_S, g_alpha, g_A, g_c
        logical rt_semiemp
        external rt_semiemp
+       logical docis
 c    
        total_cpu = 0.0d0
        total_wall = 0.0d0 
@@ -577,53 +578,6 @@ C-------------------------------------------------------------------------------
      1    iBB))
      &   call errquit('semiemp_energy: cannot allocate BB',0,
      1    MA_ERR)
-           IF(ISW1.LT.50) THEN
-           if (.not.MA_Push_Get(MT_INT,4*nbf*nbf,'LABI',lLABI,
-     1   iLABI))
-     &   call errquit('semiemp_energy: cannot allocate LABI',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_INT,4*nbf*nbf,'LABJ',lLABJ,
-     1   iLABJ))
-     &   call errquit('semiemp_energy: cannot allocate LABJ',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_INT,4*nbf*nbf,'LABK',lLABK,
-     1   iLABK))
-     &   call errquit('semiemp_energy: cannot allocate LABK',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_INT,4*nbf*nbf,'LABL',lLABL,
-     1   iLABL))
-     &   call errquit('semiemp_energy: cannot allocate LABL',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_Dbl,4*nbf*nbf,'QQ',lQQ,iQQ))
-     &   call errquit('semiemp_energy: cannot allocate QQ',0,
-     1    MA_ERR)
-           ELSEIF (ISW1.LT.54) THEN
-           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABI',lLABI,
-     1   iLABI))
-     &   call errquit('semiemp_energy: cannot allocate LABI',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABJ',lLABJ,
-     1   iLABJ))
-     &   call errquit('semiemp_energy: cannot allocate LABJ',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABK',lLABK,
-     1   iLABK))
-     &   call errquit('semiemp_energy: cannot allocate LABK',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABL',lLABL,
-     1   iLABL))
-     &   call errquit('semiemp_energy: cannot allocate LABL',0,
-     1    MA_ERR)
-           if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf,'QQ',lQQ,iQQ))
-     &   call errquit('semiemp_energy: cannot allocate QQ',0,
-     1    MA_ERR)
-            if (.not.MA_Push_Get(MT_Dbl,9*105,'DAD',lDAD,iDAD))
-     &   call errquit('semiemp_energy: cannot allocate DAD',0,
-     1    MA_ERR)
-             if (.not.MA_Push_Get(MT_Dbl,105,'AALP',lAALP,iAALP))
-     &   call errquit('semiemp_energy: cannot allocate AALP',0,
-     1    MA_ERR)      
-          ENDIF
            if (.not.MA_Push_Get(MT_Dbl,3*nat,'FZ',lFZ,iFZ))
      &   call errquit('semiemp_energy: cannot allocate FZ',0,
      1    MA_ERR)
@@ -709,6 +663,37 @@ c
        if (.not.rtdb_put(rtdb,'semiemp:DK',mt_dbl,nat,dbl_mb(iDK)))
      1  call errquit('semiemp: failed to write DK',0, RTDB_ERR)
 
+C----------------------------------------------------------------------------------
+C
+C----------------------------------------------------------------------------------       
+           IF (ISW1.GT.50) THEN
+           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABI',lLABI,
+     1   iLABI))
+     &   call errquit('semiemp_energy: cannot allocate LABI',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABJ',lLABJ,
+     1   iLABJ))
+     &   call errquit('semiemp_energy: cannot allocate LABJ',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABK',lLABK,
+     1   iLABK))
+     &   call errquit('semiemp_energy: cannot allocate LABK',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,nbf*nbf*nbf,'LABL',lLABL,
+     1   iLABL))
+     &   call errquit('semiemp_energy: cannot allocate LABL',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf,'QQ',lQQ,iQQ))
+     &   call errquit('semiemp_energy: cannot allocate QQ',0,
+     1    MA_ERR)
+            if (.not.MA_Push_Get(MT_Dbl,9*105,'DAD',lDAD,iDAD))
+     &   call errquit('semiemp_energy: cannot allocate DAD',0,
+     1    MA_ERR)
+             if (.not.MA_Push_Get(MT_Dbl,105,'AALP',lAALP,iAALP))
+     &   call errquit('semiemp_energy: cannot allocate AALP',0,
+     1    MA_ERR)
+          ENDIF
+
 c      write(luout,*)"memory allocation done"
 
 c
@@ -731,7 +716,6 @@ C-----------------------------------------------------------------------
        Dbl_MB(iFA+I) = 0.0d0
        Dbl_MB(iBB+I) = 0.0d0
        Dbl_MB(iF+I) = 0.0d0
-       Dbl_MB(iQQ+I) = 0.0d0
        Dbl_MB(igama+I) = 0.0d0
       END DO
 
@@ -983,9 +967,18 @@ c-------------------------------------------------------------------------------
      8 Dbl_MB(iR2SDPP),Dbl_MB(iR1PDDF),Dbl_MB(iR1SPDF),Dbl_MB(iR2PFDD),
      9 Dbl_MB(iR2PFFF),Dbl_MB(iR2PPPF),Dbl_MB(iR2SDFF),Dbl_MB(iR2SDPF),
      A Dbl_MB(iR3PDDF),Dbl_MB(iR3SFDF),Dbl_MB(iR3SFPD),Dbl_MB(iR4PFDD),
-     A Dbl_MB(iR4PFFF),Dbl_MB(iQQ),INT_MB(iLABI),INT_MB(iLABJ),
-     A INT_MB(iLABK),INT_MB(iLABL),LL,INT_MB(inin))
+     A Dbl_MB(iR4PFFF),INT_MB(inin),LL)
        ENDIF
+
+       if (.not.rtdb_put(rtdb,'semiemp:numint',mt_int,1,LL))
+     1  call errquit('semiemp: failed to write numint',0, RTDB_ERR)
+
+c      call semiemp_integral_save (LL,INT_MB(iLABI),INT_MB(iLABJ),
+c    A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ),nbf) 
+
+c      call semiemp_integral_load(LL,INT_MB(iLABI),INT_MB(iLABJ),
+c    A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ))
+
 c----------------------------------------------------------------------------------------------
 c     ITS TIME TO DO SELF-CONSISTENT FIELD ITERATIONS
 C     CALL SCFIT TO DO THE SELF-CONSISTENT FIELD ITERATIONS.
@@ -1011,9 +1004,8 @@ c      write(6,*)"before scfit"
      1 Dbl_MB(iFT),Dbl_MB(irad),Dbl_MB(igama),ISW1,nbf,nat,ISWANN,scftol
      2 ,itmax,MIM,ISW3,Dbl_MB(ieig),FOP,NEL,MULT,NRR,Dbl_MB(iBB),NDN
      3 ,INT_MB(intype),INT_MB(inu),INT_MB(ing),JSLIT,Dbl_MB(isumelel),
-     4 Dbl_MB(iQQ),INT_MB(iLABI),INT_MB(iLABJ),INT_MB(iLABK),
-     5 INT_MB(iLABL),LL,REP,Dbl_MB(iFZ),INT_MB(iNIN),E1,Dbl_MB(id12),
-     6 Dbl_MB(iAA),Dbl_MB(iRA),Dbl_MB(iRB),NCORE,Dbl_MB(irho))
+     4  REP,Dbl_MB(iFZ),INT_MB(iNIN),E1,Dbl_MB(id12),
+     6 Dbl_MB(iAA),Dbl_MB(iRA),Dbl_MB(iRB),NCORE,Dbl_MB(irho),LL)
 c       write(6,*)"energy",E1
 c       E1 = E1/100
       total_wall = total_wall + util_wallsec()
@@ -1053,6 +1045,13 @@ c       E1 = E1/100
 c      do i = 0 , nrr-1
 c       write(6,*)"FZ",Dbl_MB(idipz+i)
 c      end do
+        if (.not.rtdb_get(rtdb,'semiemp:docis',mt_log,1,docis))
+     1  call errquit('semiemp: failed to read docis',0, RTDB_ERR)
+       
+       if (docis) then
+        Write(6,*)"CIS CALCULATION"
+        call semiemp_cis(rtdb,nbf,Dbl_MB(ieig))       
+        end if
        if (ISWANN.eq.1) 
      1 CALL semiemp_mo_uhf_print(rtdb,int_mb(iatnum),nbf)
 C-----------------------------------------------------------------------------------
@@ -1062,8 +1061,7 @@ C-------------------------------------------------------------------------------
      $     operation = ' '
       if (inp_compare(.false., 'rt_semiemp', operation)) then  !CSG
          call rtsemiemp(rtdb,dbl_mb(iSH),nbf,ISWANN,Dbl_MB(irho),
-     1 Dbl_MB(isumelel),Dbl_MB(iQQ),INT_MB(iLABI),INT_MB(iLABJ),
-     2 INT_MB(iLABK),INT_MB(iLABL),LL,Dbl_MB(iFA),INT_MB(iNIN),
+     1 Dbl_MB(isumelel),LL,Dbl_MB(iFA),INT_MB(iNIN),
      3 INT_MB(ing),Dbl_MB(igama),Dbl_MB(idipx),Dbl_MB(idipy),
      4 Dbl_MB(idipz),Dbl_MB(iRAD),INT_MB(iz),nat,Dbl_MB(i_xyz),
      5 INT_MB(inu),INT_MB(inw),INT_MB(ipqn),Dbl_MB(iALPHA),
@@ -1108,6 +1106,22 @@ C-------------------------------------------------------------------------------
      $     ('geom_print_rtdb_ecce: geom destroy failed',0, GEOM_ERR)
 c---------------------------------------------------------------------------------------------  
 c     Clean memory
+         IF (ISW1.LT.54.and.ISW1.GT.50) THEN
+         if (.not.ma_pop_stack(lAALP))
+     &   call errquit('semiemp_energy: cannot pop stack AALP',3, MA_ERR)
+         if (.not.ma_pop_stack(lDAD))
+     &   call errquit('semiemp_energy: cannot pop stack DAD',3, MA_ERR)
+         if (.not.ma_pop_stack(lQQ))
+     & call errquit('semiemp_energy: cannot pop stack QQ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABL))
+     & call errquit('semiemp_energy: cannot pop stack LABL',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABK))
+     & call errquit('semiemp_energy: cannot pop stack LABK',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABJ))
+     & call errquit('semiemp_energy: cannot pop stack LABJ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABI))
+     & call errquit('semiemp_energy: cannot pop stack LABI',3, MA_ERR)
+         END IF
       if (.not.ma_pop_stack(latnum))
      &   call errquit('semiemp_energy: cannot pop stack ATOM_NUM',3, 
      & MA_ERR)
@@ -1159,22 +1173,6 @@ c     Clean memory
      & call errquit('semiemp_energy: cannot pop stack SUMELE',3, MA_ERR)
          if (.not.ma_pop_stack(lFZ))
      & call errquit('semiemp_energy: cannot pop stack FZ',3, MA_ERR)
-         IF (ISW1.LT.54.and.ISW1.GT.50) THEN
-         if (.not.ma_pop_stack(lAALP))
-     &   call errquit('semiemp_energy: cannot pop stack AALP',3, MA_ERR)
-         if (.not.ma_pop_stack(lDAD))
-     &   call errquit('semiemp_energy: cannot pop stack DAD',3, MA_ERR)
-         END IF
-         if (.not.ma_pop_stack(lQQ))
-     & call errquit('semiemp_energy: cannot pop stack QQ',3, MA_ERR)
-         if (.not.ma_pop_stack(lLABL))
-     & call errquit('semiemp_energy: cannot pop stack LABL',3, MA_ERR)
-         if (.not.ma_pop_stack(lLABK))
-     & call errquit('semiemp_energy: cannot pop stack LABK',3, MA_ERR)
-         if (.not.ma_pop_stack(lLABJ))
-     & call errquit('semiemp_energy: cannot pop stack LABJ',3, MA_ERR)
-         if (.not.ma_pop_stack(lLABI))
-     & call errquit('semiemp_energy: cannot pop stack LABI',3, MA_ERR)
          if (.not.ma_pop_stack(lBB))
      & call errquit('semiemp_energy: cannot pop stack BB',3, MA_ERR)
          if (.not.ma_pop_stack(lF))

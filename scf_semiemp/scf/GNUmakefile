@@ -3,7 +3,7 @@
 #
    OBJ = \
 
-   OBJ_OPTIMIZE = assign.o densit.o diagr.o diagu.o fillf.o fillfu.o fock.o rear.o scfchk.o scfit.o scons.o semiemp_energy.o semiemp.o sing.o symorth.o trnmat.o \
+   OBJ_OPTIMIZE = assign.o densit.o diagr.o diagu.o fillf.o fillfu.o fock.o rear.o scfchk.o scfit.o scons.o semiemp_energy.o semiemp.o sing.o symorth.o trnmat.o semiemp_scf_restart.o semiemp_cis.o \
 
 
    LIBRARY = libsemiemp.a
