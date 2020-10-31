@@ -34,7 +34,9 @@ c
       integer III                !type of calculation (e.g energy)
       integer IA            !types of calculation (e.g energy,TS)
       integer geom
+      integer nroot
       logical status 
+      logical docis
       logical  geom_rtdb_ncent  !for getting number of atoms
       integer nat               !number of atoms
       
@@ -128,6 +130,21 @@ c
           if (.not.rtdb_put(rtdb,'semiemp:scftol',mt_dbl,1,scftol))
      1    call errquit('semiemp_input: failed writing to rtdb',0,
      &       RTDB_ERR)
+         else if (inp_compare(.false.,test,'nroot')) then
+        if (.not.inp_i(nroot)) then
+          write(LuOut,*) 'semiemp_input:nroot value not found; ',
+     1      'default value of 1000 will be used'
+          maxiter=0
+          docis=.false.
+         endif
+         docis=.true.
+         if (.not.rtdb_put(rtdb,'semiemp:docis',mt_log,1,docis))
+     1    call errquit('semiemp_input: failed writing to rtdb',0,
+     &       RTDB_ERR)
+          if (.not.rtdb_put(rtdb,'semiemp:nroot',mt_int,1,nroot))
+     1    call errquit('semiemp_input: failed writing to rtdb',0,
+     &       RTDB_ERR) 
+
         else if (inp_compare(.false.,test,'maxiter')) then
         if (.not.inp_i(maxiter)) then
           write(LuOut,*) 'semiemp_input:maxiter value not found; ',

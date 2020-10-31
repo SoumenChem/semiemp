@@ -2,14 +2,31 @@
      1 SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,SCG3SF,SCG2PF,SCG4PF,
      2 SCG1DF,SCG3DF,SCG5DF,SCF2PF,SCF2DF,SCF4DF,SCF2FF,SCF4FF,SCF6FF,
      3 R1SPPD,R2SDDD,R2SDPP,R1PDDF,R1SPDF,R2PFDD,R2PFFF,R2PPPF,R2SDFF,
-     4 R2SDPF,R3PDDF,R3SFDF,R3SFPD,R4PFDD,R4PFFF,QQ,LABI,LABJ,LABK,
-     5 LABL,LL,NIN) 
+     4 R2SDPF,R3PDDF,R3SFDF,R3SFPD,R4PFDD,R4PFFF,NIN,LL) 
 C
 C     THIS SUBROUTINE ASSEMBLES ALL INTEGRALS  AND STORES THEM AND THEIR
 C     CODE 
 C
+               
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       IMPLICIT INTEGER (I-N)
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "tcgmsg.fh"
+#include "global.fh"
+#include "geom.fh"
+#include "rtdb.fh"
+#include "sym.fh"
+#include "util.fh"
+#include "msgids.fh"
+#include "stdio.fh"
+#include "dra.fh"
+#include "inp.fh"
+#include "bas.fh"
+#include "schwarz.fh"
+#include "dftps.fh"
+#include "bgj.fh"
+
       PARAMETER (MXCI = 6000,
      + ZERO =  0.0D0, ONE  =  1.0D0, TWO  =  2.0D0, THREE = 3.0D0,
      +  FOUR =  4.0D0, FIVE =  5.0D0, SIX  =  6.0D0, SEVEN = 7.0D0,
@@ -28,27 +45,45 @@ C***C F type R-integrals
      .   R1PDDF(*),R1SPDF(*),R2PFDD(*),R2PFFF(*),
      .   R2PPPF(*),R2SDFF(*),R2SDPF(*),R3PDDF(*),
      .   R3SFDF(*),R3SFPD(*),R4PFDD(*),R4PFFF(*)
-      dimension  QQ(*),LABI(*),LABJ(*)
-      dimension   LABK(*),LABL(*), NIN(*)
+c     dimension  QQ(*),LABI(*),LABJ(*)
+c     dimension   LABK(*),LABL(*), NIN(*)
       DIMENSION NTYP(*),NU(*),NW(*),NG(*),KAN(*)
-      DIMENSION  H(*),GAMMA(*)
+      DIMENSION  H(*),GAMMA(*), NIN(*)
 c     INCLUDE '../include/param.cmn'
 c     INCLUDE '../include/units.cmn'
 c     INCLUDE '../include/allgf.cmn'
 c     INCLUDE '../include/nind.cmn'
 c     INCLUDE '../include/switch.cmn'
-c     INCLUDE '../include/z.cmn'
 C
 C
+           if (.not.MA_Push_Get(MT_INT,4*NB*NB,'LABI',lLABI,
+     1   iLABI))
+     &   call errquit('semiemp_energy: cannot allocate LABI',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,4*NB*NB,'LABJ',lLABJ,
+     1   iLABJ))
+     &   call errquit('semiemp_energy: cannot allocate LABJ',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,4*NB*NB,'LABK',lLABK,
+     1   iLABK))
+     &   call errquit('semiemp_energy: cannot allocate LABK',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,4*NB*NB,'LABL',lLABL,
+     1   iLABL))
+     &   call errquit('semiemp_energy: cannot allocate LABL',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_Dbl,4*NB*NB,'QQ',lQQ,iQQ))
+     &   call errquit('semiemp_energy: cannot allocate QQ',0,
+     1    MA_ERR)
+
 c     L=0
-c     if (ga_nodeid.eq.0)
-c    .write(6,*) "i am in gform"
+c     write(6,*) "i am in gform"
       DO  I = 1, NB*NB
-            QQ(I) = ZERO
-            LABI(I) = 0
-            LABJ(I) = 0
-            LABK(I) = 0
-            LABL(I) = 0
+           Dbl_MB(iQQ+i-1) = ZERO
+           Int_MB(iLABI+i-1) = 0
+           Int_MB(iLABJ+i-1) = 0
+           Int_MB(iLABK+i-1) = 0
+           Int_MB(iLABL+i-1) = 0
       END DO
 
       RT3 = SQRT(THREE)
@@ -75,11 +110,17 @@ c              IF (NU(I).EQ.NU(J)) GO TO 10
             N1N2 = NIN(N2) + N1
 c           write(6,*)"N1N2",N1N2
 c           write(6,*)"GAMMA",GAMMA(N1N2)
-            QQ(LL) = GAMMA(N1N2)
-            LABI(LL) = I
-            LABJ(LL) = I
-            LABK(LL) = J
-            LABL(LL) = J
+           Dbl_MB(iQQ+LL-1) = GAMMA(N1N2)
+           Int_MB(iLABI+LL-1) = I
+           Int_MB(iLABJ+LL-1) = I
+           Int_MB(iLABK+LL-1) = J
+           Int_MB(iLABL+LL-1) = J
+
+c           QQ(LL) = GAMMA(N1N2)
+c           LABI(LL) = I
+c           LABJ(LL) = I
+c           LABK(LL) = J
+c           LABL(LL) = J
 c           write(6,*)"LL,I,J",LL,I,J
 c           IF (LL.LT.10000) GO TO 10
 c           NINTGL = 10000
@@ -136,12 +177,17 @@ C
 C           TWO CENTER INTEGRALS
 c           write(6,*)"here",N1N2!,GAMMA(N1N2)
 c           write(6,*)"QQ",QQ(LL)
-   40       QQ(LL) = GAMMA(N1N2)
+   40      Dbl_MB(iQQ+LL-1) = GAMMA(N1N2)
+           Int_MB(iLABI+LL-1) = I
+           Int_MB(iLABJ+LL-1) = I
+           Int_MB(iLABK+LL-1) = J
+           Int_MB(iLABL+LL-1) = J
+c          QQ(LL) = GAMMA(N1N2)
 c           write(6,*)"here 1"
-            LABI(LL) = I
-            LABJ(LL) = I
-            LABK(LL) = J
-            LABL(LL) = J
+c           LABI(LL) = I
+c           LABJ(LL) = I
+c           LABK(LL) = J
+c           LABL(LL) = J
 c           write(6,*)"LL,I,J",LL,I,J
             GO TO 110
 C
@@ -169,9 +215,9 @@ C
 C   Beginning of a new integral code
 C
    60       IF (ICS.LT.15) THEN
-         CALL GFORMA(GAMMA,ICS,NIN,QQ,LABI,LABJ,LABK,LABL,IP,
-     1  I,J,LL,N1,N2,NT,N1N2
-     1 ,SCG1SP,SCF2PP,SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,
+         CALL GFORMA(GAMMA,ICS,NIN,Dbl_MB(iQQ),Int_MB(iLABI),
+     1  Int_MB(iLABJ),Int_MB(iLABK),Int_MB(iLABL),IP,I,J,LL,N1,N2,NT,
+     1 N1N2,SCG1SP,SCF2PP,SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,
      2 SCG3SF,SCG2PF,SCG4PF,SCG1DF,SCG3DF,SCG5DF,SCF2PF,SCF2DF,SCF4DF,
      3 SCF2FF,SCF4FF,SCF6FF,R1SPPD,R2SDDD,R2SDPP,R1PDDF,R1SPDF,R2PFDD,
      4 R2PFFF,R2PPPF,R2SDFF,R2SDPF,R3PDDF,R3SFDF,R3SFPD,R4PFDD,R4PFFF)
@@ -181,9 +227,9 @@ c       write(6,*)"LABL",LABL(LL)
 
             END IF
    70       IF (ICS.LT.37) THEN
-            CALL GFORMB(GAMMA,ICS,NIN,QQ,LABI,LABJ,LABK,LABL,IP,
-     1  I,J,LL,N1,N2,NT,N1N2
-     1 ,SCG1SP,SCF2PP,SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,
+            CALL GFORMB(GAMMA,ICS,NIN,Dbl_MB(iQQ),Int_MB(iLABI),
+     1  Int_MB(iLABJ),Int_MB(iLABK),Int_MB(iLABL),IP,I,J,LL,N1,N2,NT,
+     1 N1N2,SCG1SP,SCF2PP,SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,
      2 SCG3SF,SCG2PF,SCG4PF,SCG1DF,SCG3DF,SCG5DF,SCF2PF,SCF2DF,SCF4DF,
      3 SCF2FF,SCF4FF,SCF6FF,R1SPPD,R2SDDD,R2SDPP,R1PDDF,R1SPDF,R2PFDD,
      4 R2PFFF,R2PPPF,R2SDFF,R2SDPF,R3PDDF,R3SFDF,R3SFPD,R4PFDD,R4PFFF)
@@ -192,9 +238,9 @@ c       write(6,*)"LABL",LABL(LL)
 
             END IF
    80       IF (ICS.LT.63) THEN
-           CALL GFORMC(GAMMA,ICS,NIN,QQ,LABI,LABJ,LABK,LABL,IP,
-     1  I,J,LL,N1,N2,NT,N1N2
-     1 ,SCG1SP,SCF2PP,SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,
+           CALL GFORMC(GAMMA,ICS,NIN,Dbl_MB(iQQ),Int_MB(iLABI),
+     1  Int_MB(iLABJ),Int_MB(iLABK),Int_MB(iLABL),IP,I,J,LL,N1,N2,NT,
+     1  N1N2,SCG1SP,SCF2PP,SCG2SD,SCG1PD,SCF2PD,SCG3PD,SCF2DD,SCF4DD,
      2 SCG3SF,SCG2PF,SCG4PF,SCG1DF,SCG3DF,SCG5DF,SCF2PF,SCF2DF,SCF4DF,
      3 SCF2FF,SCF4FF,SCF6FF,R1SPPD,R2SDDD,R2SDPP,R1PDDF,R1SPDF,R2PFDD,
      4 R2PFFF,R2PPPF,R2SDFF,R2SDPF,R3PDDF,R3SFDF,R3SFPD,R4PFDD,R4PFFF)
@@ -262,6 +308,21 @@ c              LABL(K) = LABL(K+10000)
 C
   150 CONTINUE
 
+      call semiemp_integral_save(LL,INT_MB(iLABI),INT_MB(iLABJ),
+     A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ),nb)
+
+         if (.not.ma_pop_stack(lQQ))
+     & call errquit('semiemp_energy: cannot pop stack QQ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABL))
+     & call errquit('semiemp_energy: cannot pop stack LABL',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABK))
+     & call errquit('semiemp_energy: cannot pop stack LABK',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABJ))
+     & call errquit('semiemp_energy: cannot pop stack LABJ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABI))
+     & call errquit('semiemp_energy: cannot pop stack LABI',3, MA_ERR)
+
+        write(6,*)"done here"
 C
 C     +++++++++++++++  NDDO  INTEGRALS   ++++++++++++++++++++
 C
