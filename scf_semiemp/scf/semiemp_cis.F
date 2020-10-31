@@ -124,10 +124,11 @@ C-------------------------------------------------------------------------------
 #include "util.fh"
 #include "matutils.fh"
         
+        integer rtdb
         integer ndocc, nvirt,nbf
 c       double precision Ham(ndocc*nvirt,ndocc*nvirt)
         double precision eig(*)
-        double precision Ham
+        double precision Ham, E1
         double precision WIJAB(ndocc,ndocc,nvirt,nvirt)
         double precision WIAJB(ndocc,nvirt,ndocc,nvirt)
         integer i, j, a, b, ia, jb, ndim
@@ -141,11 +142,13 @@ c       double precision Ham(ndocc*nvirt,ndocc*nvirt)
 
         if (.not.ga_create(mt_dbl, ndim, ndim, 'Ham', 0, 0, g_ham))
      & call errquit('Could not create g_ham', 0, GA_ERR)
-        if (.not.ga_create(mt_dbl, ndim, ndim, 'Alpha', 0, 0, g_alpha))
+       if (.not.ga_create(mt_dbl,ndim,ndim, 'Alpha', 0, 0, g_alpha))
      & call errquit('Could not create g_alpha', 0, GA_ERR)
+
 
         call ga_zero(g_ham)
         call ga_zero(g_alpha)
+c       call ga_put(g_ham,1,1,1,1,0.0d0,1)
 c       Ham = 0.0d0
 c       write(6,*)"ndocc,nvirt in cis",ndocc,nvirt
         do i = 1, ndocc
@@ -169,10 +172,6 @@ c             write(6,*)"a,b,ia,ib",a,b,ia,jb
      & call errquit('semiemp_energy: cannot allocate HAMEIG',0,
      1    MA_ERR)
 
-      if (.not.MA_Push_Get(MT_Dbl,ndim*ndim,'hamalpha',lhamalpha,
-     1 ihamalpha))
-     & call errquit('semiemp_energy: cannot allocate HAMALPHA',0,
-     1    MA_ERR)
 
 c      NRR= ndim*(ndim+1)/2
 c      call ga_print(g_ham)
@@ -181,19 +180,20 @@ c          write(6,*)"done Hamiltonian"
 c          write(6,*)"after diagonalization"
 
        write(6,*) "SINGLET EXCITED STATE"
-       do i = 1, ndim
+       do i = 1, ndim 
          write(6,*)"EIG=", Dbl_MB(ihameig+i-1)
        end do 
 
         call ga_zero(g_ham)
         call ga_zero(g_alpha)
+c       call ga_put(g_ham,1,1,1,1,0.0d0,1)
 
         do i = 1, ndocc
          do a = 1, nvirt
-          ia = (i-1)*nvirt + a
+          ia = (i-1)*nvirt + a 
            do j = 1, ndocc
             do b = 1, nvirt
-             jb = (j-1)*nvirt + b
+             jb = (j-1)*nvirt + b 
                 Ham = 0.0d0
            Ham  = -WIJAB(i,j,a,b)
                if (ia.eq.jb) Ham = Ham + eig(ndocc+a)-eig(i)
@@ -207,15 +207,12 @@ c             write(6,*)"a,b,ia,ib",a,b,ia,jb
          call ga_diag_std(g_ham,g_alpha,dbl_mb(ihameig))
 c          write(6,*)"after diagonalization"
        write(6,*)"TRIPLET EXCITED STATE"
-       do i = 1, ndim
+       do i = 1, ndim  
          write(6,*)"EIG=", Dbl_MB(ihameig+i-1)
        end do
 
 
 
-       if (.not.ma_pop_stack(lhamalpha))
-     & call errquit('semiemp_energy: cannot pop stack hamalpha',3, 
-     1 MA_ERR)
        if (.not.ma_pop_stack(lhameig))
      & call errquit('semiemp_energy: cannot pop stack hameig',3, MA_ERR)     
 
