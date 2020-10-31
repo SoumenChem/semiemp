@@ -1,3 +1,4 @@
-$(LIBRARY_PATH)(paramc.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
 $(LIBRARY_PATH)(param.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
 $(LIBRARY_PATH)(exhuck.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
+$(LIBRARY_PATH)(gform.o):	$(INCDIR)/util.fh /home/soumen/nwchem/src/tools/install/include/tcgmsg.fh $(INCDIR)/sym.fh $(INCDIR)/stdio.fh ../../../ddscf/schwarz.fh $(INCDIR)/rtdb.fh $(INCDIR)/msgids.fh /home/soumen/nwchem/src/tools/install/include/mafdecls.fh $(INCDIR)/inp.fh /home/soumen/nwchem/src/tools/install/include/global.fh $(INCDIR)/geom.fh $(INCDIR)/errquit.fh /home/soumen/nwchem/src/tools/install/include/dra.fh $(INCDIR)/dftps.fh $(INCDIR)/bgj.fh $(INCDIR)/bas.fh 
+$(LIBRARY_PATH)(paramc.o):	/home/soumen/nwchem/src/tools/install/include/global.fh 
