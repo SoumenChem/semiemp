@@ -1,6 +1,5 @@
        SUBROUTINE FOCK(BB,HB,F,H,FA,Q,FZ,SVEC,GAMMA,SC,BH,
-     x IT,ITMAX,RAD,ISW1,ISWANN,FOP,SUMELEL,NB,NG,QQ,NRR,LABI,LABJ,
-     x LABK,LABL,LL,NIN)
+     x IT,ITMAX,RAD,ISW1,ISWANN,FOP,SUMELEL,NB,NG,NRR,NIN,LL)
 C
 C     ..................................................................
 C
@@ -36,9 +35,8 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
      +   (IZERO = 0, IONE = 1, ITWO = 2, ITHREE = 3, IFOUR = 4,
      +   IFIVE = 5, ISIX = 6, ISEVEN = 7, IEIGHT = 8, ININE = 9
      +   ,ITEN = 10)
-      dimension  F(*),QQ(*),FA(*),GAMMA(*),RAD(*),FZ(*), SVEC(*),
-     .    SC(NB,33),BB(*),HB(*),SUMELEL(*),NG(*),Q(*),LABI(*),
-     . LABJ(*),LABK(*),LABL(*),NIN(*)
+      dimension  F(*),FA(*),GAMMA(*),RAD(*),FZ(*), SVEC(*),
+     .    SC(NB,33),BB(*),HB(*),SUMELEL(*),NG(*),Q(*),NIN(*)
 C
       INS = ISWANN + 1
 
@@ -66,8 +64,7 @@ c     write(6,*)"before fillf BB",(BB(I),I=1,10)
 c     write(6,*)"before fillf HB",(HB(I),I=1,10)
 c     write(6,*)"before fillf F",(F(I),I=1,10)
 c     write(6,*)"before fillf FA",(FA(I),I=1,10)
-       CALL FILLF(BB,FA,F,Q,GAMMA,SUMELEL,NG,QQ,NRR,LABI,LABJ
-     1 ,LABK,LABL,LL,NIN,1)
+      CALL FILLF(BB,FA,F,Q,GAMMA,SUMELEL,NG,NRR,LL,NIN,1,NB)
 C     WRITE(6,*) ' ONE ELECTRON MATRIX'
 C     CALL PRNT(Q,NB,NRR)
 C
@@ -88,8 +85,7 @@ C
 C     Unrestricted Hartree-Fock (UHF) calculation
 C
    30 CONTINUE
-      CALL FILLFU(BB,HB,FA,F,Q,GAMMA,SUMELEL,NG,QQ,NRR,LABI,
-     1 LABJ,LABK,LABL,LL,NIN,1)
+      CALL FILLFU(BB,HB,FA,F,Q,GAMMA,SUMELEL,NG,NRR,LL,NIN,1,NB)
 C     IF XINDO , CONSIDER THIS!!
 c     IF(ISW1.EQ.8) THEN
 c      WRITE(6,*) ' IN FOCK SUMELEL'

@@ -562,7 +562,6 @@ c     if (ga_nodeid() .eq. 0) then
 c      write(LuOut,*) "diag_para cpu time", total_cpu, "total time",
 c    1 total_wall
 c     end if
-
        call ga_get(g_alpha,1,nb,1,nb,BB,nb)
             if (.not. ga_destroy(g_F))
      & call errquit('Could not destroy g_F', 0, GA_ERR)

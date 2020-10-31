@@ -1,5 +1,5 @@
-      SUBROUTINE FILLFU(BB,HB,FA,F,Q,GAMMA,SUMELEL,NG,QQ,NRR,LABI
-     1 ,LABJ,LABK,LABL,NINTGL,NIN,ITAG)
+      SUBROUTINE FILLFU(BB,HB,FA,F,Q,GAMMA,SUMELEL,NG,NRR,NINTGL,NIN,
+     1 ITAG,NB)
 C
 C     ZERNER   UNIVERSITY OF FLORIDA.  COPYRIGHTED
 C     UNRESTRICTED HF.
@@ -17,7 +17,22 @@ c     INCLUDE '../include/z.cmn'
 C
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       IMPLICIT INTEGER (I-N)
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "tcgmsg.fh"
 #include "global.fh"
+#include "geom.fh"
+#include "rtdb.fh"
+#include "sym.fh"
+#include "util.fh"
+#include "msgids.fh"
+#include "stdio.fh"
+#include "dra.fh"
+#include "inp.fh"
+#include "bas.fh"
+#include "schwarz.fh"
+#include "dftps.fh"
+#include "bgj.fh"
 c     Integer rtdb
 C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
       PARAMETER (MXB = 4000, MXA = 1200,MXF = 100, MPE = 105)
@@ -34,8 +49,7 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
      +   IFIVE = 5, ISIX = 6, ISEVEN = 7, IEIGHT = 8, ININE = 9
      +   ,ITEN = 10)
       dimension  F(*),Q(*),FA(*),GAMMA(*),HB(*),BB(*),DIP(3)
-     +,AD(3),BD(3),BBDD(3),BBD(3),NIN(*),SUMELEL(*),LABI(*),
-     + LABJ(*),LABK(*),LABL(*),NG(*),QQ(*)
+     +,AD(3),BD(3),BBDD(3),BBD(3),NIN(*),SUMELEL(*),NG(*) 
       CHARACTER*8  FLAGM, FLAGU
       
 c     LSCRF=JSW(6).GT.0.AND.JSW(6).NE.50.AND.JSW(6).NE.40
@@ -64,6 +78,29 @@ C
 C     CONVENTION I.LE.J,K.LE.L,I.LE.K. FORI.EQ.K,J.LE.L
 C     V=(I,J/K,L)=(1,1/2,2)
 C
+          if (.not.MA_Push_Get(MT_INT,NINTGL,'LABI',lLABI,
+     1   iLABI))
+     &   call errquit('semiemp_energy: cannot allocate LABI',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,NINTGL,'LABJ',lLABJ,
+     1   iLABJ))
+     &   call errquit('semiemp_energy: cannot allocate LABJ',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,NINTGL,'LABK',lLABK,
+     1   iLABK))
+     &   call errquit('semiemp_energy: cannot allocate LABK',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,NINTGL,'LABL',lLABL,
+     1   iLABL))
+     &   call errquit('semiemp_energy: cannot allocate LABL',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_Dbl,NINTGL,'QQ',lQQ,iQQ))
+     &   call errquit('semiemp_energy: cannot allocate QQ',0,
+     1    MA_ERR)
+
+       call semiemp_integral_load(NINTGL,INT_MB(iLABI),INT_MB(iLABJ),
+     A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ))
+           
       FLAGU = FLAGU
 C     REWIND 11
 c     CALL ZREWIND (IO_AOINTS, 'FILLFU')
@@ -96,11 +133,11 @@ c     L = 0
 c     LL = 1
    30 CONTINUE
 c     write(6,*)"i am here in fillf",LL,NINTGL
-      I = LABI(LL)
-      J = LABJ(LL)
-      K = LABK(LL)
-      L = LABL(LL)
-      V = QQ(LL)
+      I = int_mb(iLABI+LL-1)
+      J = int_mb(iLABJ+LL-1)
+      K = int_mb(iLABK+LL-1)      
+      L = int_mb(iLABL+LL-1)
+      V = Dbl_MB(iQQ+LL-1)
 c     WRITE(6,*) 'I J K L V', I,J,K,L,V
 C
 C     SEE SUBROUTINE FILLF FOR REMARKS ABOUT ILAB AND EQUIVALENCE
@@ -116,7 +153,7 @@ C     (I,I/I,I)
 C     FOR NDDO THEORY
 C     SUMELEL(I) = SUMELEL(I) + F(IN)*V
 C     FOR INDO
-      SUMELEL(I) = SUMELEL(I) + F(IN)*GAMMA(NIN(NG(I))+NG(I))
+c     SUMELEL(I) = SUMELEL(I) + F(IN)*GAMMA(NIN(NG(I))+NG(I))
       GO TO 160
 C     (I,I/K,K)
    70 IN = NIN(I) + I
@@ -130,8 +167,8 @@ C     SUMELEL(I) = SUMELEL(I) + F(KN)*V
 C     SUMELEL(K) = SUMELEL(K) + F(IN)*V
 C     FOR INDO, CNDO
       IIKK = NIN(NG(K)) + NG(I)
-      SUMELEL(I) = SUMELEL(I) + F(KN)*GAMMA(IIKK)
-      SUMELEL(K) = SUMELEL(K) + F(IN)*GAMMA(IIKK)
+c     SUMELEL(I) = SUMELEL(I) + F(KN)*GAMMA(IIKK)
+c     SUMELEL(K) = SUMELEL(K) + F(IN)*GAMMA(IIKK)
       IN = NIN(K) + I
       BB(IN) = BB(IN) - FA(IN)*V
       HB(IN) = HB(IN) - (F(IN)-FA(IN))*V
@@ -361,6 +398,17 @@ C       CALL PRNT(BB,NB,NRR)
   200 WRITE (6,9000) I, J, K, L
       CALL ZEXIT(3)
   210 CONTINUE
+         if (.not.ma_pop_stack(lQQ))
+     & call errquit('semiemp_energy: cannot pop stack QQ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABL))
+     & call errquit('semiemp_energy: cannot pop stack LABL',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABK))
+     & call errquit('semiemp_energy: cannot pop stack LABK',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABJ))
+     & call errquit('semiemp_energy: cannot pop stack LABJ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABI))
+     & call errquit('semiemp_energy: cannot pop stack LABI',3, MA_ERR)
+
 c     write(6,*)"after fock F",(BB(I),I=1,nrr)
       call ga_sync()
       RETURN

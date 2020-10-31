@@ -1050,7 +1050,7 @@ c      end do
        
        if (docis) then
         Write(6,*)"CIS CALCULATION"
-        call semiemp_cis(rtdb,nbf,Dbl_MB(ieig))       
+        call semiemp_cis(rtdb,nbf,Dbl_MB(ieig),Dbl_MB(iFT))       
         end if
        if (ISWANN.eq.1) 
      1 CALL semiemp_mo_uhf_print(rtdb,int_mb(iatnum),nbf)

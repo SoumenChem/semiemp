@@ -1,4 +1,4 @@
-      subroutine semiemp_cis(rtdb,nbf,eig)
+      subroutine semiemp_cis(rtdb,nbf,eig,FT)
 *
 * $Id: movecs_pr_anal.F 27889 2015-12-04 03:24:50Z edo $
 *
@@ -20,12 +20,13 @@ c
       integer rtdb
       integer iBB, lBB, iW, lW, ieig, leig
       integer nbf, nmo
-      integer lwijkl, iwijkl
+      integer lwiajb, iwiajb, lwijab, iwijab
       integer MIM(2)
-      integer ndocc, nvirt
+      integer g_coeff,g_ft, g_temp
+      integer ndocc, nvirt, ndim
       integer i, a, j, b, ia, jb
       integer lham, iham
-      double precision eig(*)
+      double precision eig(*), FT(*)
 
        if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'BB',lBB,iBB))
      &   call errquit('mo_print: cannot allocate BB',0,MA_ERR)
@@ -34,31 +35,69 @@ c
      1 Dbl_MB(iBB)))
      1 call errquit('mo_print: failed to write coefficient',0, RTDB_ERR)
 
-      if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIJKL',lwijkl,
-     1 iwijkl))
-     & call errquit('semiemp_energy: cannot allocate WIJKL',0,
-     1    MA_ERR)
-      
-       call semiemp_ao2mo(rtdb,Dbl_MB(iBB),nbf,Dbl_MB(iwijkl))
+c      if (.not.ga_create(mt_dbl, nbf, nbf, 'Coeff', 0, 0, g_coeff))
+c     & call errquit('Could not create g_coff', 0, GA_ERR)
+c
+c      if (.not.ga_create(mt_dbl, nbf, nbf, 'FT', 0, 0, g_ft))
+c     & call errquit('Could not create g_ft', 0, GA_ERR)
+c
+c      if (.not.ga_create(mt_dbl, nbf, nbf, 'Temp', 0, 0, g_temp))
+c     & call errquit('Could not create g_temp', 0, GA_ERR)
+c
+c       call ga_put(g_coeff,1,nbf,1,nbf,Dbl_MB(iBB),nbf)
+c
+c      call ga_sqmat(g_ft,FT,nbf,1)
+c
+c      call ga_dgemm('N','N',nbf,nbf,nbf,1.0d0,g_coeff,g_ft,0.0d0,
+c     1 g_temp)
+c
+c      call ga_dgemm('N','N',nbf,nbf,nbf,1.0d0,g_temp,g_ft,0.0d0,
+c     1 g_coeff)
+c      
+c      call ga_get(g_coeff,1,nbf,1,nbf,Dbl_MB(iBB),nbf) 
+c
+c      if (.not. ga_destroy(g_temp))
+c     & call errquit('Could not destroy g_temp', 0, GA_ERR)       
+c      if (.not. ga_destroy(g_ft))
+c     & call errquit('Could not destroy g_ft', 0, GA_ERR)       
+c      if (.not. ga_destroy(g_coeff))
+c     & call errquit('Could not destroy g_coeff', 0, GA_ERR)
 
-        if (.not.rtdb_get(rtdb,'semiemp:MIM',mt_int,2,MIM))
+      if (.not.rtdb_get(rtdb,'semiemp:MIM',mt_int,2,MIM))
      1  call errquit('semiemp: failed to write MIM',0, RTDB_ERR)
-        
+
         ndocc = MIM(1)
         nvirt = nbf-ndocc
+        ndim = ndocc*nvirt
+        write(6,*)"ndocc,nvirt,ndim",ndocc,nvirt,ndim
 
-        write(6,*)"ndocc,nvirt",ndocc,nvirt
+      if (.not.MA_Push_Get(MT_Dbl,ndim*ndim,'WIAJB',lwiajb,
+     1 iwiajb))
+     & call errquit('semiemp_energy: cannot allocate WIAJB',0,
+     1    MA_ERR)
 
-c       if (.not.MA_Push_Get(MT_Dbl,ndocc*nvirt*ndocc*nvirt,'Ham',lham,
-c    1  iham))
+      if (.not.MA_Push_Get(MT_Dbl,ndim*ndim,'WIJAB',lwijab,
+     1 iwijab))
+     & call errquit('semiemp_energy: cannot allocate WIAJB',0,
+     1    MA_ERR)
+
+       call semiemp_ao2mo(rtdb,Dbl_MB(iBB),nbf,ndocc,Dbl_MB(iwiajb),
+     1 Dbl_MB(iwijab))
+
+        
+
+c       if (.not.MA_Push_Get(MT_Dbl,ndim*ndim,'Ham',lham,iham))
 c    &  call errquit('semiemp_energy: cannot allocate Ham',0,MA_ERR)
 
-        call semiemp_singlet_cis(nbf,ndocc,nvirt,eig,Dbl_MB(iwijkl))
+        call semiemp_singlet_cis(nbf,ndocc,nvirt,eig,
+     1  Dbl_MB(iwijab),Dbl_MB(iwiajb))
 
 c       if (.not.ma_pop_stack(lham))
 c    & call errquit('semiemp_energy: cannot pop stack ham',3, MA_ERR)   
-        if (.not.ma_pop_stack(lwijkl))
-     & call errquit('semiemp_energy: cannot pop stack wijkl',3, MA_ERR)     
+        if (.not.ma_pop_stack(lwijab))
+     & call errquit('semiemp_energy: cannot pop stack wijab',3, MA_ERR)
+        if (.not.ma_pop_stack(lwiajb))
+     & call errquit('semiemp_energy: cannot pop stack wiajb',3, MA_ERR)     
        if (.not.ma_pop_stack(lBB))
      &   call errquit('mo_print: cannot pop stack BB',3, MA_ERR)
 
@@ -67,7 +106,8 @@ c    & call errquit('semiemp_energy: cannot pop stack ham',3, MA_ERR)
 C-------------------------------------------------------------------------------
 C
 C-------------------------------------------------------------------------------
-       subroutine semiemp_singlet_cis(nbf,ndocc,nvirt,eig,WIJKL)
+       subroutine semiemp_singlet_cis(nbf,ndocc,nvirt,eig,WIJAB,
+     1 WIAJB)
 
        implicit none
 
@@ -88,45 +128,74 @@ C-------------------------------------------------------------------------------
 c       double precision Ham(ndocc*nvirt,ndocc*nvirt)
         double precision eig(*)
         double precision Ham
-        double precision WIJKL(nbf,nbf,nbf,nbf)
+        double precision WIJAB(ndocc,ndocc,nvirt,nvirt)
+        double precision WIAJB(ndocc,nvirt,ndocc,nvirt)
         integer i, j, a, b, ia, jb, ndim
         integer iocc, jocc, avirt, bvirt
-        integer g_ham
+        integer g_ham, g_alpha
+        integer ihameig, lhameig, ihamalpha, lhamalpha
+        integer nrr
+
 
         ndim = nvirt*ndocc
 
         if (.not.ga_create(mt_dbl, ndim, ndim, 'Ham', 0, 0, g_ham))
      & call errquit('Could not create g_ham', 0, GA_ERR)
+        if (.not.ga_create(mt_dbl, ndim, ndim, 'Alpha', 0, 0, g_alpha))
+     & call errquit('Could not create g_alpha', 0, GA_ERR)
 
-        call ga_zero(g_ham)
-
+c       Ham = 0.0d0
         write(6,*)"ndocc,nvirt in cis",ndocc,nvirt
-        do iocc = 1, ndocc
-         do avirt = 1, nvirt
-          a = ndocc+avirt
-          ia = (iocc-1)*nvirt+avirt
-          write(6,*)"ia",ia
-           do jocc = 1, ndocc
-            do bvirt = 1, nvirt
-             b = bvirt + ndocc
-             jb = (jocc-1)*nvirt + bvirt
-             write(6,*)"jb", jb
-              Ham = 0.0d0
-              Ham = 2.0*(WIJKL(iocc,a,jocc,b)-WIJKL(iocc,jocc,a,b))
-              write(6,*)"Ham",Ham
-              if (ia.eq.jb) Ham =Ham + eig(a)-eig(iocc)
-              write(6,*)"Ham = ", Ham
+        do i = 1, ndocc
+         do a = 1, nvirt
+          ia = (i-1)*nvirt + a
+           do j = 1, ndocc
+            do b = 1, nvirt
+             jb = (j-1)*nvirt + b
+                Ham = 0.0d0
+           Ham  = -WIJAB(i,j,a,b)
+c          Ham = -WIJAB(i,j,a,b) + 2.0d0*WIAJB(i,a,j,b)
+               if (ia.eq.jb) Ham = Ham + eig(ndocc+a)-eig(i)
+c             write(6,*)"a,b,ia,ib",a,b,ia,jb
               call ga_put(g_ham,ia,ia,jb,jb,Ham,1)
-             end do 
-            end do 
+              end do 
+            end do
+c         Ham = Ham + eig(a)-eig(iocc)
           end do
          end do
 
-           write(6,*)"done Hamiltonian"
-           call ga_print(g_ham)
+      if (.not.MA_Push_Get(MT_Dbl,ndim,'hameig',lhameig,ihameig))
+     & call errquit('semiemp_energy: cannot allocate HAMEIG',0,
+     1    MA_ERR)
 
-       if (.not. ga_destroy(g_ham))
+      if (.not.MA_Push_Get(MT_Dbl,ndim*ndim,'hamalpha',lhamalpha,
+     1 ihamalpha))
+     & call errquit('semiemp_energy: cannot allocate HAMALPHA',0,
+     1    MA_ERR)
+
+       NRR= ndim*(ndim+1)/2
+c      call ga_print(g_ham)
+           write(6,*)"done Hamiltonian"
+c      call ga_put(g_ham,1,ndim,1,ndim,Ham,ndim)
+       call ga_diag_std(g_ham,g_alpha,dbl_mb(ihameig))
+c      call diag_para(Ham,nrr,ndim,Dbl_MB(ihamalpha),dbl_MB(ihameig))
+           write(6,*)"after diagonalization"
+
+       do i = 1, ndim
+         write(6,*)"EIG=", Dbl_MB(ihameig+i-1)
+       end do 
+
+
+       if (.not.ma_pop_stack(lhamalpha))
+     & call errquit('semiemp_energy: cannot pop stack hamalpha',3, 
+     1 MA_ERR)
+       if (.not.ma_pop_stack(lhameig))
+     & call errquit('semiemp_energy: cannot pop stack hameig',3, MA_ERR)     
+
+      if (.not. ga_destroy(g_alpha))
      & call errquit('Could not destroy g_alpha', 0, GA_ERR)
+       if (.not. ga_destroy(g_ham))
+     & call errquit('Could not destroy g_ham', 0, GA_ERR)
 
          return
          end        
@@ -134,7 +203,7 @@ C-------------------------------------------------------------------------------
 C AO TO MO TRANFORMATION
 C-------------------------------------------------------------------------------
 
-       subroutine semiemp_ao2mo(rtdb,BB,nbf,WIJKL)
+       subroutine semiemp_ao2mo(rtdb,BB,nbf,ndocc,WIAJB,WIJAB)
        
        implicit none
 
@@ -151,13 +220,13 @@ C-------------------------------------------------------------------------------
 #include "util.fh"
 #include "matutils.fh"
 
-       integer rtdb, nbf, nintgl
+       integer rtdb, nbf, nintgl,ndocc, nvirt
        integer ilabi,llabi,ilabj,llabj,ilabk,llabk,ilabl,llabl
        integer imoi, lmoi, imoj, lmoj, imok, lmok, imol, lmol
        integer iqq, lqq, iro, lro
        integer lwijkl, iwijkl
        integer iwiqrs, lwiqrs, iwijrs, lwijrs, iwijks, lwijks
-       double precision BB(nbf,nbf), WIJKL(*)
+       double precision BB(nbf,nbf), WIJAB(*),WIAJB(*)
 
         if (.not.rtdb_get(rtdb,'semiemp:numint',mt_int,1,nintgl))
      &  call errquit('semiemp failed read to inttyp',0,RTDB_ERR)
@@ -186,32 +255,32 @@ C-------------------------------------------------------------------------------
         call semiemp_integral_load(NINTGL,INT_MB(iLABI),INT_MB(iLABJ),
      A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ))
         
-
-          if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIQRS',lwiqrs,
-     1    iwiqrs))
-     &   call errquit('semiemp_energy: cannot allocate WIqrs',0,
-     1    MA_ERR)
-
-          if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIJRS',lwijrs,
-     1    iwijrs))
-     &   call errquit('semiemp_energy: cannot allocate WIJRS',0,
-     1    MA_ERR)
-
-          if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIJKS',lwijks,
-     1    iwijks))
-     &   call errquit('semiemp_energy: cannot allocate WIJKS',0,
-     1    MA_ERR)
-          
+          write(6,*) "NINTGL", NINTGL
+c          if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIQRS',lwiqrs,
+c     1    iwiqrs))
+c     &   call errquit('semiemp_energy: cannot allocate WIqrs',0,
+c     1    MA_ERR)
+c
+c          if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIJRS',lwijrs,
+c     1    iwijrs))
+c     &   call errquit('semiemp_energy: cannot allocate WIJRS',0,
+c     1    MA_ERR)
+c
+c          if (.not.MA_Push_Get(MT_Dbl,nbf*nbf*nbf*nbf,'WIJKS',lwijks,
+c     1    iwijks))
+c     &   call errquit('semiemp_energy: cannot allocate WIJKS',0,
+c     1    MA_ERR)
+          nvirt = nbf - ndocc
          call semiemp_mo_trans(NINTGL,INT_MB(iLABI),INT_MB(iLABJ),
-     A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ),WIJKL,BB,nbf
-     B   ,Dbl_MB(iwiqrs),Dbl_MB(iwijrs),Dbl_mb(iwijks))
+     A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ),WIJAB,WIAJB,BB,nbf,
+     A   ndocc,nvirt)
 
-        if (.not.ma_pop_stack(lwijks))
-     & call errquit('semiemp_energy: cannot pop stack wijks',3, MA_ERR) 
-        if (.not.ma_pop_stack(lwijrs))
-     & call errquit('semiemp_energy: cannot pop stack wijrs',3, MA_ERR) 
-        if (.not.ma_pop_stack(lwiqrs))
-     & call errquit('semiemp_energy: cannot pop stack wiqrs',3, MA_ERR)          
+c        if (.not.ma_pop_stack(lwijks))
+c     & call errquit('semiemp_energy: cannot pop stack wijks',3, MA_ERR) 
+c        if (.not.ma_pop_stack(lwijrs))
+c     & call errquit('semiemp_energy: cannot pop stack wijrs',3, MA_ERR) 
+c        if (.not.ma_pop_stack(lwiqrs))
+c     & call errquit('semiemp_energy: cannot pop stack wiqrs',3, MA_ERR)          
         if (.not.ma_pop_stack(lQQ))
      & call errquit('semiemp_energy: cannot pop stack QQ',3, MA_ERR)
          if (.not.ma_pop_stack(lLABL))
@@ -228,8 +297,8 @@ C-------------------------------------------------------------------------------
 C--------------------------------------------------------------------------------
 C
 C----------------------------------------------------------------------------------
-       subroutine semiemp_mo_trans(NINTGL,LABI,LABJ,LABK,LABL,QQ,WIJKL,
-     1 BB,nbf,WIQRS,WIJRS,WIJKS)
+       subroutine semiemp_mo_trans(NINTGL,LABI,LABJ,LABK,LABL,QQ,WIJAB,
+     1 WIAJB,BB,nbf,ndocc,nvirt)
 
        implicit none
 
@@ -247,49 +316,121 @@ C-------------------------------------------------------------------------------
 #include "matutils.fh"
 
        integer NINTGL, LABI(*), LABJ(*), LABK(*), LABL(*)
-       integer nbf, LL, p, q, r , s, i, j, k, l
-       double precision BB(nbf,nbf), WIJKL(nbf,nbf,nbf,nbf), QQ(*)
-       double precision WIQRS(nbf,nbf,nbf,nbf), WIJRS(nbf,nbf,nbf,nbf)
-       double precision WIJKS(nbf,nbf,nbf,nbf), V
+       integer nbf, LL, p, q, r , s, i, j, k, l, ndocc, nvirt
+       integer a, b, avirt, bvirt
+       double precision BB(nbf,nbf), QQ(*), V
+       double precision WIAJB(ndocc,nvirt,ndocc,nvirt)
+       double precision WIJAB(ndocc,ndocc,nvirt,nvirt)
+c      double precision WIQRS(nbf,nbf,nbf,nbf), WIJRS(nbf,nbf,nbf,nbf)
+c      double precision WIJKS(nbf,nbf,nbf,nbf), V
+       
+c      WIQRS = 0.0d0
+c      WIJRS = 0.0d0
+c      WIJKS = 0.0d0
+c      WIJKL = 0.0d0
+       WIAJB = 0.0d0
+       WIJAB = 0.0d0
 
-       do i = 1, nbf
-        do LL = 1, nintgl
-          p = LABI(LL)
-          q = LABJ(LL)
-          r = LABK(LL)
-          s = LABL(LL)
-          V = QQ(LL)
-          WIQRS(i,q,r,s) = WIQRS(i,q,r,s)+ BB(i,p)*V
-        end do
-        do j = 1, nbf
-         do LL = 1, nintgl
-          p = LABI(LL)
-          q = LABJ(LL)
-          r = LABK(LL)
-          s = LABL(LL)
-          WIJRS(i,j,r,s) = WIJRS(i,j,r,s)+ BB(j,q)*WIQRS(i,q,r,s)
-         end do
-         do k = 1, nbf
+         write(6,*)"i am mo_trans"
+       do i = 1, ndocc
+        do avirt = 1 , nvirt
+         do j = 1, ndocc
+          do bvirt = 1, nvirt
+           a = ndocc + avirt
+           b = ndocc + bvirt
            do LL = 1, nintgl
             p = LABI(LL)
             q = LABJ(LL)
             r = LABK(LL)
             s = LABL(LL)
-            WIJKS(i,j,k,s) = WIJKS(i,j,r,s)+ BB(k,r)*WIJRS(i,j,r,s)
+            V = QQ(LL)
+        WIAJB(i,avirt,j,bvirt)=WIAJB(i,avirt,j,bvirt)
+     1         +BB(p,i)*BB(q,a)*BB(r,j)*BB(s,b)*V  
            end do
-           do l = 1, nbf
-            do LL = 1, nintgl
-             p = LABI(LL)
-             q = LABJ(LL)
-             r = LABK(LL)
-             s = LABL(LL)
-             WIJKL(i,j,k,l) = WIJKL(i,j,k,s)+ BB(l,s)*WIJKS(i,j,r,s)
-            end do
-           end do 
           end do
          end do
-        end do 
+        end do
+       end do
 
+       do i = 1, ndocc
+        do j = 1, ndocc
+         do avirt = 1 , nvirt       
+          do bvirt = 1, nvirt
+           a = ndocc + avirt
+           b = ndocc + bvirt          
+           do LL = 1, nintgl
+            p = LABI(LL)
+            q = LABJ(LL)
+            r = LABK(LL)
+            s = LABL(LL)
+            V = QQ(LL)
+        WIJAB(i,j,avirt,bvirt)=WIJAB(i,j,avirt,bvirt)
+     1       +BB(p,i)*BB(q,j)*BB(r,a)*BB(s,b)*V  
+           end do
+          end do
+         end do
+        end do
+       end do
+       
+c       do LL = 1, nintgl
+c        p = LABI(LL)
+c        q = LABJ(LL)
+c        r = LABK(LL)
+c        s = LABL(LL)
+c        V = QQ(LL)
+c        do i = 1, nbf
+c         WIQRS(i,q,r,s) = WIQRS(i,q,r,s) + BB(p,i)*V
+c         do j = 1, nbf
+c          WIJRS(i,j,r,s) = WIJRS(i,j,r,s)+BB(q,j)*WIQRS(i,q,r,s)
+c          do k = 1, nbf
+c           WIJKS(i,j,k,s)=WIJKS(i,j,k,s)+BB(r,k)*WIJRS(i,j,r,s)
+c           do l = 1, nbf
+c            WIJKL(i,j,k,l)=WIJKL(i,j,k,l)+BB(s,l)*WIJKS(i,j,k,s)
+cc           write(6,*)i,j,k,l,WIJKL(i,j,k,l)
+c            end do
+c          end do
+c         end do
+c        end do
+c       end do
+       
+c      do i = 1, nbf
+c       do LL = 1, nintgl
+c         p = LABI(LL)
+c         q = LABJ(LL)
+c         r = LABK(LL)
+c         s = LABL(LL)
+c         V = QQ(LL)
+c         WIQRS(i,q,r,s) = WIQRS(i,q,r,s)+ BB(i,p)*V
+c       end do
+c       do j = 1, nbf
+c        do LL = 1, nintgl
+c         p = LABI(LL)
+c         q = LABJ(LL)
+c         r = LABK(LL)
+c         s = LABL(LL)
+c         WIJRS(i,j,r,s) = WIJRS(i,j,r,s)+ BB(j,q)*WIQRS(i,q,r,s)
+c        end do
+c        do k = 1, nbf
+c          do LL = 1, nintgl
+c           p = LABI(LL)
+c           q = LABJ(LL)
+c           r = LABK(LL)
+c           s = LABL(LL)
+c           WIJKS(i,j,k,s) = WIJKS(i,j,k,s)+ BB(k,r)*WIJRS(i,j,r,s)
+c          end do
+c          do l = 1, nbf
+c           do LL = 1, nintgl
+c            p = LABI(LL)
+c            q = LABJ(LL)
+c            r = LABK(LL)
+c            s = LABL(LL)
+c            WIJKL(i,j,k,l) = WIJKL(i,j,k,l)+ BB(l,s)*WIJKS(i,j,k,s)             
+c            end do
+c            write(6,*)i,j,k,l,WIJKL(i,j,k,l)
+c          end do 
+c         end do
+c        end do
+c       end do 
 
        return
        end

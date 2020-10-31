@@ -1,5 +1,5 @@
-      SUBROUTINE FILLF(BB,FA,F,Q,GAMMA,SUMELEL,NG,QQ,NRR,LABI
-     2 ,LABJ,LABK,LABL,NINTGL,NIN,ITAG)
+      SUBROUTINE FILLF(BB,FA,F,Q,GAMMA,SUMELEL,NG,NRR,NINTGL,NIN,ITAG,
+     1 NB)
 C     ZERNER   QTP,   UNIV. OF FL.
 C     MODIFIED BY NR   VERSION : 29.10.84
 C     CLOSED SHELL F=TOTAL DENSITY, FA= HALF OF F=ALPHA SPIN DENSITY
@@ -8,7 +8,22 @@ C     Q RETURNS AS THE ONE_ELECTRON MATRIX INCLUDING REACTION FIELD.
 C
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       IMPLICIT INTEGER (I-N)
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "tcgmsg.fh"
 #include "global.fh"
+#include "geom.fh"
+#include "rtdb.fh"
+#include "sym.fh"
+#include "util.fh"
+#include "msgids.fh"
+#include "stdio.fh"
+#include "dra.fh"
+#include "inp.fh"
+#include "bas.fh"
+#include "schwarz.fh"
+#include "dftps.fh"
+#include "bgj.fh"
 c     Integer rtdb
 C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
       PARAMETER (MXB = 4000, MXA = 1200,MXF = 100, MPE = 105)
@@ -25,15 +40,38 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
      +   IFIVE = 5, ISIX = 6, ISEVEN = 7, IEIGHT = 8, ININE = 9
      +   ,ITEN = 10)
       dimension  F(*),Q(*),FA(*),GAMMA(*),BB(*),DIP(3)
-     +,AD(3),BD(3),BBDD(3),BBD(3),NIN(*),SUMELEL(*),LABI(*),
-     + LABJ(*),LABK(*),LABL(*),NG(*),QQ(*)
+     +,AD(3),BD(3),BBDD(3),BBD(3),NIN(*),SUMELEL(*),NG(*)
       CHARACTER*8  FLAGM, FLAGU
      
-c     write(6,*)"i am in fillf",LL
+c     write(6,*)"i am in fillf",NINTGL
 c     write(6,*)"F",(F(I),I=1,20)
 c     write(6,*)"FA",(FA(I),I=1,20)
 c     write(6,*)"BB",(BB(I),I=1,20)
 c     write(6,*)"Q",(Q(I),I=1,nrr)
+          if (.not.MA_Push_Get(MT_INT,NINTGL,'LABI',lLABI,
+     1   iLABI))
+     &   call errquit('semiemp_energy: cannot allocate LABI',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,NINTGL,'LABJ',lLABJ,
+     1   iLABJ))
+     &   call errquit('semiemp_energy: cannot allocate LABJ',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,NINTGL,'LABK',lLABK,
+     1   iLABK))
+     &   call errquit('semiemp_energy: cannot allocate LABK',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_INT,NINTGL,'LABL',lLABL,
+     1   iLABL))
+     &   call errquit('semiemp_energy: cannot allocate LABL',0,
+     1    MA_ERR)
+           if (.not.MA_Push_Get(MT_Dbl,NINTGL,'QQ',lQQ,iQQ))
+     &   call errquit('semiemp_energy: cannot allocate QQ',0,
+     1    MA_ERR)
+
+        call semiemp_integral_load(NINTGL,INT_MB(iLABI),INT_MB(iLABJ),
+     A   INT_MB(iLABK),INT_MB(iLABL),Dbl_MB(iQQ))
+           
+c      write(6,*)"got the integrals"
       ITDIP = 1
       FLAGU = FLAGU
 C     JD 1999
@@ -58,7 +96,7 @@ c     go to 170
    20 CONTINUE
 C     BEGIN TWO _ ELECTRON PART
       LL = LL + 1
-C     write(6,*)"LL,NINTGL",LL,NINTGL
+c     write(6,*)"LL,NINTGL",LL,NINTGL
       IF (LL.LE.NINTGL) THEN
       GO TO 30
       ELSE
@@ -72,11 +110,17 @@ c     L = 0
 c     LL = 1
    30 CONTINUE
 c     write(6,*)"i am here in fillf",LL,NINTGL
-      I = LABI(LL)
-      J = LABJ(LL)
-      K = LABK(LL)
-      L = LABL(LL)
-      V = QQ(LL)
+      I = int_mb(iLABI+LL-1)
+      J = int_mb(iLABJ+LL-1)
+      K = int_mb(iLABK+LL-1)
+      L = int_mb(iLABL+LL-1)
+      V = Dbl_MB(iQQ+LL-1)
+
+c     I = LABI(LL)
+c     J = LABJ(LL)
+c     K = LABK(LL)
+c     L = LABL(LL)
+c     V = QQ(LL)
 c     WRITE(6,*) 'I J K L V', I,J,K,L,V
 C
 cyw BB matrix starts with a zero matrix
@@ -111,7 +155,7 @@ c     IF (ITAG.EQ.1) THEN
 C     FOR NDDO THEORY
 c     SUMELEL(I) = SUMELEL(I) + F(IN)*V
 C     FOR INDO
-      SUMELEL(I) = SUMELEL(I) + F(IN)*GAMMA(NIN(NG(I))+NG(I))
+c     SUMELEL(I) = SUMELEL(I) + F(IN)*GAMMA(NIN(NG(I))+NG(I))
 c     if (ga_nodeid().eq.0) write(6,*) "SUMELEL",SUMELEL(I)
 c     GO TO 160
 c     ELSE
@@ -128,8 +172,8 @@ C     SUMELEL(I) = SUMELEL(I) + F(KN)*V
 C     SUMELEL(K) = SUMELEL(K) + F(IN)*V
 C     FOR INDO, CNDO
       IIKK = NIN(NG(K)) + NG(I)
-      SUMELEL(I) = SUMELEL(I) + F(KN)*GAMMA(IIKK)
-      SUMELEL(K) = SUMELEL(K) + F(IN)*GAMMA(IIKK)
+c     SUMELEL(I) = SUMELEL(I) + F(KN)*GAMMA(IIKK)
+c     SUMELEL(K) = SUMELEL(K) + F(IN)*GAMMA(IIKK)
       IN = NIN(K) + I
 c     write(6,*)"BB,FA,V",BB(IN),FA(IN),V
       BB(IN) = BB(IN) - FA(IN)*V
@@ -286,6 +330,18 @@ c     WRITE (6,*)"BB", (BB(M),M=1,NRR)
       CALL ZEXIT(3)
 CNR
   190 CONTINUE
+         if (.not.ma_pop_stack(lQQ))
+     & call errquit('semiemp_energy: cannot pop stack QQ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABL))
+     & call errquit('semiemp_energy: cannot pop stack LABL',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABK))
+     & call errquit('semiemp_energy: cannot pop stack LABK',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABJ))
+     & call errquit('semiemp_energy: cannot pop stack LABJ',3, MA_ERR)
+         if (.not.ma_pop_stack(lLABI))
+     & call errquit('semiemp_energy: cannot pop stack LABI',3, MA_ERR)
+
+
 c     call ga_sync()
 CNR
       RETURN

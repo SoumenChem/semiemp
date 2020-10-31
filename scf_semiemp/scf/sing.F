@@ -1,7 +1,7 @@
       SUBROUTINE SING(HA,HB,F,H,FA,FZ,SVEC,GAMMA,SC,RAD,E1,BH,
      X IT,ITGL,ITMAX,ISW1,ISWANN,NDN,NB,NA,ISW3,NTYP,NU,W,JSLIT,FOP
-     X ,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,Q,REP,D12,NIN,PNOW,RA,
-     X RB,PRA,PRB,XBACK1,XBACK2,PBACK1,slowscf)
+     X ,SUMELEL,NG,NRR,Q,REP,D12,NIN,PNOW,RA,
+     X RB,PRA,PRB,XBACK1,XBACK2,PBACK1,slowscf,LL)
 C
 C     ..................................................................
 C
@@ -37,8 +37,8 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
 C
       DIMENSION    HA(*),HB(*),BH(*),F(*),NTYP(*),NU(*),NG(*)
       DIMENSION    H(*),FA(*),FZ(*),GAMMA(*),RAD(*),DIFF(10)
-     . ,W(*),FOP(*),SUMELEL(*),QQ(*),LABI(*),LABJ(*),RA(*),RB(*),
-     . LABK(*),LABL(*),D12(NA), Q(*),NIN(*),PNOW(*),PRA(*),PRB(*),
+     . ,W(*),FOP(*),SUMELEL(*),RA(*),RB(*),
+     . D12(NA), Q(*),NIN(*),PNOW(*),PRA(*),PRB(*),
      . XBACK1(*), XBACK2(*), PBACK1(*)
       INTEGER JSLIT(4)
       logical slowscf
@@ -237,8 +237,7 @@ c     write(6,*)"before fock F",(F(I),I=1,nrr)
 c     write(6,*)"before fock FA",(FA(I),I=1,nrr)
 c     write(6,*)"before fock H",(H(I),I=1,nrr)
       CALL FOCK(HA,HB,F,H,FA,Q,FZ,SVEC,GAMMA,SC,BH,
-     x IT,ITMAX,RAD,ISW1,ISWANN,FOP,SUMELEL,NB,NG,QQ,NRR,LABI,LABJ,LABK,
-     x LABL,LL,NIN)
+     x IT,ITMAX,RAD,ISW1,ISWANN,FOP,SUMELEL,NB,NG,NRR,NIN,LL)
 c     if (ga_nodeid().eq.0) write(6,*)"after fock HA",(HA(I),I=1,nrr)
 c     if (ga_nodeid().eq.0) write(6,*)"after fock HB",(HB(I),I=1,nrr)
 c     if (ga_nodeid().eq.0) write(6,*)"after fock F",(F(I),I=1,nrr)

@@ -1,7 +1,6 @@
       SUBROUTINE SCFIT(rtdb,F,H,Q,SH,FT,RAD,GAMMA,ISW1,NB,NA,ISWANN,
      1 scftol,itmax,MIM,ISW3,EIG,FOP,NEL,MULT,NRR,BB,NDN,NTYP,NU
-     2,NG,JSLIT,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL,REP,FZ,NIN,E1,D12,AA,
-     3 RA,RB,NCORE,FA)
+     2,NG,JSLIT,SUMELEL,REP,FZ,NIN,E1,D12,AA,RA,RB,NCORE,FA,LL)
 
       IMPLICIT DOUBLE PRECISION (A-H, O-Z)
       IMPLICIT INTEGER (I-N)
@@ -36,8 +35,8 @@ C     WARNING   RPA PGM MUST HAVE THESE DIMENSIONS
      +   ,ITEN = 10)
       dimension  F(*),H(*),FA(*),GAMMA(*),SH(*),RAD(*),NU(*),NG(*)
      .    ,D13(NA),NASS(7),MIM(*),EIG(*),BB(*),FT(*),!SC(NB,33)
-     . JSLIT(4),SUMELEL(*),QQ(*),LABI(*),LABJ(*),LABK(*),!W(2*NB)
-     . LABL(*), D12(NA),FZ(*),NIN(*),!RA(NRR),RB(NRR)
+     . JSLIT(4),SUMELEL(*),!W(2*NB)
+     .  D12(NA),FZ(*),NIN(*),!RA(NRR),RB(NRR)
      . AA(*),RA(*),RB(*),Q(*)
       CHARACTER*8  BLOCK
       CHARACTER*6  ASSINP
@@ -243,9 +242,9 @@ c     total_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec() 
        CALL SING(BB,AA,F,H,FA,FZ,SVEC,GAMMA,SC,RAD,E1,BH,
      .  IT,ITGL,ITMAX,ISW1,ISWANN,NDN,NB,NA,ISW3,NTYP,NU,Dbl_MB(iW),
-     .  JSLIT,FOP,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,Q,
+     .  JSLIT,FOP,SUMELEL,NG,NRR,Q,
      .  REP,D12,NIN,Dbl_MB(iPNOW),RA,RB,Dbl_MB(iPRA), Dbl_MB(iPRB),
-     . Dbl_MB(iXBACK1),Dbl_MB(iXBACK2),Dbl_MB(iPBACK1),slowscf)
+     . Dbl_MB(iXBACK1),Dbl_MB(iXBACK2),Dbl_MB(iPBACK1),slowscf,LL)
 C     CALL SLITEN(0,'SING2')
 c     total_wall = total_wall +  util_wallsec()
 c     total_cpu  =  total_cpu + util_cpusec()
