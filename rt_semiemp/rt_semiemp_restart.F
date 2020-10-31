@@ -46,19 +46,6 @@ C     == Variables ==
 
       me = ga_nodeid()
       
-c     if (params%prof) call prof_start (elapsed)
-
-c     if ((nmats .ne. 1).and.(nmats .ne. 2))
-c    $     call errquit(pname//
-c    $     "only valid fornmats = 1 or nmats = 2", 0, 0)
-
-c     checksum = 0d0
-c     do imat = 1, nmats
-c        checksum = checksum + zmat_checksum (g_zdens_ao(imat))
-c     enddo
-
-c     n = params%ns_ao   !alias for clarity
-
 C     note: date returns a newline at the end, so we strip it off
       call util_date (date)
       date = date(:inp_strlen(date)-1) 
@@ -93,11 +80,7 @@ c        enddo
      $        //trim(fname_restart), 0, 0)
 
       endif
-c     call ga_sync()
 
-c     call rt_tddft_print_msg (params, tt, "Saved restart file")
-
-c     if (params%prof) call prof_end (elapsed, "Saving restart point")
 
       end subroutine
 

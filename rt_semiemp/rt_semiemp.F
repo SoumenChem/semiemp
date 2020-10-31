@@ -1,6 +1,6 @@
-      subroutine rtsemiemp(rtdb,SH,nb,ipol,FA,SUMELEL,QQ,LABI,LABJ,LABK
-     1 ,LABL,LL,Q,NIN,NG,GAMMA,dipx,dipy,dipz,RAD,KAN,NA,CO,NU,NW,NP,
-     2 ALPHA,H,BB,NEL,ISW1,Z12,D12,FT,RA,RB)
+      subroutine rtsemiemp(rtdb,SH,nb,ipol,FA,SUMELEL,LL,Q,NIN,NG,GAMMA,
+     1 dipx,dipy,dipz,RAD,KAN,NA,CO,NU,NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12
+     1 ,FT,RA,RB)
       implicit none
 
 #include "errquit.fh"
@@ -41,9 +41,9 @@ C     == Variables ==
       integer MIM(2)
       logical atmblk
       integer lseig,iseig,lsvecs,isvecs, inverse
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), LL, NIN(*), NG(*)
+      integer LL, NIN(*), NG(*)
       double precision mult
-      double precision QQ(*), SUMELEL(*), Q(*), GAMMA(*), FT(*)
+      double precision  SUMELEL(*), Q(*), GAMMA(*), FT(*)
 C     (tmp)
       double precision SH(*),FA(*),RAD(*),Z12(*),D12(*),H(*),BB(*)
       double precision ALPHA(*),CO(*),RA(*),RB(*)
@@ -248,15 +248,15 @@ C
       call ga_zero(g_temp)
 
       if (ipol.eq.0.and.prop_method.eq.0) then             !closed shell DFT
-      call rt_semiemp_cs_prop (rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
-     1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
+      call rt_semiemp_cs_prop (rtdb,g_densre,SUMELEL,LL,NIN,Q,NG,GAMMA,
+     2 g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
      2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgs,g_core,
      3 g_temp)
 
 
        elseif (ipol.eq.0.and.prop_method.eq.2) then
-      call rt_semiemp_cs_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
-     1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
+      call rt_semiemp_cs_cheb(rtdb,g_densre,SUMELEL,LL,NIN,Q,NG,GAMMA
+     1 ,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
      2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgs,g_core,
      3 g_temp)
 
@@ -324,8 +324,8 @@ c     end if
 c     call rt_semiemp_anhi(rtdb,g_densa,g_densb,g_scr,nb,nel)
 
 
-      call rt_semiemp_os_prop (rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
-     1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
+      call rt_semiemp_os_prop (rtdb,g_densre,SUMELEL,LL,NIN,Q,NG,GAMMA,
+     1 g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
      2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgsa,g_cgsb,g_core,
      3 g_temp,g_densa,g_densb)
 
@@ -401,8 +401,8 @@ c     call rt_semiemp_anhi(rtdb,g_densa,g_densb,g_scr,nb,nel)
 c     call rt_semiemp_anhi(rtdb,g_densa,g_densb,g_scr,nb,nel)
 
 
-       call rt_semiemp_os_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ,LABK
-     1,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
+       call rt_semiemp_os_cheb(rtdb,g_densre,SUMELEL,LL,NIN,Q,NG,GAMMA,
+     1 g_dipx,g_dipy,g_dipz,nb,RAD,KAN,NA,CO,NU,
      2 NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgsa,g_cgsb,g_core,
      3 g_temp,g_densa,g_densb)
 
