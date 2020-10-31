@@ -144,8 +144,10 @@ c       double precision Ham(ndocc*nvirt,ndocc*nvirt)
         if (.not.ga_create(mt_dbl, ndim, ndim, 'Alpha', 0, 0, g_alpha))
      & call errquit('Could not create g_alpha', 0, GA_ERR)
 
+        call ga_zero(g_ham)
+        call ga_zero(g_alpha)
 c       Ham = 0.0d0
-        write(6,*)"ndocc,nvirt in cis",ndocc,nvirt
+c       write(6,*)"ndocc,nvirt in cis",ndocc,nvirt
         do i = 1, ndocc
          do a = 1, nvirt
           ia = (i-1)*nvirt + a
@@ -153,14 +155,13 @@ c       Ham = 0.0d0
             do b = 1, nvirt
              jb = (j-1)*nvirt + b
                 Ham = 0.0d0
-           Ham  = -WIJAB(i,j,a,b)
-c          Ham = -WIJAB(i,j,a,b) + 2.0d0*WIAJB(i,a,j,b)
+c          Ham  = -WIJAB(i,j,a,b)
+           Ham = -1.0d0*WIJAB(i,j,a,b) + 2.0d0*WIAJB(i,a,j,b)
                if (ia.eq.jb) Ham = Ham + eig(ndocc+a)-eig(i)
 c             write(6,*)"a,b,ia,ib",a,b,ia,jb
               call ga_put(g_ham,ia,ia,jb,jb,Ham,1)
               end do 
             end do
-c         Ham = Ham + eig(a)-eig(iocc)
           end do
          end do
 
@@ -173,17 +174,43 @@ c         Ham = Ham + eig(a)-eig(iocc)
      & call errquit('semiemp_energy: cannot allocate HAMALPHA',0,
      1    MA_ERR)
 
-       NRR= ndim*(ndim+1)/2
+c      NRR= ndim*(ndim+1)/2
 c      call ga_print(g_ham)
-           write(6,*)"done Hamiltonian"
-c      call ga_put(g_ham,1,ndim,1,ndim,Ham,ndim)
+c          write(6,*)"done Hamiltonian"
        call ga_diag_std(g_ham,g_alpha,dbl_mb(ihameig))
-c      call diag_para(Ham,nrr,ndim,Dbl_MB(ihamalpha),dbl_MB(ihameig))
-           write(6,*)"after diagonalization"
+c          write(6,*)"after diagonalization"
 
+       write(6,*) "SINGLET EXCITED STATE"
        do i = 1, ndim
          write(6,*)"EIG=", Dbl_MB(ihameig+i-1)
        end do 
+
+        call ga_zero(g_ham)
+        call ga_zero(g_alpha)
+
+        do i = 1, ndocc
+         do a = 1, nvirt
+          ia = (i-1)*nvirt + a
+           do j = 1, ndocc
+            do b = 1, nvirt
+             jb = (j-1)*nvirt + b
+                Ham = 0.0d0
+           Ham  = -WIJAB(i,j,a,b)
+               if (ia.eq.jb) Ham = Ham + eig(ndocc+a)-eig(i)
+c             write(6,*)"a,b,ia,ib",a,b,ia,jb
+              call ga_put(g_ham,ia,ia,jb,jb,Ham,1)
+              end do
+            end do
+          end do
+         end do
+
+         call ga_diag_std(g_ham,g_alpha,dbl_mb(ihameig))
+c          write(6,*)"after diagonalization"
+       write(6,*)"TRIPLET EXCITED STATE"
+       do i = 1, ndim
+         write(6,*)"EIG=", Dbl_MB(ihameig+i-1)
+       end do
+
 
 
        if (.not.ma_pop_stack(lhamalpha))
@@ -328,8 +355,18 @@ c      WIQRS = 0.0d0
 c      WIJRS = 0.0d0
 c      WIJKS = 0.0d0
 c      WIJKL = 0.0d0
-       WIAJB = 0.0d0
-       WIJAB = 0.0d0
+c      WIAJB = 0.0d0
+c      WIJAB = 0.0d0
+       do i = 1, ndocc
+        do j = 1, ndocc
+         do  a = 1, nvirt
+          do b = 1, nvirt
+         WIJAB(i,j,a,b) = 0.0d0
+         WIAJB(i,a,j,b) = 0.0d0
+          end do
+         end do
+        end do
+       end do
 
          write(6,*)"i am mo_trans"
        do i = 1, ndocc
