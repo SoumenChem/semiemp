@@ -7,8 +7,8 @@ C>
 C>  Propagates open shell density matrix using von Neumann
 C>  dynamics.
 C--------------------------------------------------------------------
-      subroutine rt_semiemp_os_prop(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ
-     1,LABK,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,n,RAD,KAN,NA,
+      subroutine rt_semiemp_os_prop(rtdb,g_densre,SUMELEL,LL,NIN,Q,
+     1 NG,GAMMA,g_dipx,g_dipy,g_dipz,n,RAD,KAN,NA,
      1 CO,NU,NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgsa,g_cgsb,
      3 g_core,g_temp,g_densa,g_densb)
       implicit none
@@ -82,8 +82,8 @@ C     == Variables ==
       double precision emin, t, dt, tmax
       double precision GPARAMA, GPARAMB
       integer i, j
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), LL, NIN(*), NG(*)
-      double precision QQ(*), SUMELEL(*), Q(*), GAMMA(*)
+      integer LL, NIN(*), NG(*)
+      double precision  SUMELEL(*), Q(*), GAMMA(*)
       double precision RAD(*),Z12(*),D12(*),H(*),BB(*),E(3)
       double precision ALPHA(*),CO(*)
       integer NU(*),NW(*),NP(*),KAN(*)      
@@ -279,9 +279,8 @@ c      write(6,*)"t,dt",tmax,dt
 c     call ga_print(g_zwa)
 c     call ga_print(g_zwb)
 
-      call semiemp_os_fock_build(g_zdens_ao,g_zdensa,SUMELEL,QQ,LABI,
-     1 LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,1,GPARAMA,
-     2 GPARAMB)
+      call semiemp_os_fock_build(g_zdens_ao,g_zdensa,SUMELEL,LL,NIN,n
+     1 ,Q,NG,GAMMA,g_zfocka,g_zfockb,1,GPARAMA,GPARAMB)
 
 C------------------------------------------------------------------
 c     AO TO MO transformation
@@ -463,8 +462,8 @@ c     call ga_print(g_zdensb_mo)
      $ call rt_semiemp_os_restart_save(it,n,t,g_zwa,g_zwb)
 
       call prop_os_superoperator(g_zdensa,g_zdensb,g_zfocka,g_zfockb,
-     1 GPARAMA,GPARAMB,n,g_zwa,g_zwb,dt,SUMELEL,QQ,LABI,LABJ,LABK,
-     1 LABL,LL,NIN,Q,NG,GAMMA,g_zfpa,g_zfpb,g_zcheba,g_zchebb)
+     1 GPARAMA,GPARAMB,n,g_zwa,g_zwb,dt,SUMELEL,LL,NIN,Q,NG,GAMMA,g_zfpa
+     1 ,g_zfpb,g_zcheba,g_zchebb)
 
 c     call ga_print(g_zcheba)
       call ga_zero(g_ztemp1)

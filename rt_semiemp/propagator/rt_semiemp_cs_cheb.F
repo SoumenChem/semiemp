@@ -7,8 +7,8 @@ C>
 C>  Propagates open shell density matrix using von Neumann
 C>  dynamics.
 C--------------------------------------------------------------------
-      subroutine rt_semiemp_cs_cheb(rtdb,g_densre,SUMELEL,QQ,LABI,LABJ
-     1,LABK,LABL,LL,NIN,Q,NG,GAMMA,g_dipx,g_dipy,g_dipz,n,RAD,KAN,NA,CO,
+      subroutine rt_semiemp_cs_cheb(rtdb,g_densre,SUMELEL,LL,NIN,Q,
+     1  NG,GAMMA,g_dipx,g_dipy,g_dipz,n,RAD,KAN,NA,CO,
      2 NU,NW,NP,ALPHA,H,BB,NEL,ISW1,Z12,D12,g_s,g_ft,g_cgs,g_c,
      3 g_temp)
       implicit none
@@ -83,8 +83,8 @@ C     == Variables ==
       double precision emin, t, dt, tmax
       double precision GPARAMA, GPARAMB
       integer i, j
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), LL, NIN(*), NG(*)
-      double precision QQ(*), SUMELEL(*), Q(*), GAMMA(*)
+      integer  LL, NIN(*), NG(*)
+      double precision  SUMELEL(*), Q(*), GAMMA(*)
       double precision RAD(*),Z12(*),D12(*),H(*),BB(*),E(3)
       double precision ALPHA(*),CO(*)
       integer NU(*),NW(*),NP(*),KAN(*)      
@@ -279,8 +279,8 @@ c     call ga_scale(g_zwb, -zi*ebeta)
 
 c     call ga_print(g_ca)
 c     call ga_print(g_zwb)
-      call semiemp_cs_fock_build(g_zdens_ao,SUMELEL,QQ,LABI,LABJ
-     1 ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfock_ao,1,GPARAM,emin,g_c)
+      call semiemp_cs_fock_build(g_zdens_ao,SUMELEL,LL,NIN,n,Q,NG,GAMMA,
+     1 g_zfock_ao,1,GPARAM,emin,g_c)
 
        if (inp_compare(.false.,field_type,'delta')) 
      1  call ga_add(z1, g_zfock_ao, z1, g_zscr, g_zfock_ao)
@@ -484,8 +484,8 @@ c    1 g_scr,g_zscr,n,nel,t)
       call prop_chebyshev(g_zdens_ao,g_zfock_ao,GPARAM,n,emin, 
      1 g_zcheb,dt)
 
-      call semiemp_cs_fock_build(g_zdens_ao,SUMELEL,QQ,LABI,LABJ
-     1 ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfock_ao,2,GPARAM,emin,g_c)
+      call semiemp_cs_fock_build(g_zdens_ao,SUMELEL,LL,NIN,n,Q,NG,GAMMA,
+     1  g_zfock_ao,2,GPARAM,emin,g_c)
 
       t = t + dt
       it = it + 1      

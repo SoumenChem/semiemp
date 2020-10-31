@@ -1,6 +1,5 @@
-      subroutine semiemp_os_fock_build(g_zdens,g_zdensa,SUMELEL,QQ,LABI
-     1 ,LABJ,LABK,LABL,LL,NIN,nbf,Q,NG,GAMMA,g_zfocka,g_zfockb,ITAG,
-     1 GPARAMA,GPARAMB)
+      subroutine semiemp_os_fock_build(g_zdens,g_zdensa,SUMELEL,LL,NIN,
+     1 nbf,Q,NG,GAMMA,g_zfocka,g_zfockb,ITAG,GPARAMA,GPARAMB)
 
       implicit none
 
@@ -17,8 +16,8 @@ c#include "cdft.fh"
 #include "zora.fh"
 #include "rt_tddft.fh"
 
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), LL, NIN(*), NG(*)
-      double precision QQ(*), SUMELEL(*), Q(*), GAMMA(*), GPARAMA 
+      integer  LL, NIN(*), NG(*)
+      double precision SUMELEL(*), Q(*), GAMMA(*), GPARAMA 
       double precision GPARAMB
       integer g_zdens, g_zfp, g_core
       integer g_zdensa
@@ -53,38 +52,38 @@ c     total_cpu  = -util_cpusec()
 c     write(6,*)"semiemp_os_fock_build"
 
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'densre',ldensre,idensre))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate densre',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate densre',0,
      1    MA_ERR)
      
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'fockre',lfockare,ifockare))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fockre',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fockre',0,
      1    MA_ERR)
 
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'hdense',lhdense,ihdense))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fockre',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fockre',0,
      1    MA_ERR)
 
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'densim',ldensim,idensim))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate densim',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate densim',0,
      1    MA_ERR)
 
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'fockaim',lfockaim,ifockaim))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fockim',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fockim',0,
      1    MA_ERR)
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'fockbre',lfockbre,ifockbre))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fockim',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fockim',0,
      1    MA_ERR)
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'fockbim',lfockbim,ifockbim))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fockim',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fockim',0,
      1    MA_ERR)
 
 
       if (.not.MA_Push_Get(MT_Dbl,nbf*nbf,'fock',lfock,ifock))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fock',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fock',0,
      1    MA_ERR)
 
       if (.not.MA_Push_Get(MT_Dbl,nbf,'EIG',leig,ieig))
-     &   call errquit('semiemp_cs_fock_build: cannot allocate fock',0,
+     &   call errquit('semiemp_os_fock_build: cannot allocate fock',0,
      1    MA_ERR)
 
 
@@ -141,8 +140,7 @@ c     end do
 
 
       CALL FILLFU(Dbl_MB(ifockare),Dbl_MB(ifockbre),Dbl_MB(ihdense),
-     1 Dbl_MB(idensre),Q,GAMMA,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,
-     2 NIN,1)
+     1 Dbl_MB(idensre),Q,GAMMA,SUMELEL,NG,NRR,LL,NIN,1,nbf)
 
       call ga_trimat(g_densim,dbl_mb(idensim),nbf)
       call ga_trimat(g_densaim,dbl_mb(ihdense),nbf)
@@ -154,8 +152,7 @@ c     end do
 
 
       CALL FILLFU(Dbl_MB(ifockaim),Dbl_MB(ifockbim),Dbl_MB(ihdense),
-     1 Dbl_MB(idensim),Q,GAMMA,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,
-     2 NIN,2)
+     1 Dbl_MB(idensim),Q,GAMMA,SUMELEL,NG,NRR,LL,NIN,2,nbf)
 
 
       if (itag.eq.1) then

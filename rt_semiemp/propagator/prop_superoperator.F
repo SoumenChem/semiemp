@@ -1,6 +1,5 @@
       subroutine prop_superoperator(g_zdens,g_zfock,GPARAM,nbf,emin,g_zw
-     1,dt,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL,NIN,Q,NG,GAMMA,g_zfp,
-     2 g_zcheb,g_core)
+     1,dt,SUMELEL,LL,NIN,Q,NG,GAMMA,g_zfp,g_zcheb,g_core)
 
       implicit none
 
@@ -22,8 +21,8 @@ c#include "cdft.fh"
       double precision alpha !scaling factor
       double precision dt !time step
       double precision beta !effective time step
-      double precision  QQ(*), SUMELEL(*), Q(*), GAMMA(*)
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), NG(*), NIN(*)
+      double precision  SUMELEL(*), Q(*), GAMMA(*)
+      integer NG(*), NIN(*)
       integer g_zdens, g_core
       integer g_zfock
       integer  g_ztemp
@@ -80,7 +79,7 @@ C-------------------------------------------------------------
 C     2nd term
 C------------------------------------------------------------
 c     call ga_print(g_zw)
-      call superopertor(g_zw,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL,NIN,nbf,Q
+      call superopertor(g_zw,SUMELEL,LL,NIN,nbf,Q
      1,NG,GAMMA,GPARAM,g_zt_n_1,g_zfp,g_zdens,beta,g_core)
 c     call ga_print(g_zt_n_1)
       call ga_add(z0,g_zcheb_n_1,bessfun*z1,g_zt_n_1,g_zcheb_n_1)
@@ -105,8 +104,8 @@ C-----------------------------------------------------------------
 c      write(6,*)"IT",IT
 c     total_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec()
-      call superopertor(g_zt_n_1,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL,NIN,
-     1 nbf,Q,NG,GAMMA,GPARAM,g_ztemp,g_zfp,g_zdens,beta,g_core)
+      call superopertor(g_zt_n_1,SUMELEL,LL,NIN,nbf,Q,NG,GAMMA,GPARAM,
+     1  g_ztemp,g_zfp,g_zdens,beta,g_core)
 
        call ga_add(2*z1,g_ztemp,z1,g_zt_n_2,g_zt_n)
        call bessel_function(IT,alpha,bessfun)       
@@ -164,8 +163,8 @@ c-------------------------------------------------------------------------------
 c
 c------------------------------------------------------------------------------------------------------
 
-      subroutine superopertor(g_zw,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL,
-     1 NIN,n,Q,NG,GAMMA,GPARAM,g_zsuper,g_zfp,g_zdens,beta,g_core)
+      subroutine superopertor(g_zw,SUMELEL,LL,NIN,n,Q,NG,GAMMA,GPARAM 
+     1 ,g_zsuper,g_zfp,g_zdens,beta,g_core)
  
       implicit none
 
@@ -182,8 +181,8 @@ c#include "cdft.fh"
 #include "zora.fh"
 #include "rt_tddft.fh"
  
-       double precision QQ(*), GAMMA(*), SUMELEL(*), Q(*)
-       integer NIN(*), NG(*), LABI(*), LABJ(*), LABK(*), LABL(*)
+       double precision  GAMMA(*), SUMELEL(*), Q(*)
+       integer NIN(*), NG(*)  
        integer LL, N
        integer g_zw !(L^n)W
        integer g_zcomm ![[F,Pnew]-[F0,P0]]
@@ -239,8 +238,8 @@ c     call ga_print(g_zw_scale)
 c----------------------------------------------------------------
 C     Build the new Fock matrix
 C----------------------------------------------------------------
-      call semiemp_cs_fock_build(g_zdens_new,SUMELEL,QQ,LABI,LABJ
-     1 ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfock,2,GPARAM,emin,g_core)
+      call semiemp_cs_fock_build(g_zdens_new,SUMELEL,LL,NIN,n,Q,NG,GAMMA
+     1 ,g_zfock,2,GPARAM,emin,g_core)
 C---------------------------------------------------------------
 C--------------------------------------------------------------
 C     Constructing super operator

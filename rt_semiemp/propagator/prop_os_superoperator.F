@@ -1,6 +1,6 @@
       subroutine prop_os_superoperator(g_zdensa,g_zdensb,g_zfocka,
-     1 g_zfockb,GPARAMA,GPARAMB,nbf,g_zwa,g_zwb,dt,SUMELEL,QQ,LABI,
-     1 LABJ,LABK,LABL,LL,NIN,Q,NG,GAMMA,g_zfpa,g_zfpb,g_zcheba,g_zchebb)
+     1 g_zfockb,GPARAMA,GPARAMB,nbf,g_zwa,g_zwb,dt,SUMELEL,LL,NIN,
+     2 Q,NG,GAMMA,g_zfpa,g_zfpb,g_zcheba,g_zchebb)
 
       implicit none
 
@@ -22,8 +22,8 @@ c#include "cdft.fh"
       double precision Aalpha, Balpha !scaling factor
       double precision dt !time step
       double precision Abeta, Bbeta !effective time step
-      double precision  QQ(*), SUMELEL(*), Q(*), GAMMA(*)
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), NG(*), NIN(*)
+      double precision  SUMELEL(*), Q(*), GAMMA(*)
+      integer  NG(*), NIN(*)
       integer g_zdensa, g_zdensb
       integer g_zfocka, g_zfockb
       integer  g_ztempa, g_ztempb
@@ -97,7 +97,7 @@ C     2nd term
 C------------------------------------------------------------
 c     call ga_print(g_zwa)
 
-      call superopertor_os(g_zwa,g_zwb,SUMELEL,QQ,LABI,LABJ,LABK,LABL,LL
+      call superopertor_os(g_zwa,g_zwb,SUMELEL,LL
      1 ,NIN,nbf,Q,NG,GAMMA,GPARAMA,GPARAMB,g_zta_n_1,g_ztb_n_1,g_zfpa,
      1 g_zfpb,g_zdensa,g_zdensb,Abeta,Bbeta)
 
@@ -142,8 +142,8 @@ c     total_cpu  = -util_cpusec()
 c      call ga_print(g_zfpb)
 c      call ga_print(g_zfpa)
 
-      call superopertor_os(g_zta_n_1,g_ztb_n_1,SUMELEL,QQ,LABI,LABJ,LABK
-     1 ,LABL,LL,NIN,nbf,Q,NG,GAMMA,GPARAMA,GPARAMB,g_ztempa,g_ztempb,
+      call superopertor_os(g_zta_n_1,g_ztb_n_1,SUMELEL
+     1 ,LL,NIN,nbf,Q,NG,GAMMA,GPARAMA,GPARAMB,g_ztempa,g_ztempb,
      2 g_zfpa,g_zfpb,g_zdensa,g_zdensb,Abeta,Bbeta)
     
 c     call ga_print(g_ztempa)
@@ -222,8 +222,8 @@ c-------------------------------------------------------------------------------
 c
 c------------------------------------------------------------------------------------------------------
 
-      subroutine superopertor_os(g_zwa,g_zwb,SUMELEL,QQ,LABI,LABJ,LABK,
-     1 LABL,LL,NIN,n,Q,NG,GAMMA,GPARAMA,GPARAMB,g_zsupera,g_zsuperb,
+      subroutine superopertor_os(g_zwa,g_zwb,SUMELEL,
+     1 LL,NIN,n,Q,NG,GAMMA,GPARAMA,GPARAMB,g_zsupera,g_zsuperb,
      1 g_zfpa,g_zfpb,g_zdensa,g_zdensb,Abeta,Bbeta)
  
       implicit none
@@ -241,8 +241,8 @@ c#include "cdft.fh"
 #include "zora.fh"
 #include "rt_tddft.fh"
  
-       double precision QQ(*), GAMMA(*), SUMELEL(*), Q(*)
-       integer NIN(*), NG(*), LABI(*), LABJ(*), LABK(*), LABL(*)
+       double precision  GAMMA(*), SUMELEL(*), Q(*)
+       integer NIN(*), NG(*)
        integer LL, N
        integer g_zwa,g_zwb !(L^n)W
        integer g_zcomm ![[F,Pnew]-[F0,P0]]
@@ -337,8 +337,8 @@ c     call ga_print(g_zdensb_new)
 
       call ga_add(z1,g_zdensa_new,z1,g_zdensb_new,g_zdens)
 
-      call semiemp_os_fock_build(g_zdens,g_zdensa_new,SUMELEL,QQ,
-     1 LABI,LABJ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,
+      call semiemp_os_fock_build(g_zdens,g_zdensa_new,SUMELEL,
+     1 LL,NIN,n,Q,NG,GAMMA,g_zfocka,g_zfockb,2,
      2 GPARAMA,GPARAMB)
 
 c     call ga_print(g_zfocka)

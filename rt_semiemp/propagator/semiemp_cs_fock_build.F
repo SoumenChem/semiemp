@@ -1,5 +1,5 @@
-      subroutine semiemp_cs_fock_build(g_zdens,SUMELEL,QQ,LABI,LABJ
-     1 ,LABK,LABL,LL,NIN,nbf,Q,NG,GAMMA,g_zfock,ITAG,GPARAM,emin,g_c)
+      subroutine semiemp_cs_fock_build(g_zdens,SUMELEL,LL,NIN,nbf,Q,
+     1 NG,GAMMA,g_zfock,ITAG,GPARAM,emin,g_c)
 
       implicit none
 
@@ -16,8 +16,8 @@ c#include "cdft.fh"
 #include "zora.fh"
 #include "rt_tddft.fh"
 
-      integer LABI(*), LABJ(*), LABK(*), LABL(*), LL, NIN(*), NG(*)
-      double precision QQ(*), SUMELEL(*), Q(*), GAMMA(*), GPARAM, emin
+      integer  LL, NIN(*), NG(*)
+      double precision SUMELEL(*), Q(*), GAMMA(*), GPARAM, emin
       integer g_zdens, g_zfp, g_c
       integer g_densre          !real part of dens mat
       integer g_densim          !imag part of dens mat
@@ -102,7 +102,7 @@ cSG   call mat_triangular(Dbl_MB(idensim),nbf)
       call ga_trimat(g_densim,dbl_mb(idensim),nbf) 
 
       CALL FILLF(Dbl_MB(ifockre),Dbl_MB(ihdense),Dbl_MB(idensre),Q,GAMMA
-     1 ,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,NIN,1)
+     1 ,SUMELEL,NG,NRR,LL,NIN,1,nbf)
       
 
 c     do i = 0, nbf*nbf-1
@@ -110,7 +110,7 @@ c      write(6,*)"fock",Dbl_MB(ifockre+i)
 c     end do
 
       CALL FILLF(Dbl_MB(ifockim),Dbl_MB(ihdense),Dbl_MB(idensim),Q,GAMMA
-     1 ,SUMELEL,NG,QQ,NRR,LABI,LABJ,LABK,LABL,LL,NIN,2)
+     1 ,SUMELEL,NG,NRR,LL,NIN,2,nbf)
 c     CALL MATPAC(nbf,nrr,nrr,Dbl_MB(idensre),Dbl_MB(ifockre),NIN,
 c    1 Dbl_MB(icomut))
 
