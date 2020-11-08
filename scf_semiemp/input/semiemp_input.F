@@ -84,7 +84,10 @@ c    1      call errquit('semiemp_init: no geometry found',0, RTDB_ERR)
         infa(6)=1.0D0
          if (.not.rtdb_put(rtdb,'semiemp:infa',mt_dbl,6,infa))
      &  call errquit('smeiemp_input: failed writing to rtdb',0,RTDB_ERR)
- 
+         docis=.false.
+         if (.not.rtdb_put(rtdb,'semiemp:docis',mt_log,1,docis))
+     1    call errquit('semiemp_input: failed writing to rtdb',0,
+     &       RTDB_ERR) 
 c----------
 c Read input
 c ----------
