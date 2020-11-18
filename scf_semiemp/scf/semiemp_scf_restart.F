@@ -238,3 +238,233 @@ c     call rt_tddft_print_msg (params, tt, "Loaded restart file")
 
       end subroutine      
 
+      subroutine semiemp_coefficient_save (n,BB)
+      implicit none
+
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "rtdb.fh"
+#include "util.fh"
+#include "cdft.fh"
+#include "matutils.fh"
+#include "inp.fh"
+#include "rt_tddft.fh"
+
+C     == Inputs ==
+c     type(rt_params_t), intent(in)     :: params
+      integer              :: n
+      double precision     :: BB(n,n)
+
+      
+C     == Parameters ==
+      character(*), parameter :: pname = "semiemp_coefficient_save: "
+
+
+C     == Variables ==
+      character(255) fname_restart
+      integer, parameter      :: unitno = 6457251    !XXX TERRIBLE: HARDCODED UNIT #
+      integer ios, me, lmat, kmat
+      logical ok
+
+      integer i, j, imat
+      double complex zval
+      double precision checksum
+      double precision elapsed
+      character(len=50) date
+
+
+      me = ga_nodeid()
+      
+C     note: date returns a newline at the end, so we strip it off
+      call util_date (date)
+      date = date(:inp_strlen(date)-1) 
+
+      if (me.eq.0) then
+         call util_file_name ("ao_coeff",
+     $        .false., .false., fname_restart)
+         
+         open (unitno, status="replace", file=fname_restart, iostat=ios)
+         if (ios .ne. 0) call errquit("failed to open/create: "
+     $        //trim(fname_restart), 0, 0)
+         
+         write (unitno, "(a)")        "Semiemp coefficient file"
+         write (unitno, "(a,a)")      "created   ", trim(date)
+c        write (unitno, "(a,i0)")     "nmats     ", nmats
+         write (unitno, "(a,i0)")     "nbf_ao    ", n
+c        write (unitno, "(a,e20.12)") "checksum  ", checksum
+
+c        do imat = 1, nmats
+         do i =1,n
+          write(unitno,fmt="(1000F14.7)")(BB(i,j), j=1,n)
+         end do 
+c            do i = 1, n
+c              do j = 1, n
+c                 zval = BB(i,j)
+c                 write (unitno, advance="no", fmt="(2e20.10)") zval
+c              enddo
+c           enddo
+c        enddo
+         close (unitno)
+         
+         if (ios .ne. 0) call errquit("failed to close: "
+     $        //trim(fname_restart), 0, 0)
+
+      endif
+
+
+      end subroutine
+
+      subroutine semiemp_aofock_save (n,F)
+      implicit none
+
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "rtdb.fh"
+#include "util.fh"
+#include "cdft.fh"
+#include "matutils.fh"
+#include "inp.fh"
+#include "rt_tddft.fh"
+
+C     == Inputs ==
+c     type(rt_params_t), intent(in)     :: params
+      integer              :: n
+      double precision     :: F(n,n)
+
+      
+C     == Parameters ==
+      character(*), parameter :: pname = "semiemp_aofock_save: "
+
+
+C     == Variables ==
+      character(255) fname_restart
+      integer, parameter      :: unitno = 6457251    !XXX TERRIBLE: HARDCODED UNIT #
+      integer ios, me, lmat, kmat
+      logical ok
+
+      integer i, j, imat
+      double complex zval
+      double precision checksum
+      double precision elapsed
+      character(len=50) date
+
+
+      me = ga_nodeid()
+      
+C     note: date returns a newline at the end, so we strip it off
+      call util_date (date)
+      date = date(:inp_strlen(date)-1) 
+
+      if (me.eq.0) then
+         call util_file_name ("ao_fock",
+     $        .false., .false., fname_restart)
+         
+         open (unitno, status="replace", file=fname_restart, iostat=ios)
+         if (ios .ne. 0) call errquit("failed to open/create: "
+     $        //trim(fname_restart), 0, 0)
+         
+         write (unitno, "(a)")        "Semiemp ao fock file"
+         write (unitno, "(a,a)")      "created   ", trim(date)
+c        write (unitno, "(a,i0)")     "nmats     ", nmats
+         write (unitno, "(a,i0)")     "nbf_ao    ", n
+c        write (unitno, "(a,e20.12)") "checksum  ", checksum
+
+c        do imat = 1, nmats
+         do i =1,n
+          write(unitno,fmt="(1000F14.7)")(F(i,j), j=1,i)
+         end do 
+c            do i = 1, n
+c              do j = 1, n
+c                 zval = BB(i,j)
+c                 write (unitno, advance="no", fmt="(2e20.10)") zval
+c              enddo
+c           enddo
+c        enddo
+         close (unitno)
+         
+         if (ios .ne. 0) call errquit("failed to close: "
+     $        //trim(fname_restart), 0, 0)
+
+      endif
+
+
+      end subroutine
+
+      subroutine semiemp_eigenvalue_save (n,eig)
+      implicit none
+
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "rtdb.fh"
+#include "util.fh"
+#include "cdft.fh"
+#include "matutils.fh"
+#include "inp.fh"
+#include "rt_tddft.fh"
+
+C     == Inputs ==
+c     type(rt_params_t), intent(in)     :: params
+      integer              :: n
+      double precision      :: eig(n)
+
+      
+C     == Parameters ==
+      character(*), parameter :: pname = "semiemp_aofock_save: "
+
+
+C     == Variables ==
+      character(255) fname_restart
+      integer, parameter      :: unitno = 6457251    !XXX TERRIBLE: HARDCODED UNIT #
+      integer ios, me, lmat, kmat
+      logical ok
+
+      integer i, j, imat
+      double complex zval
+      double precision checksum
+      double precision elapsed
+      character(len=50) date
+
+
+      me = ga_nodeid()
+      
+C     note: date returns a newline at the end, so we strip it off
+      call util_date (date)
+      date = date(:inp_strlen(date)-1) 
+
+      if (me.eq.0) then
+         call util_file_name ("eigenvalue",
+     $        .false., .false., fname_restart)
+         
+         open (unitno, status="replace", file=fname_restart, iostat=ios)
+         if (ios .ne. 0) call errquit("failed to open/create: "
+     $        //trim(fname_restart), 0, 0)
+         
+         write (unitno, "(a)")        "Semiemp eigen value file"
+         write (unitno, "(a,a)")      "created   ", trim(date)
+c        write (unitno, "(a,i0)")     "nmats     ", nmats
+         write (unitno, "(a,i0)")     "nbf_ao    ", n
+c        write (unitno, "(a,e20.12)") "checksum  ", checksum
+
+c        do imat = 1, nmats
+          do i = 1, n
+             write (unitno, advance="no", fmt="(2e20.10)") eig(i)
+           enddo
+c        enddo
+         close (unitno)
+         
+         if (ios .ne. 0) call errquit("failed to close: "
+     $        //trim(fname_restart), 0, 0)
+
+      endif
+
+
+      end subroutine
+
+
+      

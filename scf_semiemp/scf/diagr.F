@@ -172,7 +172,9 @@ c     call mat_sym(F,nb)
 c     CALL GIVENS(F,BB,EIG,NB,NROOT,IBGIV,QQ,NIN)
 c     total_wall = -util_wallsec()
 c     total_cpu  = -util_cpusec()
+      call semiemp_aofock_save (nb,F)
       call diag_para(F,NRR,NB,BB,EIG)
+      call semiemp_eigenvalue_save(nb,eig)
 c     total_wall = total_wall +  util_wallsec()
 c     total_cpu  =  total_cpu + util_cpusec()
 c     if (ga_nodeid() .eq. 0) then
@@ -228,7 +230,7 @@ c     END IF
        if (.not.rtdb_put(rtdb,'semiemp:occupation',mt_dbl,nb,W))
      1  call errquit('diagr: failed to write ocuupation',0, RTDB_ERR)
 
-      
+       call semiemp_coefficient_save(nb,BB)      
 c     WRITE(6,*) ' DIAGR AFTER REAR ',(Q(I),I=1,20)
    70 CONTINUE
 c     IF (NXT.EQ.1)  CALL SYMORB(BB,EIG,NU,NW,IIMO,NB,IONE,IFLAG)
