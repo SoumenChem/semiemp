@@ -130,7 +130,7 @@ c     if ((nmats .ne. 1).and.(nmats .ne. 2))
 c    $     call errquit(pname//
 c    $     "only valid fornmats = 1 or nmats = 2", 0, 0)
       
-      if (me.eq.0) then
+c     if (me.eq.0) then
 
          call util_file_name ("aoint",
      $        .false., .false., fname_restart)
@@ -183,14 +183,14 @@ C
 
          close(unitno)
 
-      endif
+c     endif
 c     call ga_sync()
 
 C
 C     Broadcast it and tt to all procs
 C
 c     msglen = MA_sizeof(MT_INT,1,MT_BYTE)
-c     call ga_brdcst(100001, it_in, msglen, 0)
+c     call ga_brdcst(100001, ll_in, msglen, 0)
 
 c     msglen = MA_sizeof(MT_DBL,1,MT_BYTE)
 c     call ga_brdcst(100002, tt_in, msglen, 0)
@@ -232,7 +232,6 @@ C     Overwrite it and tt for output.  g_zdens_ao is already
 C     overwritten.
 C
 
-c     call ga_sync ()
 
 c     call rt_tddft_print_msg (params, tt, "Loaded restart file")
 
