@@ -143,7 +143,7 @@ c     if ((nmats .ne. 1).and.(nmats .ne. 2))
 c    $     call errquit(pname//
 c    $     "only valid fornmats = 1 or nmats = 2", 0, 0)
       
-      if (me.eq.0) then
+c     if (me.eq.0) then
 
          call util_file_name ("rt_restart",
      $        .false., .false., fname_restart)
@@ -206,7 +206,7 @@ c        do imat = 1, nmats
 c        enddo
          close(unitno)
 
-      endif
+c     endif
 c     call ga_sync()
 
 C
@@ -260,7 +260,7 @@ C
 
 c     call ga_sync ()
 
-      write(6,*)"HERE in load"
+c     write(6,*)"HERE in load"
 c     call rt_tddft_print_msg (params, tt, "Loaded restart file")
 
       end subroutine
