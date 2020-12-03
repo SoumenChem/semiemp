@@ -322,7 +322,6 @@ C
          if (.not.ma_pop_stack(lLABI))
      & call errquit('semiemp_energy: cannot pop stack LABI',3, MA_ERR)
 
-        write(6,*)"done here"
 C
 C     +++++++++++++++  NDDO  INTEGRALS   ++++++++++++++++++++
 C
