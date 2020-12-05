@@ -25,7 +25,7 @@
 c       write(6,*)"i am at elh_state"
         NRR = NB*(NB+1)/2
 
-        write(6,*)"i am in eh_state"
+c       write(6,*)"i am in eh_state"
         if (.not.MA_Push_Get(MT_Dbl,nb*nb,'BB',lBB,iBB))
      &   call errquit('eh_state: cannot allocate BB',0,MA_ERR)
 
@@ -118,7 +118,7 @@ c--------------------------------------------------------------------------
        integer numfoa, numfob
 
         NRR= NB*(NB+1)/2
-        write(6,*)"i am in eh_state_u"
+c       write(6,*)"i am in eh_state_u"
           if (.not.MA_Push_Get(MT_Dbl,nb*nb,'AA',lAA,iAA))
      &   call errquit('eh_state: cannot allocate AA',0,MA_ERR)
 
