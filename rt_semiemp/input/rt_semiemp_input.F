@@ -63,7 +63,7 @@ C     == External ==
 
 
 C     (values which have no defaults and must be supplied)
-      write(6,*)"i am in rt_semiemp_input"
+c     write(6,*)"i am in rt_semiemp_input"
       got_tmin = .false.
       got_tmax = .false.
       got_dt = .false.

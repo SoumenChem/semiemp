@@ -123,7 +123,7 @@ C     == Variables ==
       print_moocc=.false.
 C     == Initialization ==
       
-      write(6,*)"i am in rt_semiemp_os_cheb"
+c     write(6,*)"i am in rt_semiemp_os_cheb"
       if (me.eq.0) call util_print_centered (luout,
      $     "Open shell propagation", 40, .true.)
       
