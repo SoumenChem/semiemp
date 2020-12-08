@@ -12,6 +12,8 @@
 #include "rt_tddft.fh"
 #include "inp.fh"
 
+       character(255) fname_restart
+       integer, parameter      :: unitno = 7813259    !XXX TERRIBLE:HARDCODED UNIT #               
        integer rtdb, nb
        double precision FA(*)
        integer lBB, iBB, iW, lW, norb
@@ -21,7 +23,7 @@
        integer soccup(2), i, j, iorb
        integer ocor, uocor  
        integer numfo
-
+       logical lmoocc
 c       write(6,*)"i am at elh_state"
         NRR = NB*(NB+1)/2
 
@@ -65,7 +67,28 @@ c      write(6,*)"HERE",norb
         Dbl_MB(iw+i-1) = occuorb(iorb)
 c      write(6,*) "occupation", occuorb(iorb)
        end do
-      CALL DENSIT(Dbl_MB(iBB),FA,Dbl_MB(iW),NB,NB,NRR)
+      if (.not.rtdb_get (rtdb, "rt_semiemp:moocc",
+     $     mt_log, 1, lmoocc))
+     $     lmoocc = .false.
+
+      if (lmoocc) then
+         call util_file_name ("rt_moocc",
+     $        .false., .false., fname_restart)
+         open (unitno, status="old", file=fname_restart, iostat=ios)
+         if (ios .ne. 0) call errquit("failed to open: "
+     $        //trim(fname_restart), 0, 0)
+           do i = 1, nb
+            read (unitno, fmt="(2e20.12)") Dbl_MB(iW+i-1)
+           enddo
+c        enddo
+         close (unitno)
+
+         if (ios .ne. 0) call errquit("failed to close: "
+     $        //trim(fname_restart), 0, 0)
+
+      end if
+
+       CALL DENSIT(Dbl_MB(iBB),FA,Dbl_MB(iW),NB,NB,NRR)
 c     write(6,*)"numfo,numorb",numfo,numorb(1), numorb(numfo) 
       ehinfo(3) = numfo
       ehinfo(1) = numorb(1)

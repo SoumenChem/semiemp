@@ -640,4 +640,133 @@ c     call ga_sync ()
 c     call rt_tddft_print_msg (params, tt, "Loaded restart file")
 
       end subroutine
+C---------------------------------------------------------------------------------------
+      subroutine rt_semiemp_restart_moocc(it,nbf,g_movecs_gs,g_zdens_ao)
 
+      implicit none
+
+#include "errquit.fh"
+#include "mafdecls.fh"
+#include "stdio.fh"
+#include "global.fh"
+#include "rtdb.fh"
+#include "util.fh"
+#include "inp.fh"
+#include "matutils.fh"
+#include "rt_tddft.fh"
+
+C     == Inputs ==
+      integer              :: it
+      double precision     :: tt
+c     integer, intent(in)               :: nmats
+      integer              :: g_zdens_ao, g_movecs_gs 
+
+
+C     == Parameters ==
+      character(*), parameter :: pname = "rt_semiemp_restart_moocc: "
+
+
+C     == Variables ==
+      integer g_densre, g_densim
+      character(255) fname_restart
+      integer, parameter      :: unitno = 7813259    !XXX TERRIBLE:HARDCODED UNIT #
+      integer ios, me, lmat, kmat
+      logical ok
+      integer nbf
+      integer lveck, iveck      !handle and index for kth eigenvector
+      double precision occk     !occupation of orbital k
+      double precision moocc
+      integer imoocc, lmoocc
+      integer g_veck, g_tmp, g_veckt
+      integer k, i
+      character*20 scftype
+
+      ok = .true.
+      ok=ok.and.ga_create(mt_dbl,nbf,nbf,"densre", 0,0, g_densre)
+      ok=ok.and.ga_create(mt_dbl,nbf,nbf,"densim", 0,0, g_densim)
+
+      write(6,*)"before real density"
+      call convert_z2d(g_zdens_ao,g_densre,g_densim)
+
+      if (.not. ga_create(mt_dbl, nbf, 1,
+     $     "k^th evec", 0, 0, g_veck))
+     $     call errquit ("failed to create veck", 0, GA_ERR)
+
+      if (.not. ga_duplicate(g_veck, g_tmp, "moocc tmp"))
+     $     call errquit ("failed to create g_tmp", 0, GA_ERR)
+
+      if (.not. ga_duplicate(g_veck, g_veckt, "col of transpose C"))
+     $     call errquit ("failed to create g_tmp", 0, GA_ERR)
+
+      if (.not.MA_Push_Get(MT_Dbl,nbf,'moocc',lmoocc,imoocc))
+     &   call errquit('semiemp_energy: cannot allocate moocc',0,
+     1    MA_ERR)
+
+C
+C     Load k^th evec in g_veck and k^th column of C in g_vectk.
+C
+      do k = 1, nbf
+CXXX  [KAL]: its redundant to have two g_veck
+         call ga_zero (g_veck)
+         call ga_zero (g_veckt)
+         call ga_zero (g_tmp)
+
+         call ga_copy_patch ("N",
+     $        g_movecs_gs, 1, nbf, k, k,
+     $        g_veck, 1, nbf, 1, 1)
+         call ga_copy_patch ("T",
+     $        g_movecs_gs, 1, nbf, k, k,
+     $        g_veckt, 1, nbf, 1, 1)
+
+
+C     Compute P'(t) C'_k.
+         call ga_dgemm ("N", "N", nbf, 1, nbf,
+     $        1d0, g_densre, g_veck, 0d0, g_tmp)
+
+
+C     Compute n_k = C'_k^T P'(t) C'_k.
+
+        Dbl_MB(imoocc+k-1) = ga_ddot (g_veckt, g_tmp)
+
+
+      enddo
+
+      if (me.eq.0) then
+         call util_file_name ("rt_moocc",
+     $        .false., .false., fname_restart)
+
+         open (unitno, status="replace", file=fname_restart, iostat=ios)
+         if (ios .ne. 0) call errquit("failed to open/create: "
+     $        //trim(fname_restart), 0, 0)
+
+c        do imat = 1, nmats
+            do i = 1, nbf
+              write (unitno, fmt="(2e20.10)") 
+     $         Dbl_MB(imoocc+i-1)
+            enddo
+c        enddo
+         close (unitno)
+
+         if (ios .ne. 0) call errquit("failed to close: "
+     $        //trim(fname_restart), 0, 0)
+
+       endif
+      
+
+      if (.not.ma_pop_stack(lmoocc))
+     &  call errquit('restart_moocc: cannot pop stack lmoocc',3, MA_ERR)
+
+      ok = .true.
+C     == Clean up ==
+      if (.not. ga_destroy(g_veck))
+     $     call errquit ("failed to destroy g_veck", 0, GA_ERR)
+      if (.not. ga_destroy(g_tmp))
+     $     call errquit ("failed to destroy g_tmp", 0, GA_ERR)
+      if (.not. ga_destroy(g_veckt))
+     $     call errquit ("failed to destroy g_tmp", 0, GA_ERR)
+
+      ok = ok .and. ga_destroy(g_densre)
+      ok = ok .and. ga_destroy(g_densim)
+
+
+      end subroutine       

@@ -60,10 +60,10 @@ C     == Variables ==
       integer me
       logical ok
       integer it, rest_it, ig, iorb, test
-      integer lmoocc, imoocc
+c     integer lmoocc, imoocc
 
       character*60 outstr
-      logical lrestart
+      logical lrestart, lmoocc
       logical got_orbspace
       double precision emin, t, dt, tmax
       integer i, j
@@ -377,9 +377,9 @@ c     call ga_print(g_zfock_ao)
       call ga_zero(g_ztemp1)
       call convert_d2z (1d0, g_s, 0d0, g_s, g_zs)
 
-            if (.not.rtdb_get(rtdb,'rt_semiemp:nrestarts',
-     $           mt_int,1,nrestarts))
-     $           call errquit(pname//'Read failed to rtdb',0,RTDB_ERR)
+      if (.not.rtdb_get(rtdb,'rt_semiemp:nrestarts',
+     $ mt_int,1,nrestarts))
+     $ call errquit(pname//'Read failed to rtdb',0,RTDB_ERR)
 
       if (.not.rtdb_get (rtdb, "rt_semiemp:restart",
      $     mt_log, 1, lrestart))
@@ -452,7 +452,6 @@ c    1 ,LABK,LABL,LL,NIN,n,Q,NG,GAMMA,g_zfock_ao,2,GPARAM,emin,g_zfp)
       if (t.lt.tmax) GO TO 10
 
 
-
 C     == Cleanup GAs for time-dependent quantities and params ==
       if (.not.ma_pop_stack(ldipz))
      & call errquit('rt_semiemp_dipole:cannot pop stack dens',3, MA_ERR)
@@ -462,6 +461,8 @@ C     == Cleanup GAs for time-dependent quantities and params ==
 
       if (.not.ma_pop_stack(ldipx))
      & call errquit('rt_semiemp_dipole:cannot pop stack dens',3, MA_ERR)
+
+
 
       ok = .true.
       ok = ok .and. ga_destroy(g_zdens_mo)

@@ -74,10 +74,9 @@ C     == Variables ==
       logical ok
       logical got_orbspace
       integer it, rest_it, ig, iorb, test
-      integer lmoocc, imoocc
       integer miter
       character*60 outstr
-      logical lrestart
+      logical lrestart, lmoocc
       integer idipx, ldipx, idipy, ldipy, idipz, ldipz
 
       double precision emin, t, dt, tmax
@@ -491,6 +490,12 @@ c    1 g_scr,g_zscr,n,nel,t)
       it = it + 1      
       if (t.le.tmax) GO TO 50
 
+      if (.not.rtdb_get (rtdb, "rt_semiemp:moocc",
+     $     mt_log, 1, lmoocc))
+     $     lmoocc = .false.
+
+      if (lmoocc) call  rt_semiemp_restart_moocc(it,n,g_cgs,g_zdens_ao)
+      
 
 
 C     == Cleanup GAs for time-dependent quantities and params ==
